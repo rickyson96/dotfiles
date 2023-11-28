@@ -14,7 +14,7 @@ default-timeout=3000
 ignore-timeout=0
 max-visible=5
 output=eDP-1
-font=IosevkaNerdFontExtended 9
+font=IosevraRelaxedNerdFont 10
 format=<span font="8" weight="light">%a</span>\n<span font="12" weight="bold" underline="low">%s</span>\n\n%b
 
 [urgency=low]
