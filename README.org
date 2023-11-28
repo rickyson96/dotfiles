@@ -1,0 +1,5 @@
+#+TITLE: Stow-based Dotfiles
+#+SUBTITLE: The new stow-based dotfiles after losing it
+
+* Introduction
+This is my dotfiles, which is powered by [[https://www.gnu.org/software/stow/][GNU Stow]]

@@ -1,0 +1,28 @@
+[user]
+	email = ricky.anderson2696@gmail.com
+	name = Ricky Anderson
+
+[gitlab]
+	user = rickyson
+
+[github]
+	user = rickyson96
+
+[credential]
+	helper = !pass-git-helper $@
+	useHttpPath = true
+
+[http]
+	postBuffer = 1524288000
+
+[branch]
+	autoSetupMerge = true
+
+[init]
+	defaultBranch = main
+
+[url "git@bitbucket.org:"]
+	 insteadOf = "https://bitbucket.org"
+
+[rerere]
+	enabled = true
