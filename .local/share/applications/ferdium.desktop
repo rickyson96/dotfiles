@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Ferdium
-Exec=/usr/bin/ferdium %U
+Exec=/usr/bin/ferdium --ozone-platform-hint=auto %U
 Terminal=false
 Type=Application
 Icon=ferdium
