@@ -133,6 +133,8 @@ Taken from: http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html"
 (defvar-keymap ra/toggle-map
   :doc "Keymap for toggling emacs state"
   :prefix 'ra/toggle-map
+  "*" #'literate-calc-mode
+  "c" #'literate-calc-mode
   "d" #'toggle-debug-on-error
   "f" #'auto-fill-mode
   "l" #'visual-line-mode
@@ -185,7 +187,8 @@ Taken from: http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html"
   "M-." #'embark-dwim
   "M-'" #'er/expand-region
   "M-!" #'ra/shell-command
-  "M-$" #'eat
+  "M-#" #'eat
+  "M-$" #'eshell
   "M-y" #'consult-yank-pop
   "M-m" ra/manipulate-map
   "M-o" #'ace-window

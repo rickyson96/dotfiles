@@ -26,7 +26,8 @@
 (horizontal-scroll-bar-mode -1)
 
 (elpaca nerd-icons
-  (setopt nerd-icons-scale-factor 1.0))
+  (setopt nerd-icons-scale-factor 1.0
+		  nerd-icons-font-family "IosevraRelaxed Nerd Font"))
 
 (elpaca hl-todo)
 
@@ -114,6 +115,9 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 	"M-s" #'dirvish-setup-menu
 	"M-e" #'dirvish-emerge-menu
 	"M-j" #'dirvish-fd-jump
+
+	"$" #'eshell
+	"M-$" #'eshell
 
 	"y" #'dirvish-yank-menu ; `dired-show-file-type' is accessible from `dirfish-file-info-menu'
 	"N" #'dirvish-narrow    ; `dired-do-man' is less used command

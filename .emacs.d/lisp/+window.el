@@ -63,6 +63,11 @@
 								(display-buffer-in-side-window)
 								(side . bottom)
 								(slot . 0)
+								(window-height .3))
+							   (,(rx bol "*eat" (0+ nonl) "*" eol)
+								(display-buffer-in-side-window)
+								(side . bottom)
+								(slot . 0)
 								(window-height .3))))
 
 (provide '+window)

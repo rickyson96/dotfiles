@@ -34,8 +34,31 @@
 
 (auth-source-pass-enable)
 
+(elpaca eat
+  (add-hook 'eat-exit-hook #'quit-window))
+
+(elpaca eshell-prompt-extras
+  (autoload 'epe-theme-multiline-with-status "eshell-prompt-extras")
+  (with-eval-after-load 'esh-opt
+    (setopt eshell-highlight-prompt nil
+            eshell-prompt-function 'epe-theme-multiline-with-status)))
+
 (add-hook 'eshell-exit-hook #'quit-window)
-(add-hook 'eat-exit-hook #'quit-window)
+(setopt eshell-modules-list '( eshell-alias eshell-banner
+                               eshell-basic eshell-cmpl
+                               eshell-dirs eshell-elecslash
+                               eshell-extpipe eshell-glob
+                               eshell-hist eshell-ls
+                               eshell-pred eshell-rebind
+                               eshell-script eshell-smart
+                               eshell-term eshell-tramp
+                               eshell-unix eshell-xtra
+                               eshell-prompt)
+        eshell-where-to-jump 'begin
+        eshell-review-quick-commands nil
+        eshell-smart-space-goes-to-end t)
+
+(setopt calc-multiplication-has-precedence nil)
 
 (setopt proced-enable-color-flag t
         proced-auto-update-flag t

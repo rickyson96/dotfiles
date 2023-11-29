@@ -31,5 +31,8 @@
 (elpaca fish-mode)
 (elpaca fish-completion)
 
+;; literate calc
+(elpaca literate-calc-mode)
+
 (provide '+lang)
 ;;; +lang.el ends here
