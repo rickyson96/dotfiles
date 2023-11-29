@@ -23,6 +23,7 @@ If nothing can be deleted, kill backward.  If still nothing can be
 deleted, kill the pairs around point.
 Taken from: https://github.com/AmaiKinono/puni/wiki/Useful-commands"
     (interactive "P")
+    (require 'puni)
     (if n
         (puni-kill-line (prefix-numeric-value n))
       (let ((bounds (puni-bounds-of-list-around-point)))
