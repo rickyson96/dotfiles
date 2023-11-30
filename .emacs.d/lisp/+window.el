@@ -60,15 +60,13 @@
 
 (setopt switch-to-buffer-obey-display-actions t ; Sane `switch-to-buffer'
 		display-buffer-alist `((,(rx bol "*eshell" (0+ nonl) "*" eol)
-								(display-buffer-in-side-window)
-								(side . bottom)
-								(slot . 0)
-								(window-height .3))
+								(display-buffer-in-direction)
+								(direction . bottom)
+								(window-height . 0.3))
 							   (,(rx bol "*eat" (0+ nonl) "*" eol)
-								(display-buffer-in-side-window)
-								(side . bottom)
-								(slot . 0)
-								(window-height .3))))
+								(display-buffer-in-direction)
+								(direction . bottom)
+								(window-height . 0.3))))
 
 (provide '+window)
 ;;; +window.el ends here
