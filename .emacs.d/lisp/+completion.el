@@ -38,9 +38,9 @@
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
 
 (elpaca orderless
-  (setopt completion-styles '(substring orderless basic)
+  (setopt completion-styles '(substring orderless partial-completion)
 		  completion-category-defaults nil
-		  completion-category-overrides '((file (styles partial-completion)))))
+		  completion-category-overrides '((file (styles basic partial-completion)))))
 
 (elpaca marginalia
   (marginalia-mode))

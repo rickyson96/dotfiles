@@ -32,6 +32,11 @@
 		scroll-conservatively 1000
 		scroll-preserve-screen-position 1
 
+		;; for eat purposes https://codeberg.org/akib/emacs-eat/issues/110
+		read-process-output-max (* 4 1024 1024)
+		process-adaptive-read-buffering nil
+
+		tramp-default-remote-shell "/bin/bash"
 		shell-command-prompt-show-cwd t
 		find-file-visit-truename t
 		enable-recursive-minibuffers t

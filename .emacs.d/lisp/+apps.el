@@ -32,10 +32,20 @@
   (with-eval-after-load 'marginalia
     (add-to-list 'marginalia-prompt-categories '("Password entry" . password-store))))
 
+(defun ra/scan-otp-uri (&optional direct-insert)
+  "Scan otp-uri using `hyprshot' and put it in `kill-ring'"
+  (interactive "P")
+  (let* ((cmd (if direct-insert #'insert #'kill-new))
+         (otp-raw (shell-command-to-string "hyprshot -rm region | zbarimg PNG:-"))
+         (otp (car (split-string otp-raw)))
+         (otp-split (split-string otp ":")))
+    (funcall cmd (string-join (cdr otp-split) ":"))))
+
 (auth-source-pass-enable)
 
 (elpaca eat
-  (add-hook 'eat-exit-hook #'quit-window))
+  (add-hook 'eat-exit-hook #'quit-window)
+  (add-hook 'eshell-load-hook #'eat-eshell-mode))
 
 (elpaca eshell-prompt-extras
   (autoload 'epe-theme-multiline-with-status "eshell-prompt-extras")
@@ -65,6 +75,13 @@
         proced-auto-update-interval 1
         proced-format 'short
         proced-show-remote-processes t)
+
+(elpaca daemons)
+
+(elpaca system-packages
+  (setopt system-packages-package-manager 'pacman))
+
+(elpaca trashed)
 
 (provide '+apps)
 ;;; +apps.el ends here

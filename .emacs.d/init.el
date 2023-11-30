@@ -82,8 +82,7 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 
 (require '+ui)
 
-(elpaca (bmkp :host github :repo "emacsmirror/bookmark-plus")
-  (require 'bookmark+))
+(setopt bookmark-save-flag 1) ; auto save bookmark
 
 ;; (require '+project)
 

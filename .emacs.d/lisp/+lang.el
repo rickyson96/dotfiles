@@ -13,6 +13,14 @@
 
 ;;; Code:
 
+(require 'treesit)
+(defmacro ra/treesitter-setup (language url &rest extra)
+  "Setup Emacs's treesitter for LANGUAGE"
+  (macroexp-progn
+   `((add-to-list 'treesit-language-source-alist '(,language ,url ,@extra))
+	 (unless (treesit-language-available-p ',language)
+	   (treesit-install-language-grammar ',language)))))
+
 (elpaca go-mode)
 (elpaca gotest)
 (elpaca go-tag)
@@ -20,10 +28,14 @@
 (elpaca go-fill-struct)
 (elpaca go-scratch)
 (elpaca go-playground)
+(ra/treesitter-setup go "https://github.com/tree-sitter/tree-sitter-go")
+
+(elpaca jsonian)
 
 (elpaca nix-mode)
 
 (elpaca macrostep)
+(elpaca suggest)
 
 ;; sudo file
 (elpaca etc-sudoers-mode)
@@ -33,6 +45,10 @@
 
 ;; literate calc
 (elpaca literate-calc-mode)
+
+(elpaca systemd)
+
+(elpaca dotenv-mode)
 
 (provide '+lang)
 ;;; +lang.el ends here

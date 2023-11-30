@@ -26,7 +26,7 @@
 (horizontal-scroll-bar-mode -1)
 
 (elpaca nerd-icons
-  (setopt nerd-icons-scale-factor 1.0
+  (setopt nerd-icons-scale-factor 1
 		  nerd-icons-font-family "IosevraRelaxed Nerd Font"))
 
 (elpaca hl-todo)

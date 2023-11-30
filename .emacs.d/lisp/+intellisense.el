@@ -30,7 +30,8 @@
 
 (elpaca lsp-mode
   (setopt lsp-idle-delay 0.3
-		  lsp-completion-provider :none)
+		  lsp-completion-provider :none
+		  lsp-keymap-prefix "C-c l")
 
   (defun ra/lsp-mode-setup-completion ()
 	"Taken from corfu's wiki"
