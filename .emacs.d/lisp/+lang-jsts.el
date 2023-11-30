@@ -13,7 +13,6 @@
 
 ;;; Code:
 
-(require '+lang/jsts)
 (ra/treesitter-setup typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
 (ra/treesitter-setup tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
 (ra/treesitter-setup javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
@@ -24,8 +23,7 @@
 
 (elpaca npm)
 (elpaca nodejs-repl)
-
-(elpaca web-mode)
+(elpaca nvm)
 
 (provide '+lang-jsts)
 ;;; +lang-jsts.el ends here

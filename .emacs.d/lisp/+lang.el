@@ -30,6 +30,10 @@
 (elpaca go-playground)
 (ra/treesitter-setup go "https://github.com/tree-sitter/tree-sitter-go")
 
+(require '+lang-jsts)
+
+(elpaca web-mode)
+
 (elpaca jsonian)
 
 (elpaca nix-mode)
