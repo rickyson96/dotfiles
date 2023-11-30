@@ -14,9 +14,7 @@
 ;;; Code:
 
 (elpaca magit
-  (magit-wip-mode 1)
-  (setopt magit-no-confirm '(set-and-push safe-with-wip)
-		  magit-branch-prefer-remote-upstream '("master" "develop" "production" "development" "staging" "dev" "main")
+  (setopt magit-branch-prefer-remote-upstream '("master" "develop" "production" "development" "staging" "dev" "main")
 		  magit-branch-adjust-remote-upstream-alist '(("origin/master" . "/")
 													  ("origin/main" . "/"))
 		  magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
