@@ -43,9 +43,9 @@
 (elpaca apheleia)
 
 (elpaca tempel
-  ;; (defun ra/tempel-setup-capf ()
-;; 	"Setup capf to try tempel first
-;; Taken from tempel's readme"
+  (defun ra/tempel-setup-capf ()
+	"Setup capf to try tempel first
+Taken from tempel's readme"
   (add-hook 'completion-at-point-functions #'tempel-expand -90 t))
 
 (elpaca tempel-collection)
