@@ -36,7 +36,6 @@
 		read-process-output-max (* 4 1024 1024)
 		process-adaptive-read-buffering nil
 
-		tramp-default-remote-shell "/bin/bash"
 		shell-command-prompt-show-cwd t
 		find-file-visit-truename t
 		enable-recursive-minibuffers t
@@ -76,6 +75,11 @@
 
 (elpaca ws-butler
   (ws-butler-global-mode 1))
+
+(elpaca super-save
+  (super-save-mode 1)
+  (setopt super-save-auto-save-when-idle t
+		  super-save-remote-files nil))
 
 (provide '+defaults)
 ;;; +defaults.el ends here

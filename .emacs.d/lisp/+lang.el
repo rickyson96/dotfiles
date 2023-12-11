@@ -32,14 +32,26 @@
 
 (require '+lang-jsts)
 
-(elpaca web-mode)
+(require '+lang-org)
+
+(require '+lang-web)
+
+(setopt markdown-fontify-code-blocks-natively t
+		markdown-wiki-link-fontify-missing t)
 
 (elpaca jsonian)
 
 (elpaca nix-mode)
 
+(elpaca csv-mode
+  (add-hook 'csv-mode-hook #'csv-align-mode)
+  (setopt csv-align-style 'auto))
+
+;; Emacs Lisp
 (elpaca macrostep)
 (elpaca suggest)
+
+(elpaca pdf-tools)
 
 ;; sudo file
 (elpaca etc-sudoers-mode)

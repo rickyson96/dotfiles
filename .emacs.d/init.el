@@ -92,6 +92,33 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 
 (require '+intellisense)
 
+;; Remote development
+(setopt tramp-default-remote-shell "/bin/bash"
+		enable-remote-dir-locals t
+		remote-file-name-inhibit-locks nil
+		tramp-ssh-controlmaster-options "")
+
+(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+
+(add-to-list 'tramp-connection-properties '("/sshx:" "remote-shell" "/usr/bin/bash"))
+
+(add-to-list 'tramp-methods '("sshbash"
+							  (tramp-login-program "ssh")
+							  (tramp-login-args
+							   (("-l" "%u")
+								("-p" "%p")
+								("%c")
+								("-e" "none")
+								("%h")))
+							  (tramp-async-args
+							   (("-q")))
+							  (tramp-direct-async t)
+							  (tramp-remote-shell "/bin/bash")
+							  (tramp-remote-shell-login
+							   ("-l"))
+							  (tramp-remote-shell-args
+							   ("-c"))))
+
 ;; View mode
 ;; Enable view-mode on read-only buffer
 (setopt view-read-only t)
@@ -111,6 +138,9 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
   (ra/keymap-set (current-global-map)
     "<remap> <query-replace>" #'anzu-query-replace
     "<remap> <query-replace-regexp>" #'anzu-query-replace-regexp))
+(elpaca ialign
+  (autoload 'ialign "ialign"))
+
 (elpaca substitute
   (require 'substitute)
   (setopt substitute-post-replace-functions #'substitute-report-operation)
@@ -204,8 +234,6 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 
 (require '+apps)
 
-(require '+mappings)
-
 (defun my/get-jira-url (&optional write-to-buffer)
   "Gobit: Copy formatted slack message to inform created MR"
   (interactive "p")
@@ -230,6 +258,8 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 	       (msg (format "%s\n*%s*\n\n:merge: %s\n:jira: %s" msg-title title url jira-link)))
 	  (kill-new msg)
 	(message "Fail to copy mr message")))
+
+(require '+mappings)
 
 (repeat-mode 1)
 

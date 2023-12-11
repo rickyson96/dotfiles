@@ -21,7 +21,8 @@
 ;; (add-hook 'tsx-ts-mode-hook #'lsp-deferred)
 ;; (add-hook 'js-ts-mode-hook #'lsp-deferred)
 
-(add-hook 'typescript-ts-mode-hook #'eglot)
+(add-to-list 'auto-mode-alist `(,(rx "." (or "j" "t") "s" eos) . typescript-ts-mode))
+(add-hook 'typescript-ts-mode-hook #'eglot-ensure)
 
 (elpaca npm)
 (elpaca nodejs-repl)

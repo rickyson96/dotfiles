@@ -17,7 +17,8 @@
   (setopt magit-branch-prefer-remote-upstream '("master" "develop" "production" "development" "staging" "dev" "main")
 		  magit-branch-adjust-remote-upstream-alist '(("origin/master" . "/")
 													  ("origin/main" . "/"))
-		  magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
+		  magit-revision-show-gravatars '("^Author:     " . "^Commit:     ")
+		  magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
 
   (with-eval-after-load 'magit
 	(transient-replace-suffix 'magit-branch 'magit-checkout
@@ -33,12 +34,13 @@
   (agitate-log-edit-informative-mode 1))
 
 (elpaca diff-hl
-  (global-diff-hl-mode 1)
-  (diff-hl-flydiff-mode 1))
+  (global-diff-hl-mode 1))
 
 (elpaca git-timemachine)
 
 (elpaca browse-at-remote)
+
+(setopt vc-handled-backends '(Git))
 
 (provide '+vc)
 ;;; +vc.el ends here

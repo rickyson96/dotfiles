@@ -89,6 +89,41 @@ Taken from: http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html"
                              default-directory)))
     (call-interactively #'shell-command)))
 
+(defun ra/comment-dwim-on-region (&optional p)
+  "Dwim style comment on region. Do nothing when region is inactive.
+
+By default, it will comment whole line,
+with \\[universal-argument], it will only comment selected region
+with \\[universal-argument] -, it will uncomment the region"
+  (when-let ((beg (use-region-beginning))
+             (end (use-region-end))
+             (comment-fn (if (< (prefix-numeric-value p) 0)
+                             #'uncomment-region
+                           #'comment-or-uncomment-region)))
+    (unless p
+      (setq beg (save-excursion
+                  (goto-char (region-beginning))
+                  (line-beginning-position)))
+      (setq end (save-excursion
+                  (goto-char (region-end))
+                  (line-end-position))))
+    (funcall comment-fn beg end)))
+
+(defun ra/comment-dwim (&optional p)
+  "Custom comment-dwim style
+With region active: call `ra/comment-dwim-on-region'
+With \\[universal-argument] -: delete comment (a.k.a `comment-kill')
+With \\[universal-argument]  : create comment for this line (a.k.a `comment-indent')
+With positive prefix : comment this much line forward.
+Without prefix: comment line (a.k.a `comment-line')"
+  (interactive "P")
+  (pcase p
+    ((guard (use-region-p)) (ra/comment-dwim-on-region p))
+    ('- (save-excursion (comment-kill 1)))
+    ('(4) (comment-indent t))
+    ('nil (save-excursion (comment-line 1)))
+    (p (comment-line (prefix-numeric-value p)))))
+
 (ra/keymap-set narrow-map
   "n" #'ra/narrow-or-widen-dwim
   "r" #'narrow-to-region)
@@ -187,6 +222,7 @@ Taken from: http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html"
   "M-." #'embark-dwim
   "M-'" #'er/expand-region
   "M-!" #'ra/shell-command
+  "M-;" #'ra/comment-dwim
   "M-#" #'eat
   "M-$" #'eshell
   "M-y" #'consult-yank-pop

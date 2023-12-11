@@ -83,5 +83,9 @@
 
 (elpaca trashed)
 
+(elpaca elfeed)
+(elpaca elfeed-org
+  (setopt rmh-elfeed-org-files '("~/org/elfeed.org")))
+
 (provide '+apps)
 ;;; +apps.el ends here
