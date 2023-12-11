@@ -17,6 +17,7 @@ if not functions -q fundle; eval (curl -sfL https://git.io/fundle-install); end
 fundle plugin 'edc/bass'
 fundle plugin 'jorgebucaran/autopair.fish'
 fundle plugin 'PatrickF1/fzf.fish'
+fundle plugin 'jorgebucaran/nvm.fish'
 
 fundle init
 
@@ -36,9 +37,12 @@ export LANG='en_US.UTF-8'
 export LC_ALL='en_US.UTF-8'
 export EDITOR='emacsclient -r'
 export LESS="-g -i -M -R -w -z-4"
-export PAGER="bat"
+export BAT_PAGER="less -RF"
 export STARSHIP_CONFIG="~/.config/starship/starship.toml"
 export LSP_USE_PLISTS=true
+export npm_config_prefix="$HOME/.local"
+export NODE_VERSION_PREFIX=v
+export NODE_VERSIONS={$HOME/.local/share/nvm}
 
 alias mux="tmuxinator"
 alias doom="~/doom-emacs/bin/doom"
