@@ -1,5 +1,6 @@
-# disable configuring from browser
-config.load_autoconfig(False)
+# enable prompt based configuration
+# such as: google-meet always accept video and audio request
+config.load_autoconfig(True)
 
 c.tabs.position = "left"
 
