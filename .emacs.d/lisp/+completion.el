@@ -43,8 +43,7 @@
 		  completion-category-overrides '((file (styles basic partial-completion)))))
 
 (elpaca marginalia
-  (marginalia-mode)
-  (add-to-list 'marginalia-prompt-categories '("\\<Callable\\>" . function)))
+  (marginalia-mode))
 
 (elpaca nerd-icons-completion
   (nerd-icons-completion-mode)

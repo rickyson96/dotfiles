@@ -21,10 +21,11 @@
 		org-special-ctrl-a/e t
 		org-hide-emphasis-markers t
 		org-pretty-entities t
-		org-ellipsis "…")
+		org-ellipsis "…"
+		org-tags-column 0)
 
 ;; Agenda styling
-(setopt org-agenda-tags-column 0
+(setopt org-agenda-tags-column 'auto
 		org-agenda-block-separator ?─
 		org-agenda-time-grid
 		'((daily today require-timed)
@@ -36,7 +37,9 @@
 (elpaca org-appear
   (add-hook 'org-mode-hook #'org-appear-mode)
   (setopt org-appear-autosubmarkers t
-		  org-appear-autokeywords t))
+		  org-appear-autokeywords t
+		  org-appear-autolinks t
+		  org-appear-delay 0.5))
 
 (provide '+lang-org)
 ;;; +lang-org.el ends here

@@ -88,6 +88,42 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 
 (require '+window)
 
+(elpaca tabspaces
+  (setopt tabspaces-use-filtered-buffers-as-default t
+		  tabspaces-keymap-prefix "C-c t"
+		  tab-bar-show nil)
+
+  (tabspaces-mode 1)
+
+  (ra/keymap-set tabspaces-mode-map
+	"<remap> <project-switch-project>" #'tabspaces-open-or-create-project-and-workspace)
+
+  (with-eval-after-load 'marginalia
+	(add-to-list 'marginalia-command-categories '(tabspaces-switch-or-create-workspace . tab)))
+
+  ;; Filter Buffers for Consult-Buffer
+  ;; Taken from https://github.com/mclear-tools/tabspaces
+
+  (with-eval-after-load 'consult
+	;; hide full buffer list (still available with "b" prefix)
+	(consult-customize consult--source-buffer :hidden t :default nil)
+	;; set consult-workspace buffer list
+	(defvar consult--source-workspace
+	  (list :name     "Workspace Buffers"
+			:narrow   ?w
+			:history  'buffer-name-history
+			:category 'buffer
+			:state    #'consult--buffer-state
+			:default  t
+			:items    (lambda () (consult--buffer-query
+								  :predicate #'tabspaces--local-buffer-p
+								  :sort 'visibility
+								  :as #'buffer-name)))
+
+	  "Set workspace buffer list for consult-buffer.")
+	(add-to-list 'consult-buffer-sources 'consult--source-workspace)))
+
+
 (require '+completion)
 
 (require '+intellisense)
@@ -125,10 +161,6 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 
 (electric-pair-mode 1)
 
-(elpaca switch-window
-  (setopt switch-window-shortcut-style 'qwerty
-		  switch-window-qwerty-shortcuts '("a" "o" "e" "u" "h" "t" "n" "s" "i" "d" "'" "," "." "p" "g" "c" "r" "l")))
-
 (elpaca outshine
   (setopt outline-minor-mode-prefix "\C-c o"))
 
@@ -138,6 +170,7 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
   (ra/keymap-set (current-global-map)
     "<remap> <query-replace>" #'anzu-query-replace
     "<remap> <query-replace-regexp>" #'anzu-query-replace-regexp))
+
 (elpaca ialign
   (autoload 'ialign "ialign"))
 
@@ -201,7 +234,9 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 		;; In depth documentation should only be show when requested.
 		eldoc-echo-area-use-multiline-p nil)
 
-(elpaca envrc
+(elpaca (envrc :host github :repo "purcell/envrc"
+			   :remotes ("envrc-remote" :host github :repo "siddharthverma314/envrc"))
+  (setopt envrc-remote t)
   (envrc-global-mode 1))
 
 (elpaca makefile-executor

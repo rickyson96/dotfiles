@@ -51,7 +51,8 @@
 (elpaca macrostep)
 (elpaca suggest)
 
-(elpaca pdf-tools)
+(elpaca pdf-tools
+  (pdf-loader-install))
 
 ;; sudo file
 (elpaca etc-sudoers-mode)

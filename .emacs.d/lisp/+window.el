@@ -58,6 +58,15 @@
 	(ra/keymap-set embark-bookmark-map
 	  "o" (ra/embark-ace-action bookmark-jump))))
 
+
+(elpaca switch-window
+  (setopt switch-window-shortcut-style 'qwerty
+		  switch-window-qwerty-shortcuts '("u" "e" "o" "a" "h" "t" "n" "s" "p" "." "," "k" "j" "i" "y" "x")
+		  switch-window-background t
+		  switch-window-threshold 2)
+  (with-eval-after-load 'switch-window
+	(set-face-attribute 'switch-window-label nil :height 4.0)))
+
 (setopt switch-to-buffer-obey-display-actions t ; Sane `switch-to-buffer'
 		display-buffer-alist `((,(rx bol "*eshell" (0+ nonl) "*" eol)
 								(display-buffer-in-direction)

@@ -28,6 +28,8 @@
 
 (elpaca magit-imerge)
 
+(elpaca forge)
+
 (elpaca agitate
   (add-hook 'diff-mode-hook #'agitate-diff-enable-outline-minor-mode)
   (advice-add #'vc-git-push :override #'agitate-vc-git-push-prompt-for-remote)

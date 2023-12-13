@@ -95,6 +95,7 @@ Taken from: http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html"
 By default, it will comment whole line,
 with \\[universal-argument], it will only comment selected region
 with \\[universal-argument] -, it will uncomment the region"
+  (comment-normalize-vars)
   (when-let ((beg (use-region-beginning))
              (end (use-region-end))
              (comment-fn (if (< (prefix-numeric-value p) 0)
@@ -109,6 +110,9 @@ with \\[universal-argument] -, it will uncomment the region"
                   (line-end-position))))
     (funcall comment-fn beg end)))
 
+(setopt comment-style 'extra-line
+        comment-empty-lines 'eol)
+
 (defun ra/comment-dwim (&optional p)
   "Custom comment-dwim style
 With region active: call `ra/comment-dwim-on-region'
@@ -117,12 +121,15 @@ With \\[universal-argument]  : create comment for this line (a.k.a `comment-inde
 With positive prefix : comment this much line forward.
 Without prefix: comment line (a.k.a `comment-line')"
   (interactive "P")
+  (comment-normalize-vars)
   (pcase p
     ((guard (use-region-p)) (ra/comment-dwim-on-region p))
     ('- (save-excursion (comment-kill 1)))
     ('(4) (comment-indent t))
-    ('nil (save-excursion (comment-line 1)))
-    (p (comment-line (prefix-numeric-value p)))))
+    ('nil (if (save-excursion (beginning-of-line) (not (looking-at "\\s-*$")))
+              (save-excursion (comment-line 1))
+            (comment-dwim nil)))
+    ((pred numberp) (comment-line p))))
 
 (ra/keymap-set narrow-map
   "n" #'ra/narrow-or-widen-dwim
@@ -184,6 +191,7 @@ Without prefix: comment line (a.k.a `comment-line')"
   :prefix 'ra/open-map
   "p" #'pass
   "t" #'eat
+  "f" #'elfeed
   "m" #'consult-man
   "'" #'proced)
 
@@ -201,7 +209,7 @@ Without prefix: comment line (a.k.a `comment-line')"
   "TAB" ra/completion-map
   "e" ra/eval-map
   "o" #'ra/open-map
-  "t" #'ra/toggle-map)
+  "T" #'ra/toggle-map)
 
 ;; C-x keymap
 (ra/keymap-set ctl-x-map
@@ -227,7 +235,7 @@ Without prefix: comment line (a.k.a `comment-line')"
   "M-$" #'eshell
   "M-y" #'consult-yank-pop
   "M-m" ra/manipulate-map
-  "M-o" #'ace-window
+  "M-o" #'switch-window
   "M-N" #'move-text-down
   "M-P" #'move-text-up)
 
