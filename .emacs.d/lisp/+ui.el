@@ -29,7 +29,8 @@
   (setopt nerd-icons-scale-factor 1
 		  nerd-icons-font-family "IosevraRelaxed Nerd Font"))
 
-(elpaca hl-todo)
+(elpaca hl-todo
+  (hl-todo-mode 1))
 
 (elpaca ef-themes
   (setopt ef-themes-mixed-fonts t
@@ -39,6 +40,9 @@
 			(1 light variable-pitch 1.5)
             (2 regular 1.3)
             (3 1.1)))
+
+  (with-eval-after-load 'org
+	(set-face-attribute 'org-quote nil :slant 'italic))
 
   (defun my-ef-themes-hl-todo-faces ()
 	"Configure `hl-todo-keyword-faces' with Ef themes colors.
@@ -63,7 +67,7 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 				("FIXME" . ,red-warmer)
 				("XXX+" . ,red-warmer)
 				("REVIEW" . ,red)
-				("DEPRECATED" . ,yellow)))))
+				("DEPRECATED" . ,yellow-faint)))))
 
   (add-hook 'ef-themes-post-load-hook #'my-ef-themes-hl-todo-faces)
 
@@ -88,6 +92,8 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 									 :right-divider-width 10
 									 :scroll-bar-width 8)))
 
+(elpaca (dired-plus :host github :repo "emacsmirror/dired-plus" :main "dired+.el"))
+
 (elpaca dirvish
   (dirvish-override-dired-mode)
   (dirvish-peek-mode)
@@ -101,7 +107,8 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 		  dirvish-header-line-format '(:left (path) :right (vc-info file-user))
 		  dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state git-msg)
 		  dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group"
-		  dirvish-reuse-session nil)
+		  dirvish-reuse-session nil
+		  dirvish-header-line-height 25)
 
   (ra/keymap-set dirvish-mode-map
 	"b" #'dired-up-directory
@@ -136,6 +143,9 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 (elpaca diredfl
   (add-hook 'dired-mode-hook #'diredfl-mode)
   (add-hook 'dirvish-directory-view-mode #'diredfl-mode))
+
+(elpaca iscroll
+  (add-hook 'text-mode-hook #'iscroll-mode))
 
 (provide '+ui)
 ;;; +ui.el ends here

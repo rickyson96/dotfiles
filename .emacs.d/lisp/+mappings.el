@@ -127,7 +127,7 @@ Without prefix: comment line (a.k.a `comment-line')"
     ('- (save-excursion (comment-kill 1)))
     ('(4) (comment-indent t))
     ('nil (if (save-excursion (beginning-of-line) (not (looking-at "\\s-*$")))
-              (save-excursion (comment-line 1))
+              (comment-line 1)
             (comment-dwim nil)))
     ((pred numberp) (comment-line p))))
 
@@ -193,6 +193,8 @@ Without prefix: comment line (a.k.a `comment-line')"
   "t" #'eat
   "f" #'elfeed
   "m" #'consult-man
+  "n" #'denote-open-or-create
+  "RET" #'mediator-open
   "'" #'proced)
 
 (defvar-keymap ra/eval-map
@@ -238,6 +240,8 @@ Without prefix: comment line (a.k.a `comment-line')"
   "M-o" #'switch-window
   "M-N" #'move-text-down
   "M-P" #'move-text-up)
+
+(require '+mappings-modal)
 
 (provide '+mappings)
 ;;; +mappings.el ends here

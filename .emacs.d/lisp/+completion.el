@@ -43,7 +43,8 @@
 		  completion-category-overrides '((file (styles basic partial-completion)))))
 
 (elpaca marginalia
-  (marginalia-mode))
+  (marginalia-mode)
+  (add-to-list 'marginalia-prompt-categories '("Callable" . function)))
 
 (elpaca nerd-icons-completion
   (nerd-icons-completion-mode)
@@ -54,7 +55,8 @@
 		  register-preview-function #'consult-register-format
 		  xref-show-xrefs-function #'consult-xref
 		  xref-show-definitions-function #'consult-xref
-		  consult-narrow-key "<")
+		  consult-narrow-key "<"
+		  consult-ripgrep-args "rg --hidden --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --with-filename --line-number --search-zip")
 
   (add-hook 'completion-list-mode #'consult-preview-at-point-mode)
 
@@ -63,7 +65,7 @@
 (elpaca embark
   (setopt prefix-help-command #'embark-prefix-help-command)
 
-   (add-to-list 'display-buffer-alist
+  (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
                  (window-parameters (mode-line-format . none)))))

@@ -59,11 +59,10 @@
                                eshell-dirs eshell-elecslash
                                eshell-extpipe eshell-glob
                                eshell-hist eshell-ls
-                               eshell-pred eshell-rebind
+                               eshell-pred ; eshell-rebind
                                eshell-script eshell-smart
-                               eshell-term eshell-tramp
-                               eshell-unix eshell-xtra
-                               eshell-prompt)
+                               eshell-tramp eshell-unix
+                               eshell-xtra eshell-prompt)
         eshell-where-to-jump 'begin
         eshell-review-quick-commands nil
         eshell-smart-space-goes-to-end t)
@@ -87,6 +86,23 @@
 (elpaca elfeed-org
   (setopt rmh-elfeed-org-files '("~/org/elfeed.org"))
   (elfeed-org))
+
+(elpaca denote
+  (require 'denote-journal-extras)
+  (setopt denote-journal-extras-title-format 'day-date-month-year)
+
+  (with-eval-after-load 'doct
+    (setopt org-capture-templates (doct-add-to org-capture-templates
+                                               '(("  Denote" :keys "n"
+                                                  :file denote-last-path
+                                                  :type plain
+                                                  :template denote-org-capture
+                                                  :no-save t
+                                                  :immediate-finish nil
+                                                  :kill-buffer t))
+                                               t))))
+
+(elpaca wordel)
 
 (provide '+apps)
 ;;; +apps.el ends here

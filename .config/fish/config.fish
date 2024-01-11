@@ -1,15 +1,11 @@
-# start nix
-source ~/.nix-profile/etc/profile.d/nix.fish
-
 # nix specific locale setting
 # taken from: https://gist.github.com/peti/2c818d6cb49b0b0f2fd7c300f8386bc3
 if [ -e /home/rickylson/.nix-profile/etc/profile.d/nix.fish ]
     source /home/rickyson/.nix-profile/etc/profile.d/nix.fish
+    export LOCALE_ARCHIVE_2_27="$(nix-build --no-out-link "<nixpkgs>" -A glibcLocales)/lib/locale/locale-archive"
+    export LOCALE_ARCHIVE="/usr/lib/locale/locale-archive"
+    export LOCALE_ARCHIVE_2_11="/etc/locale.gen"
 end
-
-export LOCALE_ARCHIVE_2_27="$(nix-build --no-out-link "<nixpkgs>" -A glibcLocales)/lib/locale/locale-archive"
-export LOCALE_ARCHIVE="/usr/lib/locale/locale-archive"
-export LOCALE_ARCHIVE_2_11="/etc/locale.gen"
 
 # Fundle
 if not functions -q fundle; eval (curl -sfL https://git.io/fundle-install); end
@@ -18,6 +14,7 @@ fundle plugin 'edc/bass'
 fundle plugin 'jorgebucaran/autopair.fish'
 fundle plugin 'PatrickF1/fzf.fish'
 fundle plugin 'jorgebucaran/nvm.fish'
+fundle plugin 'oh-my-fish/plugin-pyenv'
 
 fundle init
 
@@ -27,7 +24,7 @@ fish_add_path --universal /Users/rickyson/Library/Application\ Support/Coursier/
 fish_add_path --universal /usr/local/opt/libpq/bin
 fish_add_path --universal /usr/local/opt/openssl@1.1/bin
 fish_add_path --universal /Users/rickyson/opensource/kotlin-language-server/server/build/install/server/bin
-fish_add_path --universal /Users/rickyson/.cargo/bin
+fish_add_path --universal ~/.cargo/bin
 fish_add_path --universal /Users/rickyson/opensource/mermaid-cli/node_modules/.bin
 
 export YDOTOOL_SOCKET=/tmp/.ydotool_socket
@@ -54,6 +51,7 @@ abbr --add rmdir rmdirtrash
 if status is-interactive
     # Commands to run in interactive sessions can go here
     starship init fish | source
+    direnv hook fish | source
 end
 
 # Created by `pipx` on 2023-11-23 18:52:18

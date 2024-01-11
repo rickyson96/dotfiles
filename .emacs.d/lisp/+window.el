@@ -72,7 +72,7 @@
 								(display-buffer-in-direction)
 								(direction . bottom)
 								(window-height . 0.3))
-							   (,(rx bol "*eat" (0+ nonl) "*" eol)
+							   (,(rx bol "*" (0+ nonl) "eat" (0+ nonl) "*" eol)
 								(display-buffer-in-direction)
 								(direction . bottom)
 								(window-height . 0.3))))

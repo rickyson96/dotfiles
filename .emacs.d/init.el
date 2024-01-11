@@ -56,6 +56,14 @@
 (elpaca xr)
 (elpaca pcre2el)
 (elpaca 0xc)
+(defun +elpaca-unload-seq (e)
+  "Unload seq before continuing the elpaca build, then continue to build the recipe E."
+  (and (featurep 'seq) (unload-feature 'seq t))
+  (elpaca--continue-build e))
+(elpaca `(seq :build ,(append (butlast (if (file-exists-p (expand-file-name "seq" elpaca-builds-directory))
+                                           elpaca--pre-built-steps
+                                         elpaca-build-steps))
+                              (list '+elpaca-unload-seq 'elpaca--activate-package))))
 
 (defmacro ra/keymap-set (keymap &rest pairs)
   "Bind multiple pairs of KEY/DEFINITION to KEYMAP using `keymap-set'.
@@ -85,6 +93,13 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 (setopt bookmark-save-flag 1) ; auto save bookmark
 
 ;; (require '+project)
+;; (defun ra/project-remember-default-directory ()
+;;   ""
+;;   (let ((tabspaces-project-switch-commands #'magit-project-status)
+;; 		(project--list (append `(,default-directory) 'project--list))))
+;;   (tabspaces-project-switch-project-open-file default-directory))
+;; (with-eval-after-load 'magit
+;;   (add-hook 'magit-post-clone-hook #'ra/project-remember-default-directory))
 
 (require '+window)
 
@@ -134,26 +149,27 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 		remote-file-name-inhibit-locks nil
 		tramp-ssh-controlmaster-options "")
 
-(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-
-(add-to-list 'tramp-connection-properties '("/sshx:" "remote-shell" "/usr/bin/bash"))
-
-(add-to-list 'tramp-methods '("sshbash"
-							  (tramp-login-program "ssh")
-							  (tramp-login-args
-							   (("-l" "%u")
-								("-p" "%p")
-								("%c")
-								("-e" "none")
-								("%h")))
-							  (tramp-async-args
-							   (("-q")))
-							  (tramp-direct-async t)
-							  (tramp-remote-shell "/bin/bash")
-							  (tramp-remote-shell-login
-							   ("-l"))
-							  (tramp-remote-shell-args
-							   ("-c"))))
+(with-eval-after-load 'tramp
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  (add-to-list 'tramp-connection-properties '("/sshx:" "remote-shell" "/usr/bin/bash"))
+  (add-to-list 'tramp-methods '("sshbash"
+								(tramp-login-program "ssh")
+								(tramp-login-args
+								 (("-l" "%u")
+								  ("-p" "%p")
+								  ("%c")
+								  ("-e" "none")
+								  ("%h")))
+								(tramp-async-args
+								 (("-q")))
+								(tramp-direct-async t)
+								(tramp-remote-shell "/bin/bash")
+								(tramp-remote-shell-login
+								 ("-l"))
+								(tramp-remote-shell-args
+								 ("-c")))))
+(with-eval-after-load 'eat
+  (add-to-list 'eat-tramp-shells '("ssh" . "/bin/bash")))
 
 ;; View mode
 ;; Enable view-mode on read-only buffer
@@ -210,13 +226,18 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 	"<remap> <scroll-down-command>" #'golden-ratio-scroll-screen-down)
   (setopt golden-ratio-scroll-highlight-flag nil))
 
+(elpaca which-key
+  (setopt which-key-show-early-on-C-h t
+		  which-key-idle-secondary-delay 0.01)
+  (which-key-mode 1))
+
 (elpaca string-inflection
   (with-eval-after-load 'embark
     (keymap-set embark-identifier-map "~" #'string-inflection-all-cycle)
     (add-to-list 'embark-repeat-actions #'string-inflection-all-cycle)))
 
 (elpaca move-text
-  (defun indent-region-advice (&rest ignored)
+  (defun indent-region-advice (&rest _)
 	(let ((deactivate deactivate-mark))
       (if (region-active-p)
           (indent-region (region-beginning) (region-end))
@@ -224,7 +245,28 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
       (setq deactivate-mark deactivate)))
 
   (advice-add 'move-text-up :after 'indent-region-advice)
-  (advice-add 'move-text-down :after 'indent-region-advice))
+  (advice-add 'move-text-down :after 'indent-region-advice)
+
+  (defun ra/move-text-fix-eol (args)
+	"fix move-text not marking eol when already marking the whole line"
+	(cl-destructuring-bind (start end n) args
+	  (if (let ((point<mark (< (point) (mark)))
+				check)
+			(when (not point<mark) (exchange-point-and-mark))
+			(setq check (bolp))
+			(exchange-point-and-mark)
+			(and check
+				 (eolp)
+				 (not (bolp))))
+		  (progn
+			(forward-char 1)
+			(list start (1+ end) n))
+		(list start end n))))
+
+  (define-advice move-text-up (:filter-args (args) fix-region-mark-eol)
+	(ra/move-text-fix-eol args))
+  (define-advice move-text-down (:filter-args (args) fix-region-mark-eol)
+	(ra/move-text-fix-eol args)))
 
 (elpaca multi-line)
 
@@ -259,13 +301,21 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
     "<remap> <describe-command>" #'helpful-command
     "<remap> <describe-symbol>" #'helpful-symbol))
 
+(elpaca (noman :host github :repo "andykuszyk/noman.el"))
+
 (elpaca info-colors
   (add-hook 'Info-selection-hook #'info-colors-fontify-node))
 
 (elpaca elisp-demos
   (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 
+
 (require '+lang)
+
+(elpaca (mediator :host github :repo "dalanicolai/mediator")
+  (with-eval-after-load 'embark
+	(ra/keymap-set embark-file-map
+	  "O" #'mediator-open-file)))
 
 (require '+apps)
 

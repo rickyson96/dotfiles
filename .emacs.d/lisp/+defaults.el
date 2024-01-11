@@ -81,5 +81,16 @@
   (setopt super-save-auto-save-when-idle t
 		  super-save-remote-files nil))
 
+(elpaca undo-fu
+  (setopt undo-limit 67108864 ; 64mb.
+		  undo-strong-limit 100663296 ; 96mb.
+		  undo-outer-limit 1006632960) ; 960mb.
+  (ra/keymap-set (current-global-map)
+	"<remap> <undo>" #'undo-fu-only-undo
+	"<remap> <undo-redo>" #'undo-fu-only-redo))
+
+(elpaca undo-fu-session
+  (undo-fu-session-global-mode 1))
+
 (provide '+defaults)
 ;;; +defaults.el ends here

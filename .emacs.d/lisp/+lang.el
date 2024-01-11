@@ -40,6 +40,9 @@
 		markdown-wiki-link-fontify-missing t)
 
 (elpaca jsonian)
+(elpaca (hjson :host github :repo "hjson/hjson-emacs" :main "hjson-mode.el"))
+
+(elpaca dockerfile-mode)
 
 (elpaca nix-mode)
 
@@ -51,13 +54,17 @@
 (elpaca macrostep)
 (elpaca suggest)
 
-(elpaca pdf-tools
-  (pdf-loader-install))
+(elpaca (pdf-tools :host github :repo "vedang/pdf-tools"
+				   :remotes ("roll" :repo "dalanicolai/pdf-tools" :branch "pdf-roll"))
+  (pdf-loader-install)
+  (setopt pdf-view-display-size 'fit-page))
+
+(elpaca (image-roll :host github :repo "dalanicolai/image-roll.el"))
 
 ;; sudo file
 (elpaca etc-sudoers-mode)
 
-(elpaca fish-mode)
+(elpaca	fish-mode)
 (elpaca fish-completion)
 
 ;; literate calc
@@ -66,6 +73,8 @@
 (elpaca systemd)
 
 (elpaca dotenv-mode)
+
+(elpaca mermaid-mode)
 
 (provide '+lang)
 ;;; +lang.el ends here

@@ -20,6 +20,8 @@ c.url.searchengines = {
     "shopee": "https://shopee.co.id/search?keyword={}"
 }
 
+config.unbind("co")
+
 normal_bindings = {
     "J": "tab-next",
     "K": "tab-prev",

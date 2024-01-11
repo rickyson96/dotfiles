@@ -12,8 +12,10 @@ if [[ $1 == "otp" ]]; then
 	shift
 fi
 
+dmenu_switches=""
 if [[ -n $WAYLAND_DISPLAY ]]; then
 	dmenu=tofi
+	dmenu_switches="--prompt-text $prompt --width 650"
 	xdotool="wtype"
 elif [[ -n $DISPLAY ]]; then
 	dmenu=dmenu
@@ -28,7 +30,7 @@ password_files=( "$prefix"/**/*.gpg )
 password_files=( "${password_files[@]#"$prefix"/}" )
 password_files=( "${password_files[@]%.gpg}" )
 
-password=$(printf '%s\n' "${password_files[@]}" | "$dmenu" --prompt-text "$prompt" "$@")
+password=$(printf '%s\n' "${password_files[@]}" | "$dmenu" $dmenu_switches "$@")
 
 [[ -n $password ]] || exit
 
