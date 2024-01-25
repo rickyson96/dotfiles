@@ -18,7 +18,8 @@
 		  magit-branch-adjust-remote-upstream-alist '(("origin/master" . "/")
 													  ("origin/main" . "/"))
 		  magit-revision-show-gravatars '("^Author:     " . "^Commit:     ")
-		  magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+		  magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1
+		  auto-revert-buffer-list-filter #'magit-auto-revert-repository-buffer-p)
 
   (with-eval-after-load 'magit
 	(transient-replace-suffix 'magit-branch 'magit-checkout

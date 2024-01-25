@@ -15,6 +15,7 @@ fundle plugin 'jorgebucaran/autopair.fish'
 fundle plugin 'PatrickF1/fzf.fish'
 fundle plugin 'jorgebucaran/nvm.fish'
 fundle plugin 'oh-my-fish/plugin-pyenv'
+fundle plugin 'reitzig/sdkman-for-fish'
 
 fundle init
 
@@ -41,9 +42,8 @@ export npm_config_prefix="$HOME/.local"
 export NODE_VERSION_PREFIX=v
 export NODE_VERSIONS={$HOME/.local/share/nvm}
 
-alias mux="tmuxinator"
-alias doom="~/doom-emacs/bin/doom"
 alias grep=rg
+alias ls="exa --icons"
 
 abbr --add rm rmtrash
 abbr --add rmdir rmdirtrash

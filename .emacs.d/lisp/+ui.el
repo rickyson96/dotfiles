@@ -147,5 +147,25 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 (elpaca iscroll
   (add-hook 'text-mode-hook #'iscroll-mode))
 
+(elpaca page-break-lines)
+
+(elpaca dashboard
+  (setopt dashboard-display-icons-p t
+		  dashboard-icon-type 'nerd-icons
+		  dashboard-set-navigator t
+		  dashboard-filter-agenda-entry #'dashboard-filter-agenda-by-todo)
+
+  (add-hook 'elpaca-after-init-hook #'dashboard-insert-startupify-lists)
+  (add-hook 'elpaca-after-init-hook #'dashboard-initialize)
+  (dashboard-setup-startup-hook)
+
+  (dashboard-modify-heading-icons '((recents . "nf-oct-file_text")
+									(bookmarks . "nf-oct-book")))
+
+
+  (ra/keymap-set dashboard-mode-map
+	"n" #'dashboard-next-line
+	"p" #'dashboard-previous-line))
+
 (provide '+ui)
 ;;; +ui.el ends here

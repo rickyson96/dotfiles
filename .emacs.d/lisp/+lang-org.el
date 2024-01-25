@@ -17,9 +17,6 @@
   (with-eval-after-load 'org
 	(global-org-modern-mode 1)))
 
-(elpaca (org-modern-indent :host github :repo "jdtsmith/org-modern-indent")
-  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
-
 (setopt org-catch-invisible-edits 'show-and-error
 		org-special-ctrl-a/e t
 		org-hide-emphasis-markers t
@@ -31,16 +28,6 @@
 		org-fontify-quote-and-verse-blocks t
 		org-link-abbrev-alist '(("youtube" . "https://youtube.com/watch?v=%s")
 								("github" . "https://github.com/%s")))
-
-;; Agenda styling
-(setopt org-agenda-tags-column 'auto
-		org-agenda-block-separator ?─
-		org-agenda-time-grid
-		'((daily today require-timed)
-		  (800 1000 1200 1400 1600 1800 2000)
-		  " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-		org-agenda-current-time-string
-		"◀── now ─────────────────────────────────────────────────")
 
 (elpaca org-appear
   (add-hook 'org-mode-hook #'org-appear-mode)
@@ -65,12 +52,16 @@
 (elpaca org-gtd
   (setopt org-gtd-directory "~/org/gtd"
 		  org-edna-use-inheritance t
-		  org-gtd-update-ack "3.0.0")
+		  org-gtd-update-ack "3.0.0"
+
+		  org-agenda-files (list org-gtd-directory)
+		  org-gtd-engage-prefix-width 20)
   (ra/keymap-set org-gtd-clarify-map
 	"C-c c" #'org-gtd-organize)
 
   (with-eval-after-load 'org
-	(org-edna-mode 1)))
+	(org-edna-mode 1)
+	(require 'org-gtd)))
 
 (elpaca doct
   (setopt org-capture-templates
@@ -93,6 +84,46 @@
 							  " %i"
 							  " %a")
 				   :kill-buffer t)))))
+
+(elpaca org-super-agenda
+  (org-super-agenda-mode 1))
+
+;; Agenda styling
+(setopt org-agenda-tags-column 'auto
+		org-agenda-block-separator ?─
+		org-agenda-time-grid
+		'((daily today require-timed)
+		  (800 1000 1200 1400 1600 1800 2000)
+		  " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+		org-agenda-current-time-string
+		"◀── now ─────────────────────────────────────────────────"
+		org-agenda-window-setup 'only-window
+		org-agenda-restore-windows-after-quit t)
+
+(setopt org-agenda-custom-commands
+		'(("u" "My GTD Agenda"
+		   ((agenda "" ((org-agenda-span 'day)
+						(org-agenda-breadcrumbs-separator " ❱ ")
+						(org-agenda-current-time-string "ᐊ┈┈┈┈┈┈┈┈┈┈┈┈┈┈ Now")
+						(org-agenda-time-grid '((today require-timed remove-match)
+												(800 1000 1200 1400 1600 1800 2000 2200)
+												"      " "┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈"))
+						;; (org-agenda-prefix-format "  %-3i  %-15b%t  %s")
+						(org-agenda-prefix-format "   %i %?-2 t%s")
+						(org-agenda-start-day "+0")
+						;; (org-agenda-prefix-format " %i %-12:c%?-12t% s")
+						(org-agenda-overriding-header "󰃭 Calendar")
+						(org-agenda-files '("~/org" "~/org/gtd"))
+						(org-super-agenda-groups '((:time-grid t)))))
+			(todo "NEXT" ((org-agenda-overriding-header "⚡ Next Action")
+						  ;; (org-agenda-prefix-format " %i %-30:(my/org-gtd-agenda-prefix-format 30) ")
+						  (org-agenda-prefix-format '((todo . " %i %-12:(org-gtd-agenda--prefix-format)")))
+						  ;; (org-agenda-prefix-format " %i %-12:(org-gtd--agenda-prefix-format)")
+						  (org-agenda-files `(,org-gtd-directory))))
+			(todo "WAIT" ((org-agenda-overriding-header " Delegated / Blocked")
+						  (org-agenda-todo-ignore-with-date t)
+						  (org-agenda-prefix-format " %i %-12:(org-gtd--agenda-prefix-format)")
+						  (org-agenda-files `(,org-gtd-directory))))))))
 
 (provide '+lang-org)
 ;;; +lang-org.el ends here

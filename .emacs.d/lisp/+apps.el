@@ -77,9 +77,6 @@
 
 (elpaca daemons)
 
-(elpaca system-packages
-  (setopt system-packages-package-manager 'pacman))
-
 (elpaca trashed)
 
 (elpaca elfeed)
@@ -103,6 +100,10 @@
                                                t))))
 
 (elpaca wordel)
+
+(elpaca codespaces
+  (require 'codespaces)
+  (codespaces-setup))
 
 (provide '+apps)
 ;;; +apps.el ends here

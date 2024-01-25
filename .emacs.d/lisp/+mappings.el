@@ -209,6 +209,7 @@ Without prefix: comment line (a.k.a `comment-line')"
 ;; C-c keymap
 (ra/keymap-set mode-specific-map
   "TAB" ra/completion-map
+  "a" #'org-agenda
   "e" ra/eval-map
   "o" #'ra/open-map
   "T" #'ra/toggle-map)

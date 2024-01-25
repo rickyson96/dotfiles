@@ -147,6 +147,7 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 (setopt tramp-default-remote-shell "/bin/bash"
 		enable-remote-dir-locals t
 		remote-file-name-inhibit-locks nil
+		remote-file-name-inhibit-cache 60
 		tramp-ssh-controlmaster-options "")
 
 (with-eval-after-load 'tramp
@@ -168,8 +169,8 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 								 ("-l"))
 								(tramp-remote-shell-args
 								 ("-c")))))
-(with-eval-after-load 'eat
-  (add-to-list 'eat-tramp-shells '("ssh" . "/bin/bash")))
+;; (with-eval-after-load 'eat
+;; (add-to-list 'eat-tramp-shells '("ssh" . "/bin/bash")))
 
 ;; View mode
 ;; Enable view-mode on read-only buffer
@@ -319,7 +320,7 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 
 (require '+apps)
 
-(defun my/get-jira-url (&optional write-to-buffer)
+(defun ra/get-jira-url (&optional write-to-buffer)
   "Gobit: Copy formatted slack message to inform created MR"
   (interactive "p")
   (let* ((branch (magit-get-current-branch))
@@ -331,7 +332,7 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 	  (insert jira-link))
 	jira-link))
 
-(defun my/gobit-copy-mr-message ()
+(defun ra/gobit-copy-mr-message ()
   "Gobit: Copy formatted slack message to inform created MR"
   (interactive)
   (if-let ((pr (or (forge-post-at-point)
@@ -343,6 +344,13 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 	       (msg (format "%s\n*%s*\n\n:merge: %s\n:jira: %s" msg-title title url jira-link)))
 	  (kill-new msg)
 	(message "Fail to copy mr message")))
+
+;; TODO: make openvpn run via emacs function
+(defun ra/start-openvpn (config)
+  "Start openvpn with designated config file"
+  (make-process :name "openvpn"
+				:buffer "*openvpn*"
+				:command '("openvpn")))
 
 (require '+mappings)
 
