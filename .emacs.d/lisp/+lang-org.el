@@ -49,19 +49,20 @@
   (with-eval-after-load 'org
 	(require 'org-yt)))
 
-(elpaca org-gtd
-  (setopt org-gtd-directory "~/org/gtd"
-		  org-edna-use-inheritance t
-		  org-gtd-update-ack "3.0.0"
+(when display-graphic-p
+  (elpaca org-gtd
+	(setopt org-gtd-directory "~/org/gtd"
+			org-edna-use-inheritance t
+			org-gtd-update-ack "3.0.0"
 
-		  org-agenda-files (list org-gtd-directory)
-		  org-gtd-engage-prefix-width 20)
-  (ra/keymap-set org-gtd-clarify-map
-	"C-c c" #'org-gtd-organize)
+			org-agenda-files (list org-gtd-directory)
+			org-gtd-engage-prefix-width 20)
+	(ra/keymap-set org-gtd-clarify-map
+	  "C-c c" #'org-gtd-organize)
 
-  (with-eval-after-load 'org
-	(org-edna-mode 1)
-	(require 'org-gtd)))
+	(with-eval-after-load 'org
+	  (org-edna-mode 1)
+	  (require 'org-gtd))))
 
 (elpaca doct
   (setopt org-capture-templates

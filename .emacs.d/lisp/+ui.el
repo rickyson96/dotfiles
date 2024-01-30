@@ -167,5 +167,7 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 	"n" #'dashboard-next-line
 	"p" #'dashboard-previous-line))
 
+(elpaca hide-mode-line)
+
 (provide '+ui)
 ;;; +ui.el ends here

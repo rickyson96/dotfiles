@@ -145,14 +145,7 @@
 (elpaca meow
   (require 'meow)
   (meow-setup)
-  (meow-global-mode 1)
-
-  (with-eval-after-load 'eat
-    (add-hook 'meow-normal-mode-hook (lambda ()
-                                       (when (eq major-mode 'eat-mode)
-                                         (eat-emacs-mode))))
-    (add-hook 'meow-insert-mode-hook (lambda () (when (eq major-mode 'eat-mode)
-                                                  (eat-semi-char-mode))))))
+  (meow-global-mode 1)  )
 
 (elpaca xah-fly-keys
   ;; (setopt xah-fly-use-control-key nil

@@ -45,7 +45,34 @@
 
 (elpaca eat
   (add-hook 'eat-exit-hook #'quit-window)
-  (add-hook 'eshell-load-hook #'eat-eshell-mode))
+  (add-hook 'eshell-load-hook #'eat-eshell-mode)
+
+  (defun ra/connect-to-paystone-vm ()
+    (interactive)
+    (let ((display-buffer-overriding-action '(display-buffer-full-frame . ())))
+      (tabspaces-switch-or-create-workspace "paystone-vm")
+      (eat-other-window)))
+
+  (with-eval-after-load 'eat
+    (ra/keymap-set eat-char-mode-map
+      "C-M-g" 'eat-semi-char-mode
+      "M-RET" 'eat-self-input
+      "C-/" 'eat-self-input))
+
+  (with-eval-after-load 'meow
+    (add-hook 'meow-normal-mode-hook (lambda ()
+                                       ;; (hide-mode-line-mode -1)
+                                       (when (eq major-mode 'eat-mode)
+                                         (eat-emacs-mode))))
+    (add-hook 'meow-insert-mode-hook (lambda () (when (eq major-mode 'eat-mode)
+                                                  ;; (hide-mode-line-mode -1)
+                                                  (eat-semi-char-mode))))
+    ;; (add-hook 'eat--char-mode (lambda () (meow-motion-mode 1)))
+    ;; (define-advice eat-char-mode (:after (&rest _) hide-mode-line)
+    ;;   (meow-motion-mode 1)
+    ;;   ;; (hide-mode-line-mode 1)
+    ;;   )
+    ))
 
 (elpaca eshell-prompt-extras
   (autoload 'epe-theme-multiline-with-status "eshell-prompt-extras")
