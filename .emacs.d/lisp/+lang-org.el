@@ -49,7 +49,7 @@
   (with-eval-after-load 'org
 	(require 'org-yt)))
 
-(when display-graphic-p
+(when (display-graphic-p)
   (elpaca org-gtd
 	(setopt org-gtd-directory "~/org/gtd"
 			org-edna-use-inheritance t
