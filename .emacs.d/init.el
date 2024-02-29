@@ -227,6 +227,9 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 	"<remap> <scroll-down-command>" #'golden-ratio-scroll-screen-down)
   (setopt golden-ratio-scroll-highlight-flag nil))
 
+(elpaca clipetty
+  (global-clipetty-mode))
+
 (elpaca which-key
   (setopt which-key-show-early-on-C-h t
 		  which-key-idle-secondary-delay 0.01)

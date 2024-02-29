@@ -147,7 +147,7 @@
   (meow-setup)
   (meow-global-mode 1)  )
 
-(elpaca xah-fly-keys
+;; (elpaca xah-fly-keys
   ;; (setopt xah-fly-use-control-key nil
   ;;         xah-fly-use-meta-key nil)
   ;; (require 'xah-fly-keys)
@@ -155,7 +155,7 @@
   ;; (xah-fly-keys 1)
   ;; (ra/keymap-set xah-fly-command-map
   ;;   "F" 'undo-fu-only-redo)
-  )
+  ;; )
 
 (provide '+mappings-modal)
 ;;; +mappings-modal.el ends here

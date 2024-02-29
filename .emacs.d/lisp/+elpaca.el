@@ -50,6 +50,15 @@
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
+(defun +elpaca-unload-seq (e) "Unload seq before continuing the elpaca build, then continue to build the recipe E."
+  (and (featurep 'seq) (unload-feature 'seq t))
+  (elpaca--continue-build e))
+
+(elpaca `(seq :build ,(append (butlast (if (file-exists-p (expand-file-name "seq" elpaca-builds-directory))
+                                          elpaca--pre-built-steps
+                                        elpaca-build-steps))
+                             (list '+elpaca-unload-seq 'elpaca--activate-package))))
+
 ;; I put system-packages here because it's also package manager but systemwide.
 (elpaca system-packages
   (with-eval-after-load 'system-packages
