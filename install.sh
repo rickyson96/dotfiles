@@ -1,2 +1,3 @@
 sudo apt update
-sudo apt install fish emacs ripgrep stow
+sudo apt upgrade -y
+sudo apt install -y fish emacs ripgrep stow
