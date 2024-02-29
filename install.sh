@@ -1,1 +1,2 @@
-sudo apt install fish emacs
+sudo apt install fish
+sudo apt install emacs
