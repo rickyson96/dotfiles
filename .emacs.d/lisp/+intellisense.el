@@ -53,5 +53,10 @@ Taken from tempel's readme"
 (elpaca aggressive-indent
   (global-aggressive-indent-mode 1))
 
+(elpaca (copilot :host github
+				 :repo "copilot-emacs/copilot.el"
+				 :branch "main"
+				 :files ("dist" "*.el")))
+
 (provide '+intellisense)
 ;;; +intellisense.el ends here
