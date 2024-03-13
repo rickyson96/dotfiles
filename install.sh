@@ -4,4 +4,5 @@ sudo apt upgrade -y
 sudo apt install -y fish emacs ripgrep stow
 
 echo "STOWING"
-stow -D .
+ls -la .
+stow -v 3 -D .
