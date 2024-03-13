@@ -5,4 +5,4 @@ sudo apt install -y fish emacs ripgrep stow
 
 echo "STOWING"
 ls -la .
-stow -v 3 -D .
+stow -v 3 -t "$HOME" . 
