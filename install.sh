@@ -1,3 +1,4 @@
+#!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/ppa
