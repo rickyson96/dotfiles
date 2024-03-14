@@ -34,11 +34,9 @@ export CC=/usr/bin/gcc-10 \
     --with-png=ifavailable \
     --with-gif=ifavailable \
     --with-gnutls=ifavailable \
-    --with-x-toolkit=no \
-    CC=gcc-10
-
-make
-sudo LD_LIBRARY_PATH=/usr/local/lib make install
+    --with-x-toolkit=no \ 
+    && make \
+    && sudo LD_LIBRARY_PATH=/usr/local/lib make install
 
 popd
 
