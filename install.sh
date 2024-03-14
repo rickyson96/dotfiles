@@ -21,24 +21,26 @@ popd
 git clone https://git.savannah.gnu.org/git/emacs.git
 pushd emacs || exit
 export CC=/usr/bin/gcc-10 \
-       CXX=/usr/bin/gcc-10 \
-       LD_LIBRARY_PATH=/usr/local/lib
+    CXX=/usr/bin/gcc-10 \
+    LD_LIBRARY_PATH=/usr/local/lib
        
 ./configure \
     --with-tree-sitter \
     --with-native-compilation \
     --without-compress-install \
-    --with-x-toolkit=no \
     --with-jpeg=ifavailable \
     --with-xpm=ifavailable \
     --with-tiff=ifavailable \
     --with-png=ifavailable \
     --with-gif=ifavailable \
     --with-gnutls=ifavailable \
+    --with-x-toolkit=no \
     CC=gcc-10
 
 make
 sudo LD_LIBRARY_PATH=/usr/local/lib make install
+
+popd
 
 
 stow -t "$HOME" . 
