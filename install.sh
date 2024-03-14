@@ -3,12 +3,12 @@ export DEBIAN_FRONTEND=noninteractive
 
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/ppa
 
-sudo apt update
-sudo apt upgrade -y
-sudo apt install -y fish ripgrep stow
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get install -y fish ripgrep stow
 
 # install emacs build tools
-sudo apt install -y build-essential gcc-10 libgccjit-10-dev texinfo
+sudo apt install -y build-essential gcc-10 libgccjit-10-dev texinfo gnutls-bin
 
 # install tree-sitter
 git clone https://github.com/tree-sitter/tree-sitter.git
