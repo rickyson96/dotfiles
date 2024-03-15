@@ -18,27 +18,27 @@ sudo make install
 popd
 
 # install emacs
-git clone https://git.savannah.gnu.org/git/emacs.git
+git clone https://git.savannah.gnu.org/git/emacs.git --depth=1
 pushd emacs || exit
 export CC=/usr/bin/gcc-10 \
     CXX=/usr/bin/gcc-10 \
     LD_LIBRARY_PATH=/usr/local/lib
        
-./configure \
-    --with-tree-sitter \
-    --with-native-compilation \
-    --without-compress-install \
-    --with-jpeg=ifavailable \
-    --with-xpm=ifavailable \
-    --with-tiff=ifavailable \
-    --with-png=ifavailable \
-    --with-gif=ifavailable \
-    --with-x-toolkit=no
+# ./configure \
+#     --with-tree-sitter \
+#     --with-native-compilation \
+#     --without-compress-install \
+#     --with-jpeg=ifavailable \
+#     --with-xpm=ifavailable \
+#     --with-tiff=ifavailable \
+#     --with-png=ifavailable \
+#     --with-gif=ifavailable \
+#     --with-x-toolkit=no
 
-make
-sudo LD_LIBRARY_PATH=/usr/local/lib make install
+# make
+# sudo LD_LIBRARY_PATH=/usr/local/lib make install
 
-popd
+# popd
 
 
 stow -t "$HOME" . 
