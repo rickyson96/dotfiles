@@ -56,6 +56,7 @@
 (elpaca xr)
 (elpaca pcre2el)
 (elpaca 0xc)
+
 (defun +elpaca-unload-seq (e)
   "Unload seq before continuing the elpaca build, then continue to build the recipe E."
   (and (featurep 'seq) (unload-feature 'seq t))
@@ -234,6 +235,8 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
   (setopt which-key-show-early-on-C-h t
 		  which-key-idle-secondary-delay 0.01)
   (which-key-mode 1))
+
+(elpaca hydra)
 
 (elpaca string-inflection
   (with-eval-after-load 'embark
