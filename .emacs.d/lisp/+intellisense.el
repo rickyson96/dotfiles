@@ -44,13 +44,17 @@
 
   (add-hook 'lsp-completion-mode #'ra/lsp-mode-setup-completion))
 
-(elpaca apheleia)
+(elpaca apheleia
+  (with-eval-after-load 'apheleia-formatters
+	(add-to-list 'apheleia-formatters '(eslint . ("apheleia-npx" "eslint" "--fix" file)))
+	(add-to-list 'apheleia-formatters '(eslintd . ("eslint_d" "--fix-to-stdout" "--stdin" "--stdin-filename" filepath)))
+	(setf (alist-get 'typescript-ts-mode apheleia-mode-alist) 'eslintd)))
 
 (elpaca tempel
   (defun ra/tempel-setup-capf ()
 	"Setup capf to try tempel first
 Taken from tempel's readme"
-  (add-hook 'completion-at-point-functions #'tempel-expand -90 t)))
+	(add-hook 'completion-at-point-functions #'tempel-expand -90 t)))
 
 (elpaca tempel-collection)
 
