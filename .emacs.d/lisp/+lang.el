@@ -42,6 +42,12 @@
 (elpaca jsonian)
 (elpaca (hjson :host github :repo "hjson/hjson-emacs" :main "hjson-mode.el"))
 
+(ra/treesitter-setup yaml "https://github.com/ikatyang/tree-sitter-yaml")
+(elpaca yaml-pro
+  (autoload #'yaml-pro-ts-mode "yaml-pro" "" t)
+  (add-hook 'yaml-ts-mode-hook #'yaml-pro-ts-mode)
+  (add-to-list #'auto-mode-alist `(,(rx (or ".yml" ".yaml") eos) . yaml-ts-mode)))
+
 (elpaca dockerfile-mode)
 
 (elpaca nix-mode)
