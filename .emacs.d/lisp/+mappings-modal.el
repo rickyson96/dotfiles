@@ -124,7 +124,7 @@
    '("'" . my/meow-kmacro)
    '("/" . meow-visit)
    '("\"" . meow-end-or-call-kmacro)
-   '("-" . ngative-argument)
+   '("-" . negative-argument)
    '("_" . meow-universal-argument)
    '(";" . meow-M-x)
    '(":" . eval-expression)
