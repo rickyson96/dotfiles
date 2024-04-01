@@ -206,12 +206,28 @@ Without prefix: comment line (a.k.a `comment-line')"
   "m" #'macrostep-expand
   "r" #'crux-eval-and-replace)
 
+(defvar-keymap ra/window-manipulate-map
+  :doc "Keymap for repeatedly modify emacs' windows"
+  :repeat t
+  "c" #'enlarge-window
+  "t" #'shrink-window
+  "h" #'shrink-window-horizontally
+  "n" #'enlarge-window-horizontally)
+
+(defvar-keymap ra/window-map
+  :doc "Keymap for modifying emacs' windows"
+  :parent ra/window-manipulate-map
+  "o" #'switch-window)
+
+(defalias 'ra/window-map ra/window-map)
+
 ;; C-c keymap
 (ra/keymap-set mode-specific-map
   "TAB" ra/completion-map
   "a" #'org-agenda
   "e" ra/eval-map
   "o" #'ra/open-map
+  "w" #'ra/window-map
   "T" #'ra/toggle-map)
 
 ;; C-x keymap
@@ -239,6 +255,8 @@ Without prefix: comment line (a.k.a `comment-line')"
   "M-y" #'consult-yank-pop
   "M-m" ra/manipulate-map
   "M-o" #'switch-window
+  "M-n" #'flymake-goto-next-error
+  "M-p" #'flymake-goto-prev-error
   "M-N" #'move-text-down
   "M-P" #'move-text-up)
 
