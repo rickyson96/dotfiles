@@ -28,6 +28,10 @@
 (elpaca corfu-candidate-overlay
   (corfu-candidate-overlay-mode 1))
 
+(elpaca corfu-terminal
+  (unless (display-graphic-p)
+	(corfu-terminal-mode +1)))
+
 (elpaca lsp-mode
   (setopt lsp-idle-delay 0.3
 		  lsp-completion-provider :none
