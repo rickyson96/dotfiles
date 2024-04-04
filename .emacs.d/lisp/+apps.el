@@ -104,6 +104,8 @@
 
 (elpaca daemons)
 
+(elpaca bluetooth)
+
 (elpaca trashed)
 
 (elpaca elfeed)
