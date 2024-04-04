@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Notion
+GenericName=Online Document Editor
+Comment=Your connected workspace for wiki, docs & projects
+Exec=notion-app-nativier --with-ozone-platform=auto %U
+Icon=notion
+Categories=Office;
+MimeType=x-scheme-handler/notion;
+X-Desktop-File-Install-Version=0.27
