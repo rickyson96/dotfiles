@@ -186,11 +186,20 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 (elpaca substitute
   (require 'substitute)
   (setopt substitute-post-replace-functions #'substitute-report-operation)
+
+  (defun ra/rename-symbol ()
+	"Run rename symol based on context. Use `eglot-rename' when eglot is on,
+otherwise, use `substitute-target-in-buffer'"
+	(interactive)
+	(if (eglot-managed-p)
+		(call-interactively #'eglot-rename)
+	  (call-interactively #'substitute-target-in-buffer)))
+
   (defvar-keymap ra/substitute-map
 	:doc "Keymap for substitute package"
 	:prefix 'ra/substitute-map
-	"," #'substitute-target-in-buffer
-	"C-," #'substitute-target-in-buffer
+	"," #'ra/rename-symbol
+	"C-," #'ra/rename-symbol
 	"n" #'substitute-target-below-point
 	"p" #'substitute-target-above-point
 	"d" #'substitute-target-in-defun
