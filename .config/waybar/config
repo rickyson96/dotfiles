@@ -1,5 +1,6 @@
+// -*- mode: jsonian-c; -*-
 {
-    "layer": "bottom",
+    "layer": "top",
     "position": "top", // Waybar position (top|bottom|left|right)
     "height": 30, // Waybar height (to be removed for auto height)
     // "width": 1280, // Waybar width
@@ -84,7 +85,7 @@
     "clock": {
         "format": "{:%H:%M} ",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-	"tooltip": true,
+	    "tooltip": true,
         "format-alt": "{:%Y-%m-%d}"
     },
     "cpu": {
@@ -109,7 +110,7 @@
     },
     "backlight/slider": {
     	"min": 1,
-	"max": 100
+	    "max": 100
     },
     "battery": {
         "states": {
@@ -118,12 +119,13 @@
             "critical": 15
         },
         "format": "{capacity}% {icon}",
-        "format-charging": "{capacity}% ",
+        "format-charging": "{capacity}% 󰂄",
         "format-plugged": "{capacity}% ",
         "format-alt": "{time} {icon}",
         // "format-good": "", // An empty format will hide the module
         // "format-full": "",
-        "format-icons": ["", "", "", "", ""]
+        "format-icons": ["", "", "", "", ""],
+        "interval": 10,
     },
     "battery#bat2": {
         "bat": "BAT2"
@@ -131,15 +133,16 @@
     "network": {
         // "interface": "wlp2*", // (Optional) To force the use of this interface
         "format-wifi": "{essid} ({signalStrength}%) ",
-        "format-ethernet": "{ipaddr}/{cidr} ",
-        "tooltip-format": "{ifname} via {gwaddr} ",
+        "format-ethernet": "{ipaddr}/{cidr} ",
         "format-linked": "{ifname} (No IP) ",
         "format-disconnected": "Disconnected ⚠",
-        "format-alt": "{ifname}: {ipaddr}/{cidr}"
+        "format-alt": "{ifname}: {ipaddr}/{cidr} via {gwaddr} 󰊗",
+        "tooltip-format": "{bandwidthDownBytes}   / {bandwidthUpBytes} ",
+        "interval": 1
     },
     "pulseaudio": {
         // "scroll-step": 1, // %, can be a float
-	"max-volume": 150,
+	    "max-volume": 150,
         "format": "{volume}% {icon} {format_source}",
         "format-bluetooth": "{volume}% {icon} {format_source}",
         "format-bluetooth-muted": " {icon} {format_source}",
@@ -156,7 +159,7 @@
             "default": ["", "", ""]
         },
         "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
-	"on-click-middle": "pavucontrol"
+	    "on-click-middle": "pavucontrol"
     },
     "pulseaudio/slider": {
     	"max": 150
@@ -172,5 +175,13 @@
         "escape": true,
         "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null" // Script in resources folder
         // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
+    },
+    "systemd-failed-units": {
+        "hide-on-ok": false,
+	    "format": "✗ {nr_failed}",
+	    "format-ok": "✓",
+	    "system": true, // Monitor failed systemwide units.
+	    "user": false // Ignore failed user units.
+        "format": ""
     }
 }
