@@ -56,7 +56,7 @@
 		  xref-show-xrefs-function #'consult-xref
 		  xref-show-definitions-function #'consult-xref
 		  consult-narrow-key "<"
-		  consult-ripgrep-args "rg --hidden --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --with-filename --line-number --search-zip")
+		  consult-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --with-filename --line-number --search-zip")
 
   (add-hook 'completion-list-mode #'consult-preview-at-point-mode)
 
