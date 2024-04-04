@@ -65,6 +65,38 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   (add-hook 'smerge-mode-hook (lambda () (when smerge-mode
 										   (smerge-hydra/body)))))
 
+(setopt ediff-window-setup-function 'ediff-setup-windows-plain
+		ediff-split-window-function 'split-window-horizontally
+		ediff-diff-options "-w")
+
+(defun ra/ediff-copy-both-to-C ()
+  "`ediff' function to combine both on conflict merge.
+
+Taken from: https://stackoverflow.com/a/29757750"
+  (interactive)
+  (ediff-copy-diff ediff-current-difference nil 'C nil
+                   (concat
+                    (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
+                    (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
+
+(add-hook 'ediff-keymap-setup-hook (lambda ()
+									 (keymap-set ediff-mode-map
+									   "B" 'ra/ediff-copy-both-to-C)))
+
+(add-hook 'ediff-startup-hook (lambda ()
+								(setopt ediff-long-help-message-merge "
+p,DEL -previous diff |     | -vert/horiz split   |  x -copy buf X's region to C
+n,SPC -next diff     |     h -highlighting       |  B -copy both region to C
+    j -jump to diff  |     @ -auto-refinement    |  r -restore buf C's old diff
+   gx -goto X's point|    ## -ignore whitespace  |  * -refine current region
+  C-l -recenter      | #f/#h -focus/hide regions |  ! -update diff regions
+  v/V -scroll up/dn  |     X -read-only in buf X |  + -combine diff regions
+  </> -scroll lt/rt  |     m -wide display       | wx -save buf X
+    ~ -swap variants |     s -shrink window C    | wd -save diff output
+                     |  $$ -show clashes only    |  / -show/hide ancestor buff
+                     |  $* -skip changed regions |  & -merge w/new default
+")))
+
 (elpaca magit-imerge)
 
 (elpaca forge)

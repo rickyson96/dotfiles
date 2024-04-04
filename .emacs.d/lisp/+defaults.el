@@ -48,7 +48,6 @@
 		save-interprogram-paste-before-kill t
 		visible-bell t
 		load-prefer-newer t
-		ediff-window-setup-function 'ediff-setup-windows-plain
 		use-dialog-box nil
 		global-auto-revert-non-file-buffers t
 		auto-revert-check-vc-info t
