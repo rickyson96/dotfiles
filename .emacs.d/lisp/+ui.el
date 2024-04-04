@@ -165,7 +165,14 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 
   (ra/keymap-set dashboard-mode-map
 	"n" #'dashboard-next-line
-	"p" #'dashboard-previous-line))
+	"p" #'dashboard-previous-line)
+
+  (setopt dashboard-center-content t
+		  dashboard-vertically-center-content t)
+
+  ;; to work with daemon
+  ;; https://github.com/emacs-dashboard/emacs-dashboard?tab=readme-ov-file#emacs-daemon
+  (setopt initial-buffer-choice (lambda () (get-buffer-create dashboard-buffer-name))))
 
 (elpaca hide-mode-line)
 
