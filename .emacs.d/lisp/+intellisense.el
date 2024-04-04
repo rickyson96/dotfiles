@@ -66,5 +66,12 @@ Taken from tempel's readme"
 				 :branch "main"
 				 :files ("dist" "*.el")))
 
+(elpaca flymake-flycheck
+  (add-hook 'flymake-mode-hook 'flymake-flycheck-auto)
+
+  (with-eval-after-load 'flymake-flycheck
+	(dolist (checkers '(javascript-eslint))
+	  (add-to-list 'flycheck-disabled-checkers checkers))))
+
 (provide '+intellisense)
 ;;; +intellisense.el ends here

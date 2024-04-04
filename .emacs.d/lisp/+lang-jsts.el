@@ -43,6 +43,10 @@
 (elpaca npm)
 (elpaca nodejs-repl)
 (elpaca nvm)
+(elpaca (yarn :host github :repo "jmfirth/yarn.el"))
+(elpaca yarn-mode)
+
+(elpaca jest-test-mode)
 
 (elpaca flymake-eslint
   (add-hook 'eglot-managed-mode-hook
@@ -54,13 +58,19 @@
 							   (locate-dominating-file buffer-file-name ".eslintrc.js"))
 						   (derived-mode-p 'typescript-ts-base-mode))
 				  (setq flymake-eslint-executable-name eslint)
-				  (flymake-eslint-enable)))))
+				  (flymake-eslint-enable)))
+
+			  (flymake-flycheck-auto)))
 
   (defun ra/flymake-eslint_d-restart ()
 	"Restart eslint_d and then run `flymake-start'"
 	(interactive)
 	(shell-command "eslint_d restart")
 	(flymake-start)))
+
+(elpaca flycheck-jest
+  (setq flycheck-jest '(typescript-ts-mode web-mode js-mode typescript-mode rjsx-mode))
+  (add-hook 'typescript-ts-base-mode-hook 'flycheck-jest-setup))
 
 (provide '+lang-jsts)
 ;;; +lang-jsts.el ends here
