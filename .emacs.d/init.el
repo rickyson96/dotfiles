@@ -47,9 +47,9 @@
 ;; installation can conform to the no-littering directories
 (elpaca-wait)
 
-(set-face-attribute 'default nil :font "IosevraRelaxed Nerd Font" :height 110)
-(set-face-attribute 'fixed-pitch nil :font "IosevraRelaxed Nerd Font")
-(set-face-attribute 'variable-pitch nil :font "IosevraAileRelaxed Nerd Font")
+(set-face-attribute 'default nil :font "monospace" :height 110)
+(set-face-attribute 'fixed-pitch nil :font "monospace")
+(set-face-attribute 'variable-pitch nil :font "sans-serif")
 
 (require '+defaults)
 
