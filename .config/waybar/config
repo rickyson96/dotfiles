@@ -177,11 +177,17 @@
         // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
     },
     "systemd-failed-units": {
-        "hide-on-ok": false,
+        "hide-on-ok": true,
 	    "format": "✗ {nr_failed}",
 	    "format-ok": "✓",
 	    "system": true, // Monitor failed systemwide units.
-	    "user": false // Ignore failed user units.
-        "format": ""
+	    "user": false, // Ignore failed user units.
+    },
+    "hyprland/language": {
+        "format": "{variant}",
+        "keyboard-name": "keyd-virtual-keyboard",
+        "on-click": "hyprctl switchxkblayout keyd-virtual-keyboard next"
+        // "tooltip-format": "{}",
+        // "tooltip": true
     }
 }

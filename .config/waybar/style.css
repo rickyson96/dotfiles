@@ -350,3 +350,11 @@ label:focus {
 #privacy-item.audio-out {
     background-color: #0069d4;
 }
+
+#systemd-failed-units {
+	background-color: #cf5700;
+}
+
+#language {
+	min-width: 50px
+}
