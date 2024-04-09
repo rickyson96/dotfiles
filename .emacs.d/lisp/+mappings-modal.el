@@ -121,7 +121,7 @@
    '("Y" . meow-yank-pop)
    '("z" . meow-reverse)
    '("Z" . meow-pop-selection)
-   '("'" . my/meow-kmacro)
+   '("'" . ra/meow-kmacro)
    '("/" . meow-visit)
    '("\"" . meow-end-or-call-kmacro)
    '("-" . negative-argument)
@@ -140,7 +140,15 @@
   (setopt meow-expand-hint-remove-delay 0
           meow-use-clipboard t))
 
-;; TODO: meow kmacro
+(defun ra/meow-kmacro ()
+  "Run kmacro function based on mode.
+NORMAL: toggle kmacro state using `meow-start-kmacro' and `meow-end-or-call-kmacro'.
+BEACON: toggle kmacro state using `meow-beacon-start' and `meow-end-or-call-kmacro'."
+  (interactive)
+  (cond ((and meow-beacon-mode meow--beacon-defining-kbd-macro) (meow-end-or-call-kmacro))
+        (meow-beacon-mode (meow-beacon-start))
+        (defining-kbd-macro (meow-end-or-call-kmacro))
+        (t (meow-start-kmacro))))
 
 (elpaca meow
   (require 'meow)
