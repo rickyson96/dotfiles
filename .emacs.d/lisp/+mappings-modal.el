@@ -153,7 +153,24 @@ BEACON: toggle kmacro state using `meow-beacon-start' and `meow-end-or-call-kmac
 (elpaca meow
   (require 'meow)
   (meow-setup)
-  (meow-global-mode 1)  )
+  (meow-global-mode 1)
+
+  (defvar ra/meow--macrostep-setup nil)
+
+  (defun ra/meow--macrostep-hook-function ()
+    "Switch meow state when entering/leaving macrostep-mode"
+    (if (bound-and-true-p macrostep-mode)
+        (meow--switch-to-motion)
+      (meow--switch-to-normal)))
+
+  (defun ra/meow--setup-macrostep (enable)
+    "Setup macrostep. ENABLE non-nil means turn on shim."
+    (setq ra/meow--macrostep-setup enable)
+    (if enable
+        (add-hook 'macrostep-mode-hook #'ra/meow--macrostep-hook-function)
+      (remove-hook 'macrostep-mode-hook #'ra/meow--macrostep-hook-function)))
+
+  (with-eval-after-load "macrostep" (ra/meow--setup-macrostep t)))
 
 ;; (elpaca xah-fly-keys
   ;; (setopt xah-fly-use-control-key nil
