@@ -30,7 +30,7 @@
 		  nerd-icons-font-family "IosevraRelaxed Nerd Font"))
 
 (elpaca hl-todo
-  (hl-todo-mode 1))
+  (global-hl-todo-mode 1))
 
 (elpaca ef-themes
   (setopt ef-themes-mixed-fonts t
