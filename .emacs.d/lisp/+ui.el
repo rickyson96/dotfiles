@@ -84,13 +84,15 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 		  doom-modeline-buffer-encoding 'nondefault))
 
 (elpaca spacious-padding
-  (spacious-padding-mode 1)
   (setopt spacious-padding-widths '( :internal-border-width 15
 									 :header-line-width 4
 									 :mode-line-width 3
 									 :tab-width 4
 									 :right-divider-width 10
-									 :scroll-bar-width 8)))
+									 :scroll-bar-width 8))
+
+  (ra/configure-frame "spacious-padding" (elpaca-after-init-hook server-after-make-frame-hook)
+	(spacious-padding-mode 1)))
 
 (elpaca (dired-plus :host github :repo "emacsmirror/dired-plus" :main "dired+.el"))
 

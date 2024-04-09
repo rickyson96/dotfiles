@@ -47,9 +47,24 @@
 ;; installation can conform to the no-littering directories
 (elpaca-wait)
 
-(set-face-attribute 'default nil :font "monospace" :height 110)
-(set-face-attribute 'fixed-pitch nil :font "monospace")
-(set-face-attribute 'variable-pitch nil :font "sans-serif")
+(defmacro ra/configure-frame (name hooks &rest body)
+  "Macro for creating hook function for frame related configurations, which will not function
+correctly when being run directly on startup.
+This macro will add the corresponding hooks and then remove them on startup.
+
+See https://emacs.stackexchange.com/questions/59791/font-and-frame-configuration-in-daemon-mode"
+  (declare (indent 2))
+  (macroexp-progn
+   (mapcan (lambda (hook) (let ((name (intern (format "%s@%s" name hook))))
+							`((defun ,name (&rest _) ,@body
+									 (remove-hook ',hook #',name))
+							  (add-hook ',hook #',name))))
+		   hooks)))
+
+(ra/configure-frame ra/setup-font (after-init-hook server-after-make-frame-hook)
+  (set-face-attribute 'default nil :font "monospace" :height 110)
+  (set-face-attribute 'fixed-pitch nil :font "monospace")
+  (set-face-attribute 'variable-pitch nil :font "sans-serif"))
 
 (require '+defaults)
 
