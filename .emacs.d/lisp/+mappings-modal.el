@@ -19,7 +19,10 @@
 
 (defun ra/meow-block-to-block (arg)
   "Run `meow-block' initially, and `meow-to-block' for next invocation"
-  )
+  (interactive "P")
+  (if meow--selection
+      (meow-to-block arg)
+    (meow-block arg)))
 
 (defun ra/meow-next-word-expand (n)
   "`meow-next-word' but expand selection"
@@ -99,7 +102,7 @@
    '("n" . meow-next)
    '("N" . meow-next-expand)
    '("o" . meow-block)
-   '("O" . meow-to-block)
+   '("O" . ra/meow-block-to-block)
    '("p" . meow-prev)
    '("P" . meow-prev-expand)
    '("q" . meow-quit)
