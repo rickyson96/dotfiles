@@ -36,12 +36,27 @@
   (no-littering-theme-backups) ; setup no littering to theme backups variables
   (with-eval-after-load 'recentf
     (add-to-list 'recentf-exclude
-             (recentf-expand-file-name no-littering-var-directory))
+				 (recentf-expand-file-name no-littering-var-directory))
     (add-to-list 'recentf-exclude
-             (recentf-expand-file-name no-littering-etc-directory))))
+				 (recentf-expand-file-name no-littering-etc-directory))))
 
 (elpaca gcmh
   (gcmh-mode))
+
+;; load exec-path-from-shell before configuration, so that our config
+;; can rely on newly setup PATH. Some package also depends on
+;; environment variable like `lsp-mode'
+(elpaca exec-path-from-shell
+  (when (daemonp)
+	(require 'exec-path-from-shell)
+	(dolist (var '("SSH_AUTH_SOCK"
+				   "SSH_AGENT_PID"
+				   "LANG"
+				   "LC_ALL"
+				   "LSP_USE_PLISTS"))
+	  (add-to-list 'exec-path-from-shell-variables var))
+
+	(exec-path-from-shell-initialize)))
 
 ;; we need to wait for `no-littering' to install so that further
 ;; installation can conform to the no-littering directories
