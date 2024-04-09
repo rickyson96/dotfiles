@@ -82,5 +82,8 @@
 
 (elpaca mermaid-mode)
 
+(elpaca git-modes
+  (add-to-list 'auto-mode-alist `(,(rx (or ".ignore" ".rgignore") eos) . gitignore-mode)))
+
 (provide '+lang)
 ;;; +lang.el ends here

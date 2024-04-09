@@ -1,0 +1,2 @@
+# Globally tell rg to ignore .git contents
+.git
