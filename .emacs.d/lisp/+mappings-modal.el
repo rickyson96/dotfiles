@@ -35,22 +35,6 @@
                 (meow--select))
   (meow-next-word 1))
 
-(el-patch-defun meow-change-save ()
-  (interactive)
-  (let ((select-enable-clipboard meow-use-clipboard))
-    ((el-patch-swap when if) (and (meow--allow-modify-p) (region-active-p))
-     (el-patch-wrap 1 0
-       (progn
-         (el-patch-add (setq this-command #'meow-change-save))
-         (el-patch-wrap 1 0
-           (meow--with-selection-fallback
-            (kill-region (region-beginning) (region-end))
-            (meow--switch-state 'insert)
-            (setq-local meow--insert-pos (point))))))
-     (el-patch-add
-       (kill-region (point) (1+ (point)))
-       (meow--switch-state 'insert)))))
-
 (defun meow-xah-adapt ()
   "Meow modal adapted from xah-fly-keys"
   (meow-normal-define-key
@@ -68,6 +52,22 @@
    '("R" . ra/meow-next-word-expand)))
 
 (defun meow-setup ()
+  (el-patch-defun meow-change-save ()
+    (interactive)
+    (let ((select-enable-clipboard meow-use-clipboard))
+      ((el-patch-swap when if) (and (meow--allow-modify-p) (region-active-p))
+       (el-patch-wrap 1 0
+         (progn
+           (el-patch-add (setq this-command #'meow-change-save))
+           (el-patch-wrap 1 0
+             (meow--with-selection-fallback
+              (kill-region (region-beginning) (region-end))
+              (meow--switch-state 'insert)
+              (setq-local meow--insert-pos (point))))))
+       (el-patch-add
+         (kill-region (point) (1+ (point)))
+         (meow--switch-state 'insert)))))
+
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-dvorak)
   (ra/keymap-set mode-specific-map
     "?" #'meow-cheatsheet
