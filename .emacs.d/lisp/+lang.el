@@ -46,7 +46,7 @@
 (elpaca yaml-pro
   (autoload #'yaml-pro-ts-mode "yaml-pro" "" t)
   (add-hook 'yaml-ts-mode-hook #'yaml-pro-ts-mode)
-  (add-to-list #'auto-mode-alist `(,(rx (or ".yml" ".yaml") eos) . yaml-ts-mode)))
+  (add-to-list 'auto-mode-alist `(,(rx (or ".yml" ".yaml") eos) . yaml-ts-mode)))
 
 (elpaca dockerfile-mode)
 
