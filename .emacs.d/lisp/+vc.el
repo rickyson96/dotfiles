@@ -109,6 +109,10 @@ n,SPC -next diff     |     h -highlighting       |  B -copy both region to C
 (elpaca diff-hl
   (global-diff-hl-mode 1))
 
+(elpaca magit-todos
+  (with-eval-after-load 'magit
+	(magit-todos-mode 1)))
+
 (elpaca git-timemachine)
 
 (elpaca browse-at-remote)
