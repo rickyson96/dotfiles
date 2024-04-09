@@ -86,6 +86,7 @@ See https://emacs.stackexchange.com/questions/59791/font-and-frame-configuration
 (elpaca xr)
 (elpaca pcre2el)
 (elpaca 0xc)
+(elpaca el-patch)
 
 (defmacro ra/keymap-set (keymap &rest pairs)
   "Bind multiple pairs of KEY/DEFINITION to KEYMAP using `keymap-set'.
