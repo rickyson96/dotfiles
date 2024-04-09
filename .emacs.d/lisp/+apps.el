@@ -135,5 +135,12 @@
   (require 'codespaces)
   (codespaces-setup))
 
+(elpaca verb
+  (with-eval-after-load 'org
+    (ra/keymap-set org-mode-map
+      "C-c C-r" verb-command-map)))
+
+(elpaca impostman)
+
 (provide '+apps)
 ;;; +apps.el ends here
