@@ -339,7 +339,8 @@ otherwise, use `substitute-target-in-buffer'"
     "<remap> <describe-command>" #'helpful-command
     "<remap> <describe-symbol>" #'helpful-symbol))
 
-(elpaca (noman :host github :repo "andykuszyk/noman.el"))
+(elpaca (noman :host github :repo "andykuszyk/noman.el")
+  (autoload #'noman "noman"))
 
 (elpaca info-colors
   (add-hook 'Info-selection-hook #'info-colors-fontify-node))
