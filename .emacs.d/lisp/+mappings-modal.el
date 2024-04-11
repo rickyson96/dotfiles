@@ -12,7 +12,8 @@
 ;; Tried:
 ;;   Meow: very good, especially `beacon-mode', but not working
 ;;         great with puni, and missing mwim navigation goodies
-;;   XFK: trying
+;;   XFK: it's so hard to make it work with my muscle memory. It feels
+;;         like `meow' integrates better withemcas ecosystem
 
 
 ;;; Code:
