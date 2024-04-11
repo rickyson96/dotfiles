@@ -44,6 +44,10 @@
 
   (add-hook 'lsp-completion-mode #'ra/lsp-mode-setup-completion))
 
+(elpaca (eglot-booster :host github :repo "jdtsmith/eglot-booster")
+  (with-eval-after-load 'eglot
+	(eglot-booster-mode 1)))
+
 (elpaca apheleia
   (with-eval-after-load 'apheleia-formatters
 	(add-to-list 'apheleia-formatters '(eslint . ("apheleia-npx" "eslint" "--fix" file)))
