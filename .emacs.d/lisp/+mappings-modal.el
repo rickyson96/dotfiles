@@ -18,6 +18,17 @@
 
 ;;; Code:
 
+(elpaca embrace
+  (add-hook 'org-mode-hook #'embrace-org-mode-hook)
+  ;; See https://github.com/meow-edit/meow/discussions/273#discussioncomment-3158654
+  (defun embrace-markdown-mode-hook ()
+    (dolist (lst '((?* "*" . "*")
+                   (?\ "\\" . "\\")
+                   (?$ "$" . "$")
+                   (?/ "/" . "/")))
+      (embrace-add-pair (car lst) (cadr lst) (cddr lst))))
+  (add-hook 'markdown-mode-hook 'embrace-markdown-mode-hook))
+
 (defun ra/meow-block-to-block (arg)
   "Run `meow-block' initially, and `meow-to-block' for next invocation"
   (interactive "P")
