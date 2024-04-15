@@ -33,23 +33,28 @@ normal_bindings = {
     "tp": "config-cycle -t -p content.proxy system http://192.168.195.167:8181",
     "<ctrl+d>": "scroll-page 0 0.25",
     "<ctrl+u>": "scroll-page 0 -0.25",
-    "zll": "spawn -u qute-pass -m -d tofi",
-    "zlL": "spawn -u qute-pass -m -d tofi --unfiltered",
-    "zlu": "spawn -u qute-pass -m -d tofi --username-only",
-    "zlU": "spawn -u qute-pass -m -d tofi --unfiltered --username-only",
-    "zlp": "spawn -u qute-pass -m -d tofi --password-only",
-    "zlP": "spawn -u qute-pass -m -d tofi --unfiltered --password-only",
-    "zlo": "spawn -u qute-pass -m -d tofi --otp-only",
-    "zlO": "spawn -u qute-pass -m -d tofi --unfiltered --otp-only",
+    "zll": "spawn -u qute-pass -m -d 'fuzzel -d'",
+    "zlL": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered",
+    "zlu": "spawn -u qute-pass -m -d 'fuzzel -d' --username-only",
+    "zlU": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --username-only",
+    "zlp": "spawn -u qute-pass -m -d 'fuzzel -d' --password-only",
+    "zlP": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --password-only",
+    "zlo": "spawn -u qute-pass -m -d 'fuzzel -d' --otp-only",
+    "zlO": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --otp-only",
     "zm": "spawn umpv {url}",
-    "zM": "hint links spawn umpv {hint-url}"
+    "zM": "hint links spawn umpv {hint-url}",
+    "<alt-shift-.>": 'scroll-to-perc'
 }
 for k,v in normal_bindings.items():
     config.bind(k, v)
 
+config.source('bind-dvorak.py')
+
 command_bindings = {
-    "<Ctrl+j>": "completion-item-focus next",
-    "<Ctrl+k>": "completion-item-focus prev"
+    "<Alt+n>": "command-history-next",
+    "<Alt+p>": "command-history-prev",
+    "<Ctrl+n>": "completion-item-focus next",
+    "<Ctrl+p>": "completion-item-focus prev"
 }
 for k,v in command_bindings.items():
     config.bind(k, v, mode="command")
