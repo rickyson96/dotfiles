@@ -6,6 +6,39 @@
 
 config_version: 2
 settings:
+  bindings.commands:
+    global:
+      command:
+        <Ctrl+j>: completion-item-focus next
+        <Ctrl+k>: completion-item-focus prev
+      normal:
+        <Alt+Shift+,>: scroll-to-perc 0
+        <Alt+Shift+.>: scroll-to-perc
+        <Ctrl+Shift+.>: 'cmd-set-text :'
+        <Ctrl+Shift+\>>: 'cmd-set-text :'
+        <Ctrl+d>: scroll-page 0 0.25
+        <Ctrl+u>: scroll-page 0 -0.25
+        D: tab-close
+        J: tab-next
+        K: tab-prev
+        U: undo
+        co: null
+        d: scroll-page 0 0.5
+        tp: config-cycle -t -p content.proxy system http://192.168.195.167:8181
+        tt: config-cycle -t tabs.show switching always
+        u: scroll-page 0 -0.5
+        zM: hint links spawn umpv {hint-url}
+        zlL: spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered
+        zlO: spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --otp-only
+        zlP: spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --password-only
+        zlU: spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --username-only
+        zll: spawn -u qute-pass -m -d 'fuzzel -d'
+        zlo: spawn -u qute-pass -m -d 'fuzzel -d' --otp-only
+        zlp: spawn -u qute-pass -m -d 'fuzzel -d' --password-only
+        zlu: spawn -u qute-pass -m -d 'fuzzel -d' --username-only
+        zm: spawn umpv {url}
+  content.blocking.enabled:
+    global: true
   content.media.audio_capture:
     https://app.lunapark.com: true
     https://meet.google.com: true

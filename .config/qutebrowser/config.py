@@ -1,5 +1,11 @@
 # enable prompt based configuration
 # such as: google-meet always accept video and audio request
+# pylint: disable=C0111
+from qutebrowser.config.configfiles import ConfigAPI  # noqa: F401
+from qutebrowser.config.config import ConfigContainer  # noqa: F401
+config: ConfigAPI = config  # noqa: F821 pylint: disable=E0602,C0103
+c: ConfigContainer = c  # noqa: F821 pylint: disable=E0602,C0103
+
 config.load_autoconfig(True)
 
 c.tabs.position = "left"
@@ -21,6 +27,19 @@ c.url.searchengines = {
 }
 
 config.unbind("co")
+
+# c.input.insert_mode.auto_load = True
+c.input.insert_mode.plugins = True
+
+# c.input.insert_mode.auto_enter = False
+# c.input.insert_mode.auto_leave = False
+# c.input.insert_mode.plugins = False
+#
+# c.input.forward_unbound_keys = "all"
+#
+# c.input.match_counts = False
+#
+# c.bindings.default['normal'] = {}
 
 normal_bindings = {
     "J": "tab-next",
