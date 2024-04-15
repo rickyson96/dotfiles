@@ -14,8 +14,8 @@ fi
 
 dmenu_switches=""
 if [[ -n $WAYLAND_DISPLAY ]]; then
-	dmenu=tofi
-	dmenu_switches="--prompt-text $prompt --width 650"
+	dmenu=fuzzel
+	dmenu_switches="--prompt $prompt --width 80 --dmenu"
 	xdotool="wtype"
 elif [[ -n $DISPLAY ]]; then
 	dmenu=dmenu
