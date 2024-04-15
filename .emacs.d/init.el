@@ -222,7 +222,7 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 	"Run rename symol based on context. Use `eglot-rename' when eglot is on,
 otherwise, use `substitute-target-in-buffer'"
 	(interactive)
-	(if (eglot-managed-p)
+	(if (and (boundp 'eglot-managed-p) eglot-managed-p)
 		(call-interactively #'eglot-rename)
 	  (call-interactively #'substitute-target-in-buffer)))
 
