@@ -63,7 +63,13 @@
 (elpaca (pdf-tools :host github :repo "vedang/pdf-tools"
 				   :remotes ("roll" :repo "dalanicolai/pdf-tools" :branch "pdf-roll"))
   (pdf-loader-install)
-  (setopt pdf-view-display-size 'fit-page))
+  (setopt pdf-view-display-size 'fit-page)
+  (with-eval-after-load 'pdf-view
+	(ra/keymap-set pdf-view-mode-map
+	  "n" 'pdf-view-scroll-up-or-next-page
+	  "p" 'pdf-view-scroll-down-or-previous-page
+	  "v" 'pdf-view-next-page
+	  "V" 'pdf-view-previous-page)))
 
 (elpaca (image-roll :host github :repo "dalanicolai/image-roll.el"))
 
