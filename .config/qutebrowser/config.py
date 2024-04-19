@@ -26,7 +26,7 @@ c.url.searchengines = {
     "shopee": "https://shopee.co.id/search?keyword={}"
 }
 
-config.unbind("co")
+# config.unbind("co")
 
 # c.input.insert_mode.auto_load = True
 c.input.insert_mode.plugins = True
@@ -67,7 +67,8 @@ normal_bindings = {
 for k,v in normal_bindings.items():
     config.bind(k, v)
 
-config.source('bind-dvorak.py')
+# config.source('bind-dvorak.py')
+config.source('bind-dv-nm.py')
 
 command_bindings = {
     "<Alt+n>": "command-history-next",
