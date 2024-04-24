@@ -53,7 +53,9 @@
 				   "SSH_AGENT_PID"
 				   "LANG"
 				   "LC_ALL"
-				   "LSP_USE_PLISTS"))
+				   "LSP_USE_PLISTS"
+				   "DISPLAY"
+				   "WAYLAND_DISPLAY"))
 	  (add-to-list 'exec-path-from-shell-variables var))
 
 	(exec-path-from-shell-initialize)))
