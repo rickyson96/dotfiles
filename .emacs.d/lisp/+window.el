@@ -65,9 +65,10 @@
 		  switch-window-background t
 		  switch-window-threshold 2)
   (with-eval-after-load 'switch-window
-	(set-face-attribute 'switch-window-label nil :height 4.0)))
+	(set-face-attribute 'switch-window-label nil :height 2.0)))
 
 (setopt switch-to-buffer-obey-display-actions t ; Sane `switch-to-buffer'
+		switch-to-buffer-in-dedicated-window 'pop
 		display-buffer-alist `((,(rx bol "*eshell" (0+ nonl) "*" eol)
 								(display-buffer-in-direction)
 								(direction . bottom)
@@ -75,7 +76,25 @@
 							   (,(rx bol "*" (0+ nonl) "eat" (0+ nonl) "*" eol)
 								(display-buffer-in-direction)
 								(direction . bottom)
-								(window-height . 0.3))))
+								(window-height . 0.3))
+							   (,(rx bol "*helpful function: " (1+ nonl) eol)
+								(display-buffer-reuse-mode-window)
+								(mode . helpful-mode))))
+
+(elpaca popper
+  (ra/keymap-set (current-global-map)
+	"M-`" #'popper-toggle
+	"M-~" #'popper-cycle)
+  (setopt popper-display-control nil
+		  popper-reference-buffer `(,(rx "*Messages*")
+									,(rx "Output*" eol)
+									,(rx "*Async Shell Command*")
+									help-mode
+									compilation-mode
+									,(rx "*" (0+ nonl) "eat" (0+ nonl) "*")
+									eat-mode))
+  (popper-mode +1)
+  (popper-echo-mode +1))
 
 (provide '+window)
 ;;; +window.el ends here
