@@ -1,0 +1,4 @@
+hosts: localhost
+tasks:
+  - name: Install fish
+    apt: name=fish
