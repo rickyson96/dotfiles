@@ -28,6 +28,7 @@ c.bindings.commands['normal'] = {
     '<ctrl-c>': 'scroll-page 0 -0.5',
 
     # reload
+    '<ctrl-r>': 'reload',
     '<alt-r>': 'reload',
     '<alt-shift-r>': 'reload -f',
 
@@ -40,8 +41,10 @@ c.bindings.commands['normal'] = {
     '<Alt-o>l': 'cmd-set-text :open {url:pretty}',
     '<Alt-o>L': 'cmd-set-text :open -t -r {url:pretty}',
     '<Alt-o>p': 'cmd-set-text -s :open -p',
-    '<alt-o>w': 'tab-give',
-    '<alt-o>W': 'cmd-set-text -s :tab-give',
+    '<alt-o>g': 'tab-give',
+    '<alt-o>G': 'cmd-set-text -s :tab-give',
+    '<alt-o>n': 'open -w',
+    '<alt-o>w': 'cmd-set-text -s :open -w',
     '<alt-o>c': 'tab-clone',
 
     # hint
@@ -51,6 +54,8 @@ c.bindings.commands['normal'] = {
     '<alt-e>i': 'hint inputs',
     '<alt-e>y': 'hint links yank',
     '<alt-e>r': 'hint --rapid links tab-bg',
+    '<alt-e>t': 'hint all tab',
+    '<alt-e>e': 'hint',
 
     # toggle
     '<alt-c>t': 'config-cycle -t tabs.show switching always',
@@ -62,13 +67,15 @@ c.bindings.commands['normal'] = {
 
     # search
     '<ctrl-s>': 'cmd-set-text /',
-    '<ctrl-r>': 'cmd-set-text ?',
 
     # yank
-    '<alt-w>': 'yank',
-    '<alt-shift-w>p': 'yank pretty-url',
-    '<ctrl-y>': 'open -- {clipboard}',
-    '<alt-y>': 'open -t -- {clipboard}',
+    '<ctrl-w>': 'yank selection',
+    '<alt-w>w': 'yank',
+    '<alt-w>s': 'yank selection',
+    '<alt-w>p': 'yank pretty-url',
+    '<alt-y>y': 'open -- {clipboard}',
+    '<alt-y>t': 'open -t -- {clipboard}',
+    '<ctrl-y>': 'insert-text {clipboard}',
 
     # zoom
     '<ctrl-=>': 'zoom-in',
@@ -108,10 +115,23 @@ c.bindings.commands['command'] = {
     '<ctrl-g>': 'mode-leave',
     '<escape>': 'mode-leave',
     '<return>': 'command-accept',
-    '<Left>': 'fake-key <Left>',
-    '<Right>': 'fake-key <Right>',
-    '<Up>': 'fake-key <Up>',
-    '<Down>': 'fake-key <Down>',
+    '<Left>': 'rl-backward-char',
+    '<Right>': 'rl-forward-char',
+    '<Up>': 'completion-item-focus prev',
+    '<Down>': 'completion-item-focus next',
+
+    '<ctrl-f>': 'rl-forward-char',
+    '<ctrl-b>': 'rl-backward-char',
+    '<ctrl-a>': 'rl-beginning-of-line',
+    '<ctrl-e>': 'rl-end-of-line',
+    '<alt-f>': 'rl-forward-word',
+    '<alt-b>': 'rl-backward-word',
+    '<ctrl-d>': 'rl-delete-char',
+    '<alt-d>': 'rl-kill-word',
+    '<alt-backspace>': 'rl-backward-kill-word',
+    '<ctrl-w>': 'rl-backward-kill-word',
+    '<ctrl-k>': 'rl-kill-line',
+    '<ctrl-y>': 'cmd-set-text -a {clipboard}',
 }
 
 c.bindings.commands['insert'] = {
@@ -131,12 +151,18 @@ c.bindings.commands['insert'] = {
     '<alt-d>': 'fake-key <Ctrl-Delete>',
     '<alt-backspace>': 'fake-key <Ctrl-Backspace>',
     '<ctrl-w>': 'fake-key <Ctrl-backspace>',
-    '<ctrl-y>': 'insert-text {primary}',
+    '<ctrl-y>': 'insert-text {clipboard}',
+    '<ctrl-v>': 'fake-key <PgDown>',
+    '<alt-v>': 'fake-key <PgUp>',
+    '<ctrl-k>': 'fake-key <Shift-End> ;; fake-key <ctrl-x>',
     '<ctrl-g>': 'mode-leave',
     '<escape>': 'mode-leave',
 }
 
 c.bindings.commands['hint'] = {
+    '<ctrl-r>': 'hint --rapid links tab-bg',
+    '<ctrl-o>': 'hint',
+    '<ctrl-w>': 'hint links yank',
     '<ctrl-g>': 'mode-leave',
     '<escape>': 'mode-leave',
 }
@@ -155,4 +181,36 @@ c.bindings.commands['yesno'] = {
     '<alt-w>': 'prompt-yank',
     'w': 'prompt-yank',
     '<alt-g>': 'mode-leave',
+}
+
+c.bindings.commands['prompt'] = {
+    '<return>': 'prompt-accept',
+    '<escape>': 'mode-leave',
+    '<ctrl-w>': 'rl-filename-rubout',
+    '<ctrl-y>': 'rl-yank',
+    '<ctrl-delete>': 'rl-rubout "/"',
+    '<ctrl-x>': 'prompt-open-download',
+    '<ctrl-r>': 'prompt-open-download --pdfjs',
+    '<ctrl-y>': 'prompt-yank',
+    '<ctrl-o>': 'prompt-fileselect-external',
+    '<ctrl-g>': 'mode-leave',
+
+    '<ctrl-f>': 'rl-forward-char',
+    '<ctrl-b>': 'rl-backward-char',
+    '<ctrl-a>': 'rl-beginning-of-line',
+    '<ctrl-e>': 'rl-end-of-line',
+    '<alt-f>': 'rl-forward-word',
+    '<alt-b>': 'rl-backward-word',
+    '<ctrl-d>': 'rl-delete-char',
+    '<alt-d>': 'rl-kill-word',
+    '<alt-backspace>': 'rl-backward-kill-word',
+    '<ctrl-k>': 'rl-kill-line',
+    '<ctrl-p>': 'prompt-item-focus prev',
+    '<ctrl-n>': 'prompt-item-focus next',
+    '<tab>': 'prompt-item-focus next',
+    '<shift-tab>': 'prompt-item-focus prev',
+}
+
+c.bindings.commands['passthrough'] = {
+    '<shift-escape>': 'mode-leave',
 }
