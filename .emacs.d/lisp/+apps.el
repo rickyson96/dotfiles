@@ -110,7 +110,7 @@
         proced-show-remote-processes t)
 
 (elpaca daemons
-  (add-hook 'daemons-mode-hook eldoc-mode))
+  (add-hook 'daemons-mode-hook #'eldoc-mode))
 
 (elpaca bluetooth)
 
