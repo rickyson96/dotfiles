@@ -150,5 +150,9 @@
 (elpaca impostman)
 
 (elpaca (mount :host github :repo "zellerin/mount-mode"))
+
+(elpaca (noman :host github :repo "andykuszyk/noman.el")
+  (autoload #'noman "noman" "Attempt to parse command line help for the command CMD" (interactive)))
+
 (provide '+apps)
 ;;; +apps.el ends here
