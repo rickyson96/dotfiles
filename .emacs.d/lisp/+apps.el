@@ -57,7 +57,14 @@
     (ra/keymap-set eat-char-mode-map
       "C-M-g" 'eat-semi-char-mode
       "M-RET" 'eat-self-input
-      "C-/" 'eat-self-input))
+      "C-/" 'eat-self-input)
+    (ra/keymap-set eat-semi-char-mode-map
+      "C-x 3" (lambda ()
+                (interactive)
+                (let ((window (split-window nil nil 'right)))
+                  (select-window window)
+                  (with-selected-window window
+                    (eat nil '(4)))))))
 
   (with-eval-after-load 'meow
     (add-hook 'meow-normal-mode-hook (lambda ()
