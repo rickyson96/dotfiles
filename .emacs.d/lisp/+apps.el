@@ -149,5 +149,6 @@
 
 (elpaca impostman)
 
+(elpaca (mount :host github :repo "zellerin/mount-mode"))
 (provide '+apps)
 ;;; +apps.el ends here
