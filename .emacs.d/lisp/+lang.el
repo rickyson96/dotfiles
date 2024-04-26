@@ -91,5 +91,11 @@
 (elpaca git-modes
   (add-to-list 'auto-mode-alist `(,(rx (or ".ignore" ".rgignore") eos) . gitignore-mode)))
 
+;; ansible
+(elpaca ansible)
+(elpaca ansible-doc)
+(elpaca ansible-vault)
+(elpaca poly-ansible)
+
 (provide '+lang)
 ;;; +lang.el ends here
