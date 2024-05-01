@@ -1,0 +1,41 @@
+#!/usr/bin/bash
+
+# Taken and adapted from: https://git.zx2c4.com/password-store/tree/contrib/dmenu/passmenu
+
+shopt -s nullglob globstar
+
+otp=0
+prompt="Password: "
+if [[ $1 == "otp" ]]; then
+	otp=1
+	prompt="OTP: "
+	shift
+fi
+
+dmenu_switches=""
+if [[ -n $WAYLAND_DISPLAY ]]; then
+	dmenu=tofi
+	dmenu_switches="--prompt $prompt --width 600"
+	xdotool="wtype"
+elif [[ -n $DISPLAY ]]; then
+	dmenu=dmenu
+	xdotool="xdotool type --clearmodifiers --file -"
+else
+	echo "Error: No Wayland or X11 display detected" >&2
+	exit 1
+fi
+
+prefix=${PASSWORD_STORE_DIR-~/.password-store}
+password_files=( "$prefix"/**/*.gpg )
+password_files=( "${password_files[@]#"$prefix"/}" )
+password_files=( "${password_files[@]%.gpg}" )
+
+password=$(printf '%s\n' "${password_files[@]}" | "$dmenu" $dmenu_switches "$@")
+
+[[ -n $password ]] || exit
+
+if [[ $otp -eq 0 ]]; then
+	pass show "$password" | { IFS= read -r pass; printf %s "$pass"; } | xargs -0 $xdotool
+else
+	pass otp "$password" | { IFS= read -r pass; printf %s "$pass"; } | xargs -0 $xdotool
+fi
