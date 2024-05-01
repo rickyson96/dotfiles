@@ -67,6 +67,8 @@ c.bindings.commands['normal'] = {
 
     # search
     '<ctrl-s>': 'cmd-set-text /',
+    '<alt-s>s': 'cmd-set-text /{primary}',
+    '<alt-s>y': 'cmd-set-text /{clipboard}',
 
     # yank
     '<ctrl-w>': 'yank selection',
@@ -75,6 +77,7 @@ c.bindings.commands['normal'] = {
     '<alt-w>p': 'yank pretty-url',
     '<alt-y>y': 'open -- {clipboard}',
     '<alt-y>t': 'open -t -- {clipboard}',
+    '<alt-y>s': 'open -t -- {primary}',
     '<ctrl-y>': 'insert-text {clipboard}',
 
     # zoom
@@ -103,6 +106,10 @@ c.bindings.commands['normal'] = {
 c.bindings.commands['command'] = {
     '<ctrl-s>': 'search-next',
     '<ctrl-r>': 'search-prev',
+    '<alt-s>s': 'cmd-set-text /{primary}',
+    '<alt-s>y': 'cmd-set-text /{clipboard}',
+
+    '<alt-x>': 'cmd-set-text :',
 
     '<ctrl-p>': 'completion-item-focus prev',
     '<ctrl-n>': 'completion-item-focus next',
@@ -155,6 +162,10 @@ c.bindings.commands['insert'] = {
     '<ctrl-v>': 'fake-key <PgDown>',
     '<alt-v>': 'fake-key <PgUp>',
     '<ctrl-k>': 'fake-key <Shift-End> ;; fake-key <ctrl-x>',
+    '<alt-h>': 'fake-key <ctrl-a>',
+    '<ctrl-/>': 'fake-key <ctrl-z>',
+    '<ctrl-shift-?>': 'fake-key <ctrl-shift-z>',
+    '<alt-w>': 'fake-key <ctrl-c>',
     '<ctrl-g>': 'mode-leave',
     '<escape>': 'mode-leave',
 }
