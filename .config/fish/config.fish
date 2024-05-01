@@ -20,6 +20,7 @@ fundle plugin 'reitzig/sdkman-for-fish'
 fundle init
 
 fish_add_path --universal ~/bin
+fish_add_path --universal ~/.local/bin
 fish_add_path --universal ~/go/bin
 fish_add_path --universal /Users/rickyson/Library/Application\ Support/Coursier/bin
 fish_add_path --universal /usr/local/opt/libpq/bin
