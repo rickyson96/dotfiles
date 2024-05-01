@@ -49,7 +49,8 @@
 (elpaca exec-path-from-shell
   (when (daemonp)
 	(require 'exec-path-from-shell)
-	(dolist (var '("SSH_AUTH_SOCK"
+	(dolist (var '("PATH"
+				   "SSH_AUTH_SOCK"
 				   "SSH_AGENT_PID"
 				   "LANG"
 				   "LC_ALL"
@@ -78,7 +79,7 @@ See https://emacs.stackexchange.com/questions/59791/font-and-frame-configuration
 							  (add-hook ',hook #',name))))
 		   hooks)))
 
-(ra/configure-frame ra/setup-font (after-init-hook server-after-make-frame-hook)
+(ra/configure-frame ra/setup-font (elpaca-after-init-hook server-after-make-frame-hook)
   (set-face-attribute 'default nil :font "monospace" :height 110)
   (set-face-attribute 'fixed-pitch nil :font "monospace")
   (set-face-attribute 'variable-pitch nil :font "sans-serif"))
@@ -197,6 +198,12 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 ;; (with-eval-after-load 'eat
 ;; (add-to-list 'eat-tramp-shells '("ssh" . "/bin/bash")))
 
+;; Download file using emacs
+;; (defun ra/download-file ()
+;;   ""
+;;   (interactive (let ((the-file-url (read-string "Test: ")))
+;; 				 (read-string "Test2: " nil nil (parse the-file-url)))))
+
 ;; View mode
 ;; Enable view-mode on read-only buffer
 (setopt view-read-only t)
@@ -224,7 +231,7 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 	"Run rename symol based on context. Use `eglot-rename' when eglot is on,
 otherwise, use `substitute-target-in-buffer'"
 	(interactive)
-	(if (and (boundp 'eglot-managed-p) eglot-managed-p)
+	(if (and (fboundp 'eglot-managed-p) (eglot-managed-p))
 		(call-interactively #'eglot-rename)
 	  (call-interactively #'substitute-target-in-buffer)))
 
@@ -316,8 +323,7 @@ otherwise, use `substitute-target-in-buffer'"
 		;; In depth documentation should only be show when requested.
 		eldoc-echo-area-use-multiline-p nil)
 
-(elpaca (envrc :host github :repo "purcell/envrc"
-			   :remotes ("envrc-remote" :host github :repo "siddharthverma314/envrc"))
+(elpaca (envrc :host github :repo "purcell/envrc")
   (setopt envrc-remote t)
   (envrc-global-mode 1))
 
@@ -356,6 +362,9 @@ otherwise, use `substitute-target-in-buffer'"
 	  "O" #'mediator-open-file)))
 
 (require '+apps)
+
+(with-eval-after-load 'info
+  (add-to-list 'Info-default-directory-list (file-truename "~/books")))
 
 (defun ra/get-jira-url (&optional write-to-buffer)
   "Gobit: Copy formatted slack message to inform created MR"

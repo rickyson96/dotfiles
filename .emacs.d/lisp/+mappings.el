@@ -206,7 +206,7 @@ Without prefix: comment line (a.k.a `comment-line')"
   "m" #'macrostep-expand
   "r" #'crux-eval-and-replace)
 
-(defvar-keymap ra/window-manipulate-map
+(defvar-keymap ra/window-repeat-map
   :doc "Keymap for repeatedly modify emacs' windows"
   :repeat t
   "c" #'enlarge-window
@@ -216,10 +216,15 @@ Without prefix: comment line (a.k.a `comment-line')"
 
 (defvar-keymap ra/window-map
   :doc "Keymap for modifying emacs' windows"
-  :parent ra/window-manipulate-map
+  :parent ra/window-repeat-map
   "o" #'switch-window)
-
 (defalias 'ra/window-map ra/window-map)
+
+(defvar-keymap ra/eglot-map
+  :doc "Keymap for invoking eglot features"
+  :prefix 'ra/eglot-map
+  "h" #'eglot-inlay-hints-mode
+  "d" #'eldoc-box-help-at-point)
 
 ;; C-c keymap
 (ra/keymap-set mode-specific-map
@@ -258,7 +263,9 @@ Without prefix: comment line (a.k.a `comment-line')"
   "M-n" #'flymake-goto-next-error
   "M-p" #'flymake-goto-prev-error
   "M-N" #'move-text-down
-  "M-P" #'move-text-up)
+  "M-P" #'move-text-up
+  "M-l" #'ra/eglot-map
+  "<remap> <Info-goto-emacs-command-node>" #'describe-face)
 
 (require '+mappings-modal)
 

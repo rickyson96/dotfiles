@@ -13,6 +13,7 @@
 
 ;;; Code:
 
+(elpaca transient)
 (elpaca magit
   (setopt magit-branch-prefer-remote-upstream '("master" "develop" "production" "development" "staging" "dev" "main")
 		  magit-branch-adjust-remote-upstream-alist '(("origin/master" . "/")

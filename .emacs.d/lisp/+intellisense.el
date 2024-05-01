@@ -77,5 +77,7 @@ Taken from tempel's readme"
 	(dolist (checkers '(javascript-eslint))
 	  (add-to-list 'flycheck-disabled-checkers checkers))))
 
+(elpaca eldoc-box)
+
 (provide '+intellisense)
 ;;; +intellisense.el ends here

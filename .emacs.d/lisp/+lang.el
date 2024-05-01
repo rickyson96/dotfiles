@@ -14,6 +14,7 @@
 ;;; Code:
 
 (require 'treesit)
+(setopt treesit-font-lock-level 4)		; more colors
 (defmacro ra/treesitter-setup (language url &rest extra)
   "Setup Emacs's treesitter for LANGUAGE"
   (macroexp-progn
@@ -29,6 +30,8 @@
 (elpaca go-scratch)
 (elpaca go-playground)
 (ra/treesitter-setup go "https://github.com/tree-sitter/tree-sitter-go")
+
+(ra/treesitter-setup bash "https://github.com/tree-sitter/tree-sitter-bash")
 
 (require '+lang-jsts)
 
@@ -61,7 +64,8 @@
 (elpaca suggest)
 
 (elpaca (pdf-tools :host github :repo "vedang/pdf-tools"
-				   :remotes ("roll" :repo "dalanicolai/pdf-tools" :branch "pdf-roll"))
+				   ;; :remotes ("roll" :repo "dalanicolai/pdf-tools" :branch "pdf-roll")
+				   )
   (pdf-loader-install)
   (setopt pdf-view-display-size 'fit-page)
   (with-eval-after-load 'pdf-view
@@ -77,7 +81,6 @@
 (elpaca etc-sudoers-mode)
 
 (elpaca	fish-mode)
-(elpaca fish-completion)
 
 ;; literate calc
 (elpaca literate-calc-mode)

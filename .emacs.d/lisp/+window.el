@@ -67,32 +67,52 @@
   (with-eval-after-load 'switch-window
 	(set-face-attribute 'switch-window-label nil :height 2.0)))
 
+(defvar ra/eldoc-window nil)
+(defun ra/eldoc-window-delete ()
+  (when (window-live-p ra/eldoc-window)
+	(delete-window ra/eldoc-window)))
+
 (setopt switch-to-buffer-obey-display-actions t ; Sane `switch-to-buffer'
 		switch-to-buffer-in-dedicated-window 'pop
-		display-buffer-alist `((,(rx bol "*eshell" (0+ nonl) "*" eol)
+		display-buffer-alist `((,(rx bol "*" (0+ nonl) "eshell" (0+ nonl) "*" eol)
 								(display-buffer-in-direction)
 								(direction . bottom)
-								(window-height . 0.3))
+								(window-height . 0.3)
+								(dedicated . t))
 							   (,(rx bol "*" (0+ nonl) "eat" (0+ nonl) "*" eol)
 								(display-buffer-in-direction)
 								(direction . bottom)
 								(window-height . 0.3))
-							   (,(rx bol "*helpful function: " (1+ nonl) eol)
+							   (,(rx bol "*helpful" (1+ nonl) eol)
 								(display-buffer-reuse-mode-window)
-								(mode . helpful-mode))))
+								(mode . helpful-mode))
+							   (,(rx bol "*eldoc*" eol)
+								(display-buffer-in-direction)
+								(direction . bottom)
+								(window-height . ,(lambda (w)
+													(fit-window-to-buffer w 40 1)))
+								(window-parameters . ((mode-line-format . none)))
+								(body-function . ,(lambda (w)
+													(setq ra/eldoc-window w))))))
+
+(ra/keymap-set (current-global-map)
+  "C-g" (ra/cmd (ra/eldoc-window-delete) (keyboard-quit)))
 
 (elpaca popper
   (ra/keymap-set (current-global-map)
 	"M-`" #'popper-toggle
 	"M-~" #'popper-cycle)
   (setopt popper-display-control nil
-		  popper-reference-buffer `(,(rx "*Messages*")
-									,(rx "Output*" eol)
-									,(rx "*Async Shell Command*")
-									help-mode
-									compilation-mode
-									,(rx "*" (0+ nonl) "eat" (0+ nonl) "*")
-									eat-mode))
+		  popper-reference-buffers `(,(rx "*Messages*")
+									 ,(rx "Output*" eol)
+									 ,(rx "*Async Shell Command*")
+									 help-mode
+									 compilation-mode
+									 ,(rx "*" (0+ nonl) "eat" (0+ nonl) "*")
+									 eat-mode
+									 ,(rx "*" (0+ nonl) "eshell" (0+ nonl) "*")
+									 eshell-mode
+									 ,(rx bol "*eldoc*" eol)))
   (popper-mode +1)
   (popper-echo-mode +1))
 

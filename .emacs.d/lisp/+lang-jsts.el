@@ -72,5 +72,7 @@
   (setq flycheck-jest '(typescript-ts-mode web-mode js-mode typescript-mode rjsx-mode))
   (add-hook 'typescript-ts-base-mode-hook 'flycheck-jest-setup))
 
+(elpaca jsdoc)
+
 (provide '+lang-jsts)
 ;;; +lang-jsts.el ends here

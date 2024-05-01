@@ -52,6 +52,8 @@
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
+(setopt elpaca-queue-limit 4)
+
 (defun +elpaca-unload-seq (e) "Unload seq before continuing the elpaca build, then continue to build the recipe E."
        (and (featurep 'seq) (unload-feature 'seq t))
        (elpaca--continue-build e))

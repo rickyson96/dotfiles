@@ -73,33 +73,9 @@
                                          (eat-emacs-mode))))
     (add-hook 'meow-insert-mode-hook (lambda () (when (eq major-mode 'eat-mode)
                                                   ;; (hide-mode-line-mode -1)
-                                                  (eat-semi-char-mode))))
-    ;; (add-hook 'eat--char-mode (lambda () (meow-motion-mode 1)))
-    ;; (define-advice eat-char-mode (:after (&rest _) hide-mode-line)
-    ;;   (meow-motion-mode 1)
-    ;;   ;; (hide-mode-line-mode 1)
-    ;;   )
-    ))
+                                                  (eat-semi-char-mode))))))
 
-(elpaca eshell-prompt-extras
-  (autoload 'epe-theme-multiline-with-status "eshell-prompt-extras")
-  (with-eval-after-load 'esh-opt
-    (setopt eshell-highlight-prompt nil
-            eshell-prompt-function 'epe-theme-multiline-with-status)))
-
-(add-hook 'eshell-exit-hook #'quit-window)
-(setopt eshell-modules-list '( eshell-alias eshell-banner
-                               eshell-basic eshell-cmpl
-                               eshell-dirs eshell-elecslash
-                               eshell-extpipe eshell-glob
-                               eshell-hist eshell-ls
-                               eshell-pred ; eshell-rebind
-                               eshell-script eshell-smart
-                               eshell-tramp eshell-unix
-                               eshell-xtra eshell-prompt)
-        eshell-where-to-jump 'begin
-        eshell-review-quick-commands nil
-        eshell-smart-space-goes-to-end t)
+(require '+apps-eshell)
 
 (setopt calc-multiplication-has-precedence nil)
 

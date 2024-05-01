@@ -47,6 +47,13 @@
                 (meow--select))
   (meow-next-word 1))
 
+;; Eshell
+(defun ra/eshell-or-project-eshell ()
+  (interactive)
+  (if (project-current)
+      (call-interactively #'project-eshell)
+    (call-interactively #'eshell)))
+
 (defun meow-xah-adapt ()
   "Meow modal adapted from xah-fly-keys"
   (meow-normal-define-key
@@ -165,6 +172,7 @@
    '(">" . meow-end-of-thing)
    '("!" . shell-command)
    '("#" . eat-project-other-window)
+   '("$" . ra/eshell-or-project-eshell)
    '("%" . anzu-query-replace-regexp)
    '("<escape>" . ignore))
 
