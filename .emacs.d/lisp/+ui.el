@@ -178,5 +178,23 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 
 (elpaca hide-mode-line)
 
+(elpaca breadcrumb
+  (setopt breadcrumb-imenu-max-length 1.0)
+  (with-eval-after-load 'breadcrumb
+	(set-face-attribute 'breadcrumb-face nil :height 0.9)
+	(set-face-attribute 'breadcrumb-imenu-leaf-face nil :height 0.9))
+
+  (define-minor-mode ra/breadcrumb-local-mode ""
+	:init-value nil
+	(if ra/breadcrumb-local-mode (add-to-list 'header-line-format '(:eval (breadcrumb-imenu-crumbs)))
+	  (setq header-line-format (delete '(:eval (breadcrumb-imenu-crumbs)) header-line-format))))
+
+  (define-globalized-minor-mode ra/breadcrumb-mode ra/breadcrumb-local-mode
+	(lambda ()
+	  (unless (or (minibufferp)
+				  (not (buffer-file-name))
+				  (null (breadcrumb-project-crumbs)))
+		(ra/breadcrumb-local-mode 1)))))
+
 (provide '+ui)
 ;;; +ui.el ends here
