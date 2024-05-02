@@ -132,7 +132,8 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 (elpaca tabspaces
   (setopt tabspaces-use-filtered-buffers-as-default t
 		  tabspaces-keymap-prefix "C-c t"
-		  tab-bar-show nil)
+		  tab-bar-show nil
+		  tabspaces-initialize-project-with-todo nil)
 
   (tabspaces-mode 1)
 
