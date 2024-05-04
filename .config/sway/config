@@ -153,13 +153,25 @@ input * {
     # bindsym $mod+b splith
     # bindsym $mod+v splitv
 
+mode "layout" {
+    bindsym t layout tabbed, mode default
+    bindsym s layout toggle split, mode default
+	bindsym r layout stacking, mode default
+	bindsym f floating toggle, mode default
+
+    # Return to default mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+
     # Switch the current container between different layout styles
     # bindsym $mod+s layout stacking
-    bindsym $mod+w layout tabbed
-    bindsym $mod+e layout toggle split
+
+	bindsym $mod+l mode layout
 
     # Make the current focus fullscreen
-    bindsym $mod+m fullscreen
+    bindsym $mod+m layout toggle tabbed splith
+	bindsym $mod+shift+m fullscreen
 
     # Toggle the current focus between tiling and floating mode
     bindsym $mod+f floating toggle
@@ -167,8 +179,7 @@ input * {
     # Swap focus between the tiling area and the floating area
     # bindsym $mod+space focus mode_toggle
 
-    # Move focus to the parent container
-    bindsym $mod+a focus parent
+	bindsym $mod+tab focus next
 
 	bindsym $mod+shift+tab move workspace to output up
 #
