@@ -30,13 +30,15 @@
                                eshell-dirs eshell-elecslash
                                eshell-extpipe eshell-glob
                                eshell-hist eshell-ls
-                               eshell-pred ; eshell-rebind
-                               eshell-script eshell-smart
+                               eshell-pred eshell-rebind
+                               eshell-script ; eshell-smart
                                eshell-tramp eshell-unix
                                eshell-xtra eshell-prompt)
         eshell-where-to-jump 'after
         eshell-review-quick-commands 'not-even-short-output
-        eshell-smart-space-goes-to-end t)
+        eshell-smart-space-goes-to-end t
+        eshell-history-size 2048
+        eshell-hist-ignoredups t)
 
 (with-eval-after-load 'consult
   (ra/keymap-set eshell-mode-map
@@ -86,6 +88,39 @@
             (eshell-git-prompt-multiline2-host-face . ,green)
             (eshell-git-prompt-multiline2-command-face . ,magenta-cooler)
             (eshell-git-prompt-multiline2-secondary-face . ,cyan-cooler)))))
+
+;; Eshell meow integration
+(with-eval-after-load 'meow
+  (setopt eshell-rebind-keys-alist '(([(control ?d)] . eshell-delchar-or-maybe-eof)
+                                     ([backspace] . eshell-delete-backward-char)
+                                     ([delete] . eshell-delete-backward-char)
+                                     ([(control ?w)] . backward-kill-word)
+                                     ([(control ?u)] . eshell-kill-input)
+                                     ([(control ?r)] . consult-history)))
+  (setopt eshell-hist-rebind-keys-alist '(([(control ?p)]   . eshell-previous-input)
+                                          ([(control ?n)]   . eshell-next-input)
+                                          ([(control up)]   . eshell-previous-input)
+                                          ([(control down)] . eshell-next-input)
+                                          ([(control ?r)]   . consult-history)
+                                          ([(control ?s)]   . consult-history)
+                                          ([(meta ?r)]      . eshell-previous-matching-input)
+                                          ([(meta ?s)]      . eshell-next-matching-input)
+                                          ([(meta ?p)]      . eshell-previous-matching-input-from-input)
+                                          ([(meta ?n)]      . eshell-next-matching-input-from-input)
+                                          ([up]             . eshell-previous-matching-input-from-input)
+                                          ([down]           . eshell-next-matching-input-from-input)))
+  (add-hook 'meow-insert-exit-hook (lambda () (when (eq major-mode 'eshell-mode)
+                                                (eshell-lock-local-map t)
+                                                (eat-eshell-emacs-mode))))
+  (add-hook 'meow-insert-enter-hook (lambda () (when (eq major-mode 'eshell-mode)
+                                                 (eshell-lock-local-map nil)
+                                                 (eat-eshell-semi-char-mode)
+                                                 (when buffer-read-only
+                                                   (setq buffer-read-only nil)))))
+  (add-to-list 'meow-mode-state-list '(eshell-mode . insert))
+  (add-hook 'eshell-first-time-mode-hook (lambda ()
+                                           (let ((inhibit-message t))
+                                             (eshell-lock-local-map nil)))))
 
 ;; TODO: create starship eshell integration
 (defun ra/eshell-starship ()

@@ -22,6 +22,7 @@
   (add-hook 'org-mode-hook #'embrace-org-mode-hook)
   ;; See https://github.com/meow-edit/meow/discussions/273#discussioncomment-3158654
   (defun embrace-markdown-mode-hook ()
+    (require 'embrace)
     (dolist (lst '((?* "*" . "*")
                    (?\ "\\" . "\\")
                    (?$ "$" . "$")
@@ -46,13 +47,6 @@
                                       (point))
                 (meow--select))
   (meow-next-word 1))
-
-;; Eshell
-(defun ra/eshell-or-project-eshell ()
-  (interactive)
-  (if (project-current)
-      (call-interactively #'project-eshell)
-    (call-interactively #'eshell)))
 
 (defun meow-xah-adapt ()
   "Meow modal adapted from xah-fly-keys"
@@ -170,7 +164,7 @@
    '("." . meow-inner-of-thing)
    '("<" . meow-beginning-of-thing)
    '(">" . meow-end-of-thing)
-   '("!" . shell-command)
+   '("!" . ra/shell-command)
    '("#" . eat-project-other-window)
    '("$" . ra/eshell-or-project-eshell)
    '("%" . anzu-query-replace-regexp)
@@ -209,17 +203,18 @@ BEACON: toggle kmacro state using `meow-beacon-start' and `meow-end-or-call-kmac
         (add-hook 'macrostep-mode-hook #'ra/meow--macrostep-hook-function)
       (remove-hook 'macrostep-mode-hook #'ra/meow--macrostep-hook-function)))
 
-  (with-eval-after-load "macrostep" (ra/meow--setup-macrostep t)))
+  (with-eval-after-load "macrostep" (ra/meow--setup-macrostep t))
+  (add-hook 'ediff-mode-hook #'meow-motion-mode))
 
 ;; (elpaca xah-fly-keys
-  ;; (setopt xah-fly-use-control-key nil
-  ;;         xah-fly-use-meta-key nil)
-  ;; (require 'xah-fly-keys)
-  ;; (xah-fly-keys-set-layout "dvorak")
-  ;; (xah-fly-keys 1)
-  ;; (ra/keymap-set xah-fly-command-map
-  ;;   "F" 'undo-fu-only-redo)
-  ;; )
+;; (setopt xah-fly-use-control-key nil
+;;         xah-fly-use-meta-key nil)
+;; (require 'xah-fly-keys)
+;; (xah-fly-keys-set-layout "dvorak")
+;; (xah-fly-keys 1)
+;; (ra/keymap-set xah-fly-command-map
+;;   "F" 'undo-fu-only-redo)
+;; )
 
 (provide '+mappings-modal)
 ;;; +mappings-modal.el ends here

@@ -67,13 +67,13 @@
                     (eat nil '(4)))))))
 
   (with-eval-after-load 'meow
-    (add-hook 'meow-normal-mode-hook (lambda ()
+    (add-hook 'meow-insert-exit-hook (lambda ()
                                        ;; (hide-mode-line-mode -1)
                                        (when (eq major-mode 'eat-mode)
                                          (eat-emacs-mode))))
-    (add-hook 'meow-insert-mode-hook (lambda () (when (eq major-mode 'eat-mode)
-                                                  ;; (hide-mode-line-mode -1)
-                                                  (eat-semi-char-mode))))))
+    (add-hook 'meow-insert-enter-hook (lambda () (when (eq major-mode 'eat-mode)
+                                                   ;; (hide-mode-line-mode -1)
+                                                   (eat-semi-char-mode))))))
 
 (require '+apps-eshell)
 

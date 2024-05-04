@@ -196,5 +196,20 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 				  (null (breadcrumb-project-crumbs)))
 		(ra/breadcrumb-local-mode 1)))))
 
+;; Zone (screensaver)
+(define-advice zone (:around (orig-fn &rest _) "zone-all-buffer")
+  (save-window-excursion
+	(let ((op-win (car (window-list))))
+	  (mapc (lambda (w)
+			  (with-selected-window w
+				(set-window-dedicated-p w nil)
+				(switch-to-buffer "*zone*")))
+			(cdr (window-list)))
+	  (with-selected-window op-win
+		(set-window-dedicated-p op-win nil)
+		(funcall orig-fn)))))
+
+(add-hook 'elpaca-after-init-hook (lambda () (zone-when-idle 300)))
+
 (provide '+ui)
 ;;; +ui.el ends here

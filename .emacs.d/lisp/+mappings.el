@@ -81,13 +81,22 @@ Taken from: http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html"
       (kill-region (region-beginning) (region-end))
     (backward-kill-word (prefix-numeric-value p))))
 
-(defun ra/shell-command (p)
+(defun ra/shell-command (&optional p)
   "`shell-command', which on prefix \[universal-argument], got to define `default-directory'"
   (interactive "P")
   (let ((default-directory (if p
                                (read-directory-name "shell-command on dir: ")
                              default-directory)))
     (call-interactively #'shell-command)))
+
+(defun ra/eshell-command (&optional p)
+  "`shell-command', which on prefix \[universal-argument], got to define `default-directory'"
+  (interactive "P")
+  (let ((default-directory (if p
+                               (read-directory-name "shell-command on dir: ")
+                             default-directory))
+        (eshell-hist--new-items (if eshell-hist--new-items eshell-hist--new-items)))
+    (call-interactively #'eshell-command)))
 
 (defun ra/comment-dwim-on-region (&optional p)
   "Dwim style comment on region. Do nothing when region is inactive.
@@ -130,6 +139,18 @@ Without prefix: comment line (a.k.a `comment-line')"
               (comment-line 1)
             (comment-dwim nil)))
     ((pred numberp) (comment-line p))))
+
+(defun ra/cmd-or-project-cmd (cmd project-cmd)
+  "Interactively run CMD or PROJECT-CMD based on whether current file is in
+project or not"
+  (if (project-current)
+      (call-interactively project-cmd)
+    (call-interactively cmd)))
+
+(defun ra/eshell-or-project-eshell ()
+  "Run `project-eshell' on project, else run `eshell'"
+  (interactive)
+  (ra/cmd-or-project-cmd #'eshell #'project-eshell))
 
 (ra/keymap-set narrow-map
   "n" #'ra/narrow-or-widen-dwim
@@ -256,7 +277,7 @@ Without prefix: comment line (a.k.a `comment-line')"
   "M-!" #'ra/shell-command
   "M-;" #'ra/comment-dwim
   "M-#" #'eat
-  "M-$" #'eshell
+  "M-$" #'ra/eshell-or-project-eshell
   "M-y" #'consult-yank-pop
   "M-m" ra/manipulate-map
   "M-o" #'switch-window
