@@ -42,6 +42,12 @@
 (setopt markdown-fontify-code-blocks-natively t
 		markdown-wiki-link-fontify-missing t)
 
+(with-eval-after-load 'meow
+  (add-hook 'markdown-mode-hook (lambda () (markdown-toggle-markup-hiding 1)))
+  (add-hook 'meow-insert-enter-hook (lambda ()
+									  (when (derived-mode-p 'markdown-mode)
+										(markdown-toggle-markup-hiding -1)))))
+
 (elpaca jsonian)
 (elpaca (hjson :host github :repo "hjson/hjson-emacs" :main "hjson-mode.el"))
 
