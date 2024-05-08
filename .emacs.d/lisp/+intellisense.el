@@ -13,6 +13,10 @@
 
 ;;; Code:
 
+(setopt completion-ignore-case t
+		read-file-name-completion-ignore-case t
+		read-buffer-completion-ignore-case t)
+
 (elpaca corfu
   (global-corfu-mode 1)
   (corfu-popupinfo-mode)
