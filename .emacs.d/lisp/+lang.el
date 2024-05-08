@@ -98,7 +98,7 @@
 (elpaca mermaid-mode)
 
 (elpaca git-modes
-  (add-to-list 'auto-mode-alist `(,(rx (or ".ignore" ".rgignore") eos) . gitignore-mode)))
+  (add-to-list 'auto-mode-alist `(,(rx "." (0+ nonl) "ignore" eos) . gitignore-mode)))
 
 ;; ansible
 (elpaca ansible)
