@@ -109,14 +109,33 @@
                                           ([(meta ?n)]      . eshell-next-matching-input-from-input)
                                           ([up]             . eshell-previous-matching-input-from-input)
                                           ([down]           . eshell-next-matching-input-from-input)))
-  (add-hook 'meow-insert-exit-hook (lambda () (when (eq major-mode 'eshell-mode)
-                                                (eshell-lock-local-map t)
-                                                (eat-eshell-emacs-mode))))
   (add-hook 'meow-insert-enter-hook (lambda () (when (eq major-mode 'eshell-mode)
-                                                 (eshell-lock-local-map nil)
-                                                 (eat-eshell-semi-char-mode)
-                                                 (when buffer-read-only
-                                                   (setq buffer-read-only nil)))))
+                                                 (eshell-lock-local-map nil))))
+  (add-hook 'meow-insert-exit-hook (lambda () (when (eq major-mode 'eshell-mode)
+                                                (eshell-lock-local-map t))))
+
+  (defun ra/eat-eshell-meow-insert-enter-hook ()
+    (when (eq major-mode 'eshell-mode)
+      (eat-eshell-semi-char-mode)
+      (when buffer-read-only
+        (setq buffer-read-only nil))))
+  (defun ra/eat-eshell-meow-insert-exit-hook ()
+    (when (eq major-mode 'eshell-mode)
+      (eat-eshell-emacs-mode)))
+
+  (defun ra/eat-eshell-toggle-mode-enable ()
+    (add-hook 'meow-insert-enter-hook #'ra/eat-eshell-meow-insert-enter-hook)
+    (add-hook 'meow-insert-exit-hook #'ra/eat-eshell-meow-insert-exit-hook))
+  (defun ra/eat-eshell-toggle-mode-disable ()
+    (remove-hook 'meow-insert-enter-hook #'ra/eat-eshell-meow-insert-enter-hook)
+    (remove-hook 'meow-insert-exit-hook #'ra/eat-eshell-meow-insert-exit-hook))
+
+  (add-hook 'eat-eshell-exec-hook #'ra/eat-eshell-toggle-mode-enable)
+  (add-hook 'eat-eshell-exit-hook #'ra/eat-eshell-toggle-mode-disable)
+  (add-hook 'eat-eshell-exit-hook (lambda ()
+                                    (when buffer-read-only
+                                      (setq buffer-read-only nil))))
+
   (add-to-list 'meow-mode-state-list '(eshell-mode . insert))
   (add-hook 'eshell-first-time-mode-hook (lambda ()
                                            (let ((inhibit-message t))
