@@ -120,5 +120,9 @@ n,SPC -next diff     |     h -highlighting       |  B -copy both region to C
 
 (setopt vc-handled-backends '(Git))
 
+(elpaca (closql :depth nil))
+
+(elpaca (code-review :host github :repo "doomelpa/code-review"))
+
 (provide '+vc)
 ;;; +vc.el ends here
