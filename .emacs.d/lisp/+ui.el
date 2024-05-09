@@ -109,8 +109,9 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 		  dirvish-header-line-format '(:left (path) :right (vc-info file-user))
 		  dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state git-msg)
 		  dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group"
-		  dirvish-reuse-session nil
-		  dirvish-header-line-height 25)
+		  dirvish-reuse-session t
+		  dirvish-header-line-height '(20 . 25)
+		  dirvish-use-header-line 'global)
 
   (ra/keymap-set dirvish-mode-map
 	"b" #'dired-up-directory
@@ -144,7 +145,8 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 
 (elpaca diredfl
   (add-hook 'dired-mode-hook #'diredfl-mode)
-  (add-hook 'dirvish-directory-view-mode #'diredfl-mode))
+  (add-hook 'dirvish-directory-view-mode #'diredfl-mode)
+  (with-eval-after-load 'diredfl (set-face-attribute 'diredfl-dir-name nil :bold t)))
 
 (elpaca iscroll
   (add-hook 'text-mode-hook #'iscroll-mode))
