@@ -51,6 +51,7 @@
 		use-dialog-box nil
 		global-auto-revert-non-file-buffers t
 		auto-revert-check-vc-info t
+		auto-revert-interval 1 			; NOTE: use 1 sec interval, might impact performance
 		delete-by-moving-to-trash t)
 
 (load custom-file 'noerror 'nomessage)
