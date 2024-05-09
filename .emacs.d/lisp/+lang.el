@@ -106,5 +106,29 @@
 (elpaca ansible-vault)
 (elpaca poly-ansible)
 
+(defun sql-comint-spanner (product options &optional buffer)
+  "Create comint buffer and connect to spanner"
+  (let ((params (append (unless (string= "" sql-server)
+						  (list "-p" sql-server))
+						(unless (string= "" sql-user)
+						  (list "-i" sql-user))
+						(unless (string= "" sql-database)
+						  (list "-d" sql-database)))))
+	(sql-comint product params buffer)))
+
+(with-eval-after-load 'sql
+  (add-to-list 'sql-product-alist `(spanner :name "Spanner"
+											:font-lock sql-mode-ansi-font-lock-keywords
+											:sqli-program "spanner-cli"
+											:sqli-options nil
+											:sqli-login (server user database)
+											:sqli-comint-func sql-comint-spanner
+											:prompt-regexp ,(rx bol "spanner> ")
+											:prompt-cont-regexp ,(rx bol "      -> ")
+											:prompt-length 9)))
+(defun sql-spanner (&optional buffer)
+  (interactive "P")
+  (sql-product-interactive 'spanner buffer))
+
 (provide '+lang)
 ;;; +lang.el ends here
