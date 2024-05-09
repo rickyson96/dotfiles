@@ -30,7 +30,11 @@
 
   ;; Either add a prompt classifier or overwrite password-store--completing-read
   (with-eval-after-load 'marginalia
-    (add-to-list 'marginalia-prompt-categories '("Password entry" . password-store))))
+    (add-to-list 'marginalia-prompt-categories '("Password entry" . password-store)))
+
+  (with-eval-after-load 'pass
+    (ra/keymap-set pass-view-mode-map
+      "<remap> <meow-quit>" #'kill-this-buffer)))
 
 (defun ra/scan-otp-uri (&optional direct-insert)
   "Scan otp-uri using `hyprshot' and put it in `kill-ring'"
