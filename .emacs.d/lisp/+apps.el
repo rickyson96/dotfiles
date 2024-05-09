@@ -134,5 +134,8 @@
 (elpaca (noman :host github :repo "andykuszyk/noman.el")
   (autoload #'noman "noman" "Attempt to parse command line help for the command CMD" (interactive)))
 
+(elpaca wakatime-mode
+  (global-wakatime-mode 1))
+
 (provide '+apps)
 ;;; +apps.el ends here
