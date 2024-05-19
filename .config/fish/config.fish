@@ -57,3 +57,8 @@ end
 
 # Created by `pipx` on 2023-11-23 18:52:18
 set PATH $PATH /home/rickyson/.local/bin
+
+if test -e ~/.asdf/asdf.fish
+    source ~/.asdf/asdf.fish
+    mkdir -p ~/.config/fish/completions; and ln -s ~/.asdf/completions/asdf.fish ~/.config/fish/completions
+end
