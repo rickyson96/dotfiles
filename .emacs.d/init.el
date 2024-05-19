@@ -217,9 +217,10 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 (elpaca outshine
   (setopt outline-minor-mode-prefix "\C-c o"))
 
-(elpaca (asdf :host github :repo "tabfugnic/asdf.el")
-  (require 'asdf)
-  (asdf-enable))
+(when (executable-find "asdf")
+  (elpaca (asdf :host github :repo "tabfugnic/asdf.el")
+	(require 'asdf)
+	(asdf-enable)))
 
 (setopt isearch-lazy-count t)
 (elpaca anzu
