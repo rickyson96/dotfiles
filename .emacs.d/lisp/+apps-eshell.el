@@ -24,6 +24,13 @@
 
 ;;; Code:
 
+(with-eval-after-load 'corfu-candidate-overlay
+  (add-hook 'eshell-mode-hook (lambda () (corfu-candidate-overlay-mode -1))))
+
+(elpaca capf-autosuggest
+  (add-hook 'eshell-mode-hook #'capf-autosuggest-mode)
+  (add-hook 'comint-mode-hook #'capf-autosuggest-mode))
+
 (add-hook 'eshell-exit-hook #'quit-window)
 (setopt eshell-modules-list '( eshell-alias eshell-banner
                                eshell-basic eshell-cmpl
@@ -64,6 +71,7 @@
 (elpaca bash-completion)
 
 (elpaca fish-completion
+  (setopt fish-completion-fallback-on-bash-p t)
   (autoload #'global-fish-completion-mode "fish-completion")
   (global-fish-completion-mode 1))
 

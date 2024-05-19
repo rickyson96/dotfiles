@@ -50,6 +50,7 @@
 (elpaca eat
   (add-hook 'eat-exit-hook #'quit-window)
   (add-hook 'eshell-load-hook #'eat-eshell-mode)
+  (eat-eshell-mode 1)
 
   (defun ra/connect-to-paystone-vm ()
     (interactive)
