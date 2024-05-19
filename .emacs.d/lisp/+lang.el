@@ -164,5 +164,9 @@
   (interactive "P")
   (sql-product-interactive 'spanner buffer))
 
+(elpaca caddyfile-mode
+  (add-to-list 'auto-mode-alist `(,(rx "Caddyfile" eos) . caddyfile-mode))
+  (add-to-list 'auto-mode-alist `(,(rx "caddy.conf" eos) . caddyfile-mode)))
+
 (provide '+lang)
 ;;; +lang.el ends here
