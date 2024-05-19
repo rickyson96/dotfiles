@@ -137,8 +137,9 @@
 (elpaca (noman :host github :repo "andykuszyk/noman.el")
   (autoload #'noman "noman" "Attempt to parse command line help for the command CMD" t))
 
-(elpaca wakatime-mode
-  (global-wakatime-mode 1))
+(when (executable-find "wakatime-cli")
+  (elpaca wakatime-mode
+    (global-wakatime-mode 1)))
 
 (setopt calc-algebraic-mode 1)
 
