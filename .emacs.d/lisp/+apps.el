@@ -147,5 +147,7 @@
 
 (elpaca devdocs)
 
+(elpaca (emacs-conflict :host github :repo "ibizaman/emacs-conflict"))
+
 (provide '+apps)
 ;;; +apps.el ends here
