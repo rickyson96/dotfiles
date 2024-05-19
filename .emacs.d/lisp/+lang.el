@@ -66,6 +66,13 @@
   (setopt csv-align-style 'auto))
 
 ;; Emacs Lisp
+(elpaca pair-tree
+  (with-eval-after-load 'pair-tree
+	(ra/keymap-set pair-tree-mode-map
+	  "h" #'pair-tree-nav-up
+	  "n" #'pair-tree-nav-down
+	  "t" #'pair-tree-nav-right
+	  "p" #'pair-tree-nav-up)))
 (elpaca macrostep)
 (elpaca suggest)
 
