@@ -91,7 +91,7 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 									 :right-divider-width 10
 									 :scroll-bar-width 8))
 
-  (ra/configure-frame "spacious-padding" (elpaca-after-init-hook server-after-make-frame-hook)
+  (ra/configure-frame ra/spacious-padding
 	(spacious-padding-mode 1)))
 
 (elpaca (dired-plus :host github :repo "emacsmirror/dired-plus" :main "dired+.el"))

@@ -65,7 +65,7 @@
 ;; installation can conform to the no-littering directories
 (elpaca-wait)
 
-(defmacro ra/configure-frame (name hooks &rest body)
+(defmacro ra/configure-frame (name &rest body)
   "Macro for creating hook function for frame related configurations, which will not function
 correctly when being run directly on startup.
 This macro will add the corresponding hooks and then remove them on startup.
@@ -77,9 +77,9 @@ See https://emacs.stackexchange.com/questions/59791/font-and-frame-configuration
 							`((defun ,name (&rest _) ,@body
 									 (remove-hook ',hook #',name))
 							  (add-hook ',hook #',name))))
-		   hooks)))
+		    '(elpaca-after-init-hook server-after-make-frame-hook))))
 
-(ra/configure-frame ra/setup-font (elpaca-after-init-hook server-after-make-frame-hook)
+(ra/configure-frame ra/setup-font
   (set-face-attribute 'default nil :font "monospace" :height 110)
   (set-face-attribute 'fixed-pitch nil :font "monospace")
   (set-face-attribute 'variable-pitch nil :font "sans-serif"))
