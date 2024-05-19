@@ -215,6 +215,7 @@ project or not"
   "f" #'elfeed
   "m" #'consult-man
   "n" #'denote-open-or-create
+  "c" #'calc
   "RET" #'mediator-open
   "'" #'proced)
 
@@ -238,7 +239,8 @@ project or not"
 (defvar-keymap ra/window-map
   :doc "Keymap for modifying emacs' windows"
   :parent ra/window-repeat-map
-  "o" #'switch-window)
+  "o" #'switch-window
+  "u" #'ra/toggle-maximize-window)
 (defalias 'ra/window-map ra/window-map)
 
 (defvar-keymap ra/eglot-map

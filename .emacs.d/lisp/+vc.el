@@ -20,13 +20,19 @@
 													  ("origin/main" . "/"))
 		  magit-revision-show-gravatars '("^Author:     " . "^Commit:     ")
 		  magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1
-		  auto-revert-buffer-list-filter #'magit-auto-revert-repository-buffer-p)
+		  auto-revert-buffer-list-filter #'magit-auto-revert-repository-buffer-p
+		  magit-diff-refine-hunk t)
+
+  (magit-wip-mode 1)
 
   (with-eval-after-load 'magit
 	(transient-replace-suffix 'magit-branch 'magit-checkout
 	  '("b" "dwim" magit-branch-or-checkout))
 	(transient-append-suffix 'magit-branch 'magit-branch-checkout
-	  '("B" "branch/revision" magit-checkout)))
+	  '("B" "branch/revision" magit-checkout))
+
+	(ra/keymap-set magit-status-mode-map
+	  "M-RET" #'magit-diff-visit-file-other-window))
 
   ;; Taken from https://github.com/alphapapa/unpackaged.el#hydra
   (defhydra smerge-hydra
@@ -65,6 +71,10 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
   (add-hook 'smerge-mode-hook (lambda () (when smerge-mode
 										   (smerge-hydra/body)))))
+
+(when (executable-find "delta")
+  (elpaca magit-delta
+	(add-hook 'magit-mode-hook #'magit-delta-mode)))
 
 (setopt ediff-window-setup-function 'ediff-setup-windows-plain
 		ediff-split-window-function 'split-window-horizontally

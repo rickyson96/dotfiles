@@ -39,18 +39,71 @@
 (elpaca lsp-mode
   (setopt lsp-idle-delay 0.3
 		  lsp-completion-provider :none
-		  lsp-keymap-prefix "C-c l")
+		  lsp-keymap-prefix "C-c l"
+		  lsp-diagnostics-provider t
+		  lsp-inlay-hint-enable t
+		  lsp-enable-suggest-server-download nil
+		  lsp-eldoc-render-all t)
+
+  (with-eval-after-load 'lsp-mode
+	(ra/keymap-set lsp-mode-map
+	  "<remap> <display-local-help>" #'eldoc))
+
+  (with-eval-after-load 'lsp-mode
+	  (set-face-attribute 'lsp-face-highlight-read nil :inherit 'bold :underline t))
 
   (defun ra/lsp-mode-setup-completion ()
 	"Taken from corfu's wiki"
 	(setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(orderless)))
 
-  (add-hook 'lsp-completion-mode #'ra/lsp-mode-setup-completion))
+  (add-hook 'lsp-completion-mode #'ra/lsp-mode-setup-completion)
+  (add-hook 'lsp-mode-hook #'yas-minor-mode)
+
+  ;; LSP Booster
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+	"Try to parse bytecode instead of json."
+	(or
+	 (when (equal (following-char) ?#)
+       (let ((bytecode (read (current-buffer))))
+		 (when (byte-code-function-p bytecode)
+           (funcall bytecode))))
+	 (apply old-fn args)))
+  (advice-add (if (progn (require 'json)
+						 (fboundp 'json-parse-buffer))
+                  'json-parse-buffer
+				'json-read)
+              :around
+              #'lsp-booster--advice-json-parse)
+
+  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+	"Prepend emacs-lsp-booster command to lsp CMD."
+	(let ((orig-result (funcall old-fn cmd test?)))
+      (if (and (not test?)                             ;; for check lsp-server-present?
+               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+               lsp-use-plists
+               (not (functionp 'json-rpc-connection))  ;; native json-rpc
+               (executable-find "emacs-lsp-booster"))
+          (progn
+			(message "Using emacs-lsp-booster for %s!" orig-result)
+			(cons "emacs-lsp-booster" orig-result))
+		orig-result)))
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
+
+(with-eval-after-load 'eglot
+  (set-face-attribute 'eglot-highlight-symbol-face nil :underline t))
 
 (elpaca (eglot-booster :host github :repo "jdtsmith/eglot-booster")
   (with-eval-after-load 'eglot
 	(eglot-booster-mode 1)))
+
+(elpaca (lsp-bridge :host github :repo "manateelazycat/lsp-bridge"
+					:files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+					:build (:not elpaca--byte-compile))
+  (setopt lsp-bridge-enable-log nil
+		  lsp-bridge-enable-inlay-hint t))
+
+(elpaca yasnippet)
 
 (elpaca apheleia
   (with-eval-after-load 'apheleia-formatters
@@ -66,13 +119,14 @@ Taken from tempel's readme"
 
 (elpaca tempel-collection)
 
-(elpaca aggressive-indent
-  (global-aggressive-indent-mode 1))
+(elpaca (lsp-snippet :host github :repo "svaante/lsp-snippet")
+  ;; (when (featurep 'lsp-mode)
+  ;; 	(lsp-snippet-tempel-lsp-mode-init))
+  (when (featurep 'eglot)
+	(lsp-snippet-tempel-eglot-init)))
 
-(elpaca (copilot :host github
-				 :repo "copilot-emacs/copilot.el"
-				 :branch "main"
-				 :files ("dist" "*.el")))
+;; TODO: need to find a way to partially enable aggressive indent
+(elpaca aggressive-indent)
 
 (elpaca flymake-flycheck
   (add-hook 'flymake-mode-hook 'flymake-flycheck-auto)

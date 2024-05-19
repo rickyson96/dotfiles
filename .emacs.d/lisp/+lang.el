@@ -20,7 +20,9 @@
   (macroexp-progn
    `((add-to-list 'treesit-language-source-alist '(,language ,url ,@extra))
 	 (unless (treesit-language-available-p ',language)
-	   (treesit-install-language-grammar ',language)))))
+	   (treesit-install-language-grammar ',language))
+	 (add-to-list 'major-mode-remap-alist '(,(intern (concat (symbol-name language) "-mode")) .
+											,(intern (concat (symbol-name language) "-ts-mode")))))))
 
 (elpaca go-mode)
 (elpaca gotest)

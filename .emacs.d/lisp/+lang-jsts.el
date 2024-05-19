@@ -22,27 +22,44 @@
 ;; (add-hook 'js-ts-mode-hook #'lsp-deferred)
 
 (add-to-list 'auto-mode-alist `(,(rx "." (or "j" "t") "s" eos) . typescript-ts-mode))
-(dolist (actions '(eglot-ensure
-				   apheleia-mode))
+(dolist (actions '(apheleia-mode
+				   ;; lsp-deferred
+				   eglot-ensure))
   (add-hook 'typescript-ts-base-mode-hook actions))
 
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
-			   '(((typescript-ts-mode :language-id "typesrcipt")) . ("typescript-language-server" "--stdio"
-																	 :initializationOptions ( :preferences ( :importModuleSpecifierPreference "relative"
-																											 :includeInlayEnumMemberValueHints t
-																											 :includeInlayFunctionLikeReturnTypeHints t
-																											 :includeInlayFunctionParameterTypeHints t
-																											 :includeInlayParameterNameHints "literals" ; "none" | "literals" | "all"
-																											 :includeInlayParameterNameHintsWhenArgumentMatchesName t
-																											 :includeInlayPropertyDeclarationTypeHints t
-																											 :includeInlayVariableTypeHints t
-																											 :includeInlayVariableTypeHintsWhenTypeMatchesName t
-																											 :quotePreference "single"))))))
+			   '(((typescript-ts-mode :language-id "typesrcipt")) .
+				 ("typescript-language-server" "--stdio"
+				  :initializationOptions
+				  ( :preferences
+					( :importModuleSpecifierPreference "relative"
+					  :includeInlayEnumMemberValueHints t
+					  :includeInlayFunctionLikeReturnTypeHints t
+					  :includeInlayFunctionParameterTypeHints t
+					  :includeInlayParameterNameHints "literals" ; "none" | "literals" | "all"
+					  :includeInlayParameterNameHintsWhenArgumentMatchesName t
+					  :includeInlayPropertyDeclarationTypeHints t
+					  :includeInlayVariableTypeHints t
+					  :includeInlayVariableTypeHintsWhenTypeMatchesName t
+					  :quotePreference "single"))))))
+
+(with-eval-after-load 'lsp-mode
+  (setopt lsp-clients-typescript-preferences '( :importModuleSpecifierPreferences "relative"
+												:includeInlayParameterNameHints "literals"
+												:includeInlayEnumMemberValueHints t
+												:includeInlayFunctionLikeReturnTypeHints t
+												:includeInlayFunctionParameterTypeHints t
+												:includeInlayParameterNameHintsWhenArgumentMatchesName t
+												:includeInlayPropertyDeclarationTypeHints t
+												:includeInlayVariableTypeHints t
+												:includeInlayVariableTypeHintsWhenTypeMatchesName t
+												:quotePreference "single")))
 
 (elpaca npm)
 (elpaca nodejs-repl)
-(elpaca nvm)
+(elpaca nvm
+  (setopt nvm-dir "/home/randerson/.local/share/nvm/"))
 (elpaca (yarn :host github :repo "jmfirth/yarn.el"))
 (elpaca yarn-mode)
 
@@ -73,6 +90,8 @@
   (add-hook 'typescript-ts-base-mode-hook 'flycheck-jest-setup))
 
 (elpaca jsdoc)
+
+(elpaca ts-comint)
 
 (provide '+lang-jsts)
 ;;; +lang-jsts.el ends here

@@ -165,6 +165,9 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 	  "Set workspace buffer list for consult-buffer.")
 	(add-to-list 'consult-buffer-sources 'consult--source-workspace)))
 
+(elpaca imenu-list)
+
+(elpaca (treesit-fold :host github :repo "emacs-tree-sitter/treesit-fold"))
 
 (require '+completion)
 
@@ -214,6 +217,10 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 (elpaca outshine
   (setopt outline-minor-mode-prefix "\C-c o"))
 
+(elpaca (asdf :host github :repo "tabfugnic/asdf.el")
+  (require 'asdf)
+  (asdf-enable))
+
 (setopt isearch-lazy-count t)
 (elpaca anzu
   (global-anzu-mode 1)
@@ -232,9 +239,10 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 	"Run rename symol based on context. Use `eglot-rename' when eglot is on,
 otherwise, use `substitute-target-in-buffer'"
 	(interactive)
-	(if (and (fboundp 'eglot-managed-p) (eglot-managed-p))
-		(call-interactively #'eglot-rename)
-	  (call-interactively #'substitute-target-in-buffer)))
+	(call-interactively
+	 (cond ((and (fboundp 'eglot-managed-p) (eglot-managed-p)) #'eglot-rename)
+		  ((and (boundp 'lsp-managed-mode) lsp-managed-mode) #'lsp-rename)
+		  (t #'substitute-target-in-buffer))))
 
   (defvar-keymap ra/substitute-map
 	:doc "Keymap for substitute package"

@@ -91,7 +91,8 @@
     "'" #'org-capture)
   (meow-motion-overwrite-define-key
    ;; custom keybinding for motion state
-   '("<escape>" . ignore))
+   '("<escape>" . ignore)
+   '("SPC" . "H-SPC"))
   (meow-normal-define-key
    '("0" . meow-expand-0)
    '("9" . meow-expand-9)
@@ -138,7 +139,7 @@
    '("r" . meow-replace)
    '("R" . meow-swap-grab)
    '("s" . meow-search)
-   ;;`("S" . ,ra/meow-pair)
+   `("S" . embrace-commander)
    '("t" . meow-right)
    '("T" . meow-right-expand)
    '("u" . meow-undo)
