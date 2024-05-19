@@ -134,10 +134,16 @@
 (elpaca (mount :host github :repo "zellerin/mount-mode"))
 
 (elpaca (noman :host github :repo "andykuszyk/noman.el")
-  (autoload #'noman "noman" "Attempt to parse command line help for the command CMD" (interactive)))
+  (autoload #'noman "noman" "Attempt to parse command line help for the command CMD" t))
 
 (elpaca wakatime-mode
   (global-wakatime-mode 1))
+
+(setopt calc-algebraic-mode 1)
+
+(elpaca plz-see)
+
+(elpaca devdocs)
 
 (provide '+apps)
 ;;; +apps.el ends here
