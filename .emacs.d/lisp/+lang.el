@@ -56,6 +56,19 @@
 
 (elpaca jsonian)
 (elpaca (hjson :host github :repo "hjson/hjson-emacs" :main "hjson-mode.el"))
+(elpaca jq-mode
+  (setopt jq-interactive-command "yq"
+		  jq-interactive-default-options "--prettyPrint --output-format json"
+		  jq-interactive-font-lock-mode #'jsonian-mode)
+
+  (defun ra/yq-interactively ()
+	"`jq-interactively' but using yq for yaml files"
+	(interactive)
+	(let ((jq-interactive-command "yq")
+		  (jq-interactive-font-lock-mode #'yaml-ts-mode)
+		  (jq-interactive-default-options "")
+		  (jq-interactive-default-prompt "yq: "))
+	  (call-interactively #'jq-interactively))))
 
 (ra/treesitter-setup yaml "https://github.com/ikatyang/tree-sitter-yaml")
 (elpaca yaml-pro
