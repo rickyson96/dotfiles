@@ -123,6 +123,8 @@
   (codespaces-setup))
 
 (elpaca verb
+  (setopt verb-json-use-mode 'jsonian-mode
+          verb-auto-show-headers-buffer t)
   (with-eval-after-load 'org
     (ra/keymap-set org-mode-map
       "C-c C-r" verb-command-map)))

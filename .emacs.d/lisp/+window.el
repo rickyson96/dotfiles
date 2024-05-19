@@ -93,7 +93,16 @@
 													(fit-window-to-buffer w 40 1)))
 								(window-parameters . ((mode-line-format . none)))
 								(body-function . ,(lambda (w)
-													(setq ra/eldoc-window w))))))
+													(setq ra/eldoc-window w))))
+							   (,(rx bol "*HTTP Response" (0+ nonl) "*" eol)
+								(display-buffer-in-side-window)
+								(side . right)
+								(slot . 2))
+							   (,(rx bol "*HTTP Headers" (0+ nonl) "*" eol)
+								(display-buffer-in-side-window)
+								(side . right)
+								(slot . 1)
+								(mode-line-format . ""))))
 
 (ra/keymap-set (current-global-map)
   "C-g" (ra/cmd (ra/eldoc-window-delete) (keyboard-quit)))
@@ -112,7 +121,9 @@
 									 eat-mode
 									 ,(rx "*" (0+ nonl) "eshell" (0+ nonl) "*")
 									 eshell-mode
-									 ,(rx bol "*eldoc*" eol)))
+									 ,(rx bol "*eldoc*" eol)
+									 ,(rx bol "*HTTP Response" (0+ nonl) "*" eol)
+									 ,(rx bol "*HTTP Headers" (0+ nonl) "*" eol)))
   (popper-mode +1)
   (popper-echo-mode +1))
 
