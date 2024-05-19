@@ -35,6 +35,12 @@
 
 (require '+lang-jsts)
 
+(ra/treesitter-setup python "https://github.com/tree-sitter/tree-sitter-python")
+(elpaca pip-requirements)
+(elpaca conda
+  (conda-env-initialize-eshell))
+(elpaca anaconda-mode)
+
 (require '+lang-org)
 
 (require '+lang-web)
@@ -66,6 +72,11 @@
   (setopt csv-align-style 'auto))
 
 ;; Emacs Lisp
+(elpaca (elispfl :host github :repo "cireu/elispfl")
+  (elispfl-mode 1)
+  (elispfl-ielm-mode 1))
+(elpaca lisp-extra-font-lock
+  (lisp-extra-font-lock-global-mode 1))
 (elpaca pair-tree
   (with-eval-after-load 'pair-tree
 	(ra/keymap-set pair-tree-mode-map
