@@ -9,7 +9,8 @@ c.bindings.commands['normal'] = {
     '<alt-shift-p>': 'tab-move -',
 
     '<alt-h>': 'back',
-    '<alt-t>': 'forward',
+    '<alt-l>': 'forward',
+    '<alt-t>': 'cmd-set-text -s :tab-focus',
     '<ctrl-k>': 'tab-close',
     '<ctrl-u>': 'undo',
     '<ctrl-shift-u>': 'cmd-set-text -s :undo',
