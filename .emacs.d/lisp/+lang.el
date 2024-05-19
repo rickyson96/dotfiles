@@ -39,8 +39,9 @@
 
 (ra/treesitter-setup python "https://github.com/tree-sitter/tree-sitter-python")
 (elpaca pip-requirements)
-(elpaca conda
-  (conda-env-initialize-eshell))
+(when (executable-find "conda")
+  (elpaca conda
+	(conda-env-initialize-eshell)))
 (elpaca anaconda-mode)
 
 (require '+lang-org)
