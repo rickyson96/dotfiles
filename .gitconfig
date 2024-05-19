@@ -21,6 +21,24 @@
 [init]
 	defaultBranch = main
 
+[fetch]
+	writeCommitGraph = true
+
+[core]
+	pager = delta
+
+[interactive]
+	pager = delta --color-only --diff-so-fancy
+
+[delta]
+	navigate = true
+
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    colorMoved = default
+
 [url "git@bitbucket.org:"]
 	 insteadOf = "https://bitbucket.org"
 
