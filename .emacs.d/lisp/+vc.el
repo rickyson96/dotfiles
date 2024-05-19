@@ -100,7 +100,13 @@ n,SPC -next diff     |     h -highlighting       |  B -copy both region to C
 
 (elpaca magit-imerge)
 
-(elpaca forge)
+(elpaca forge
+  (autoload #'forge-read-pullreq "forge")
+  (with-eval-after-load 'forge
+	(transient-append-suffix 'forge-topic-menu 'forge-create-pullreq-from-issue
+	  '("R" "Review Pull Request" ra/checkout-and-review-forge-pr-topic
+		:transient transient--do-exit
+		:if (lambda () (forge-pullreq-p (forge-current-topic t)))))))
 
 (elpaca agitate
   (add-hook 'diff-mode-hook #'agitate-diff-enable-outline-minor-mode)
@@ -122,7 +128,25 @@ n,SPC -next diff     |     h -highlighting       |  B -copy both region to C
 
 (elpaca (closql :depth nil))
 
-(elpaca (code-review :host github :repo "doomelpa/code-review"))
+(elpaca (code-review :host github :repo "doomelpa/code-review")
+  (defun ra/checkout-and-review-forge-pr-topic ()
+	"Checkout using `forge-checkout-pullreq' and immediately start code-review session.
+This ensures that we can visit correct pullreq file when reviewing.
+This is used from `forge-topic-menu', so it's safe to assume we are on a topic."
+	(interactive)
+	(let ((pullreq (forge-current-topic t)))
+	  (forge-checkout-pullreq pullreq)
+	  (magit-fetch-all-no-prune)
+	  (call-interactively #'code-review-forge-pr-at-point)))
+
+  (defun ra/checkout-and-review-forge-pr (pullreq)
+	"Checkout using `forge-checkout-pullreq' and immediately start code-review session.
+This ensures that we can visit correct pullreq file when reviewing."
+	(interactive (list (forge-read-pullreq "Review pull-request")))
+	(forge-checkout-pullreq pullreq)
+	(magit-fetch-all-no-prune)
+	(forge-visit-pullreq pullreq)
+	(call-interactively #'code-review-forge-pr-at-point)))
 
 (provide '+vc)
 ;;; +vc.el ends here
