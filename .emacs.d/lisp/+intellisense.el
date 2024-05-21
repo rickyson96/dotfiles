@@ -13,6 +13,10 @@
 
 ;;; Code:
 
+;; TODO: checkout `lsp-mode'
+;; TODO: checkout `flycheck'
+;; TODO: checkout `projectile'
+
 (setopt completion-ignore-case t
 		read-file-name-completion-ignore-case t
 		read-buffer-completion-ignore-case t)

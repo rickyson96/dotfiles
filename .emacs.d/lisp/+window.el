@@ -13,10 +13,15 @@
 
 ;;; Code:
 
+;; TODO: integrate this https://karthinks.com/software/emacs-window-management-almanac/#this-article-is-not-about
+;; maybe use `other-window' / `other-window-alternating?' / IDEA: `other-window-dwim' - which, with subsequent call, acts like `other-window'
+
 (elpaca ace-window
   ;; Karthink's blog post has a very useful tricks to use embark.
   ;; And I also learned how to configure ace-window from there!
   ;; https://karthinks.com/software/fifteen-ways-to-use-embark/
+
+  ;; TODO: integrate this and switch from `switch-window'
 
   ;; I have decided to use left-hand keys as window selector, and
   ;; right-hand keys for dispatch command.

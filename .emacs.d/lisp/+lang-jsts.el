@@ -56,6 +56,8 @@
 												:includeInlayVariableTypeHintsWhenTypeMatchesName t
 												:quotePreference "single")))
 
+(elpaca tide)
+
 (elpaca npm)
 (elpaca nodejs-repl)
 (elpaca nvm

@@ -59,9 +59,10 @@
 
 (elpaca jsonian)
 (elpaca (hjson :host github :repo "hjson/hjson-emacs" :main "hjson-mode.el"))
+;; TODO: improve `jq-interactively' using `make-process'.
 (elpaca jq-mode
   (setopt jq-interactive-command "yq"
-		  jq-interactive-default-options "--prettyPrint --output-format json"
+		  jq-interactive-default-options "--prettyPrint --input-format json --output-format json"
 		  jq-interactive-font-lock-mode #'jsonian-mode)
 
   (defun ra/yq-interactively ()
