@@ -82,12 +82,23 @@ Taken from: http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html"
     (backward-kill-word (prefix-numeric-value p))))
 
 (defun ra/shell-command (&optional p)
-  "`shell-command', which on prefix \[universal-argument], got to define `default-directory'"
+  "Improved `shell-command'!.
+\\[universal-argument] (default on `shell-command'): Insert output to buffer.
+\\[universal-argument] \\[universal-argument]: Select directory to execute.
+\\[universal-argument] \\[universal-argument] \\[universal-argument]: Select directory and insert output.
+It also tries to run `shell-command-on-region' instead if `use-region-p' is `t'"
   (interactive "P")
-  (let ((default-directory (if p
-                               (read-directory-name "shell-command on dir: ")
-                             default-directory)))
-    (call-interactively #'shell-command)))
+  (let* ((num-prefix (prefix-numeric-value p))
+         (default-directory (if (>= num-prefix 16)
+                                (read-directory-name "shell-command on dir: ")
+                              default-directory))
+         (current-prefix-arg (if (= num-prefix 16)
+                                 nil
+                               p)))
+    (if (use-region-p)
+        (call-interactively #'shell-command-on-region)
+      (call-interactively #'shell-command))))
+
 
 (defun ra/eshell-command (&optional p)
   "`shell-command', which on prefix \[universal-argument], got to define `default-directory'"
