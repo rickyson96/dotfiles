@@ -91,16 +91,17 @@ See https://emacs.stackexchange.com/questions/59791/font-and-frame-configuration
 (elpaca 0xc)
 (elpaca el-patch)
 
-(defmacro ra/keymap-set (keymap &rest pairs)
+(defun ra/keymap-set (keymap &rest pairs)
   "Bind multiple pairs of KEY/DEFINITION to KEYMAP using `keymap-set'.
 
 \(fn KEYMAP [KEY DEFINITION]...)"
   (declare (indent defun))
   (unless (zerop (mod (length pairs) 2))
     (error "PAIRS must be pair of KEY/DEFINITION"))
-  (macroexp-progn (seq-map (lambda (pair)
-							 `(keymap-set ,keymap ,(car pair) ,(cadr pair)))
-						   (seq-split pairs 2))))
+  (seq-map (lambda (pair)
+			 (keymap-set keymap (car pair) (cadr pair)))
+		   (seq-split pairs 2)))
+
 (defmacro ra/cmd (&rest body)
   "Shorthand for (lambda () (interactive) ,@body)
 
