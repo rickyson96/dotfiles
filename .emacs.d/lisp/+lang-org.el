@@ -123,7 +123,8 @@
 			(todo "WAIT" ((org-agenda-overriding-header " Delegated / Blocked")
 						  (org-agenda-todo-ignore-with-date t)
 						  (org-agenda-prefix-format " %i %-12:(org-gtd--agenda-prefix-format)")
-						  (org-agenda-files `(,org-gtd-directory))))))))
+						  (org-agenda-files `(,org-gtd-directory)))))))
+		org-link-elisp-confirm-function #'y-or-n-p)
 
 (provide '+lang-org)
 ;;; +lang-org.el ends here
