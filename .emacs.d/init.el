@@ -174,6 +174,18 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 
 (require '+intellisense)
 
+;; (elpaca fancy-compilation
+;;   (with-eval-after-load 'compile
+;; 	(fancy-compilation-mode)))
+
+(elpaca xterm-color
+  (setopt compilation-environment '("TERM=xterm-256color"))
+
+  (defun ra/advice-compilation-filter (f proc string)
+	(funcall f proc (xterm-color-filter string)))
+
+  (advice-add 'compilation-filter :around #'ra/advice-compilation-filter))
+
 ;; Remote development
 (setopt tramp-default-remote-shell "/bin/bash"
 		enable-remote-dir-locals t

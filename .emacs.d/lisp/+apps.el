@@ -80,6 +80,8 @@
                                                    ;; (hide-mode-line-mode -1)
                                                    (eat-semi-char-mode))))))
 
+(elpaca coterm)
+
 (require '+apps-eshell)
 
 (setopt calc-multiplication-has-precedence nil)
