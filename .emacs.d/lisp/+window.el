@@ -16,6 +16,9 @@
 ;; TODO: integrate this https://karthinks.com/software/emacs-window-management-almanac/#this-article-is-not-about
 ;; maybe use `other-window' / `other-window-alternating?' / IDEA: `other-window-dwim' - which, with subsequent call, acts like `other-window'
 
+(setopt focus-follows-mouse t
+		mouse-autoselect-window -0.1)
+
 (elpaca ace-window
   ;; Karthink's blog post has a very useful tricks to use embark.
   ;; And I also learned how to configure ace-window from there!
