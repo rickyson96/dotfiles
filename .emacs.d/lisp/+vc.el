@@ -15,13 +15,16 @@
 
 (elpaca transient)
 (elpaca magit
-  (setopt magit-branch-prefer-remote-upstream '("master" "develop" "production" "development" "staging" "dev" "main")
-		  magit-branch-adjust-remote-upstream-alist '(("origin/master" . "/")
-													  ("origin/main" . "/"))
+  (setopt magit-prefer-remote-upstream t
+		  magit-branch-prefer-remote-upstream '("master" "develop" "production" "development" "staging" "dev" "main")
+		  magit-branch-adjust-remote-upstream-alist '(("origin/develop" . ("master" "main" "develop"))
+													  ("origin/master" . ("master" "main"))
+													  ("origin/main" . ("master" "main")))
 		  magit-revision-show-gravatars '("^Author:     " . "^Commit:     ")
 		  magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1
 		  auto-revert-buffer-list-filter #'magit-auto-revert-repository-buffer-p
-		  magit-diff-refine-hunk t)
+		  magit-diff-refine-hunk t
+		  magit-commit-squash-confirm nil)
 
   (magit-wip-mode 1)
 
