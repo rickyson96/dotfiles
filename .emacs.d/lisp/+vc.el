@@ -116,7 +116,23 @@ n,SPC -next diff     |     h -highlighting       |  B -copy both region to C
 	(transient-append-suffix 'forge-topic-menu 'forge-create-pullreq-from-issue
 	  '("R" "Review Pull Request" ra/checkout-and-review-forge-pr-topic
 		:transient transient--do-exit
-		:if (lambda () (forge-pullreq-p (forge-current-topic t)))))))
+		:if (lambda () (forge-pullreq-p (forge-current-topic t))))))
+
+  ;; TODO probably upstream this?
+  (defun ra/forge-post-eldoc-function (callback)
+	"use `bug-reference--url-at-point' to display the bug url at point"
+	(when-let* ((topic (forge-topic-at-point))
+			  (title (oref topic title))
+			  (num (oref topic number)))
+	  (format "%s %s"
+			  (propertize (format "#%s:" num) 'face 'bold)
+			  title)))
+
+  (defun ra/forge-post-setup ()
+	"extra setup for `forge-post-mode'"
+	(add-hook 'eldoc-documentation-functions #'ra/forge-post-eldoc-function nil t))
+
+  (add-hook 'forge-post-mode-hook #'ra/forge-post-setup))
 
 (elpaca agitate
   (add-hook 'diff-mode-hook #'agitate-diff-enable-outline-minor-mode)
