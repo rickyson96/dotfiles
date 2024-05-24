@@ -146,13 +146,15 @@
   (popper-mode +1)
   (popper-echo-mode +1))
 
+(defvar ra/maximize-window-configuration nil)
 (defun ra/toggle-maximize-window ()
   "Toggle maximize current buffer."
   (interactive)
-  (if (= 1 (length (window-list)))
-      (jump-to-register '_)
-    (window-configuration-to-register '_)
-    (delete-other-windows)))
+  (if ra/maximize-window-configuration
+	  (progn
+		(set-window-configuration ra/maximize-window-configuration)
+		(setq ra/maximize-window-configuration nil))
+	(setq ra/maximize-window-configuration (current-window-configuration))))
 
 (provide '+window)
 ;;; +window.el ends here
