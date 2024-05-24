@@ -30,6 +30,8 @@
 	  '("b" "dwim" magit-branch-or-checkout))
 	(transient-append-suffix 'magit-branch 'magit-branch-checkout
 	  '("B" "branch/revision" magit-checkout))
+	(transient-append-suffix 'magit-fetch "-t"
+	  '("-u" "Unshallow repository" "--unshallow"))
 
 	(ra/keymap-set magit-status-mode-map
 	  "M-RET" #'magit-diff-visit-file-other-window))
