@@ -62,6 +62,7 @@
 
   (advice-add #'register-preview :override #'consult-register-window))
 
+;; TODO add embark elpaca integration?
 (elpaca embark
   (setopt prefix-help-command #'embark-prefix-help-command)
 

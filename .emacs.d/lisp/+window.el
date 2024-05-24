@@ -82,6 +82,8 @@
 
 (setopt switch-to-buffer-obey-display-actions t ; Sane `switch-to-buffer'
 		switch-to-buffer-in-dedicated-window 'pop
+		;; TODO function for `display-buffer-alist'
+		;; something that use keys as parameters and set `display-buffer-alist' and `popper-reference-buffer'.
 		display-buffer-alist `((,(rx bol "*helpful" (1+ nonl) eol)
 								(display-buffer-reuse-mode-window)
 								(mode . helpful-mode))

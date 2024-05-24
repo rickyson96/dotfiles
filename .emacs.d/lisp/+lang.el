@@ -48,6 +48,7 @@
 
 (require '+lang-web)
 
+;; TODO make markdown tab to autocomplete and `markdown-cycle' only works in normal mode
 (setopt markdown-fontify-code-blocks-natively t
 		markdown-wiki-link-fontify-missing t)
 
