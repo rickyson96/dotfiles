@@ -92,5 +92,12 @@
 (elpaca undo-fu-session
   (undo-fu-session-global-mode 1))
 
+(elpaca vundo
+  (setopt vundo-glyph-alist vundo-unicode-symbols)
+  (with-eval-after-load 'vundo
+	(ra/keymap-set vundo-mode-map
+	  "h" #'vundo-backward
+	  "t" #'vundo-forward)))
+
 (provide '+defaults)
 ;;; +defaults.el ends here
