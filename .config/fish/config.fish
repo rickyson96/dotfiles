@@ -60,5 +60,7 @@ set PATH $PATH /home/rickyson/.local/bin
 
 if test -e ~/.asdf/asdf.fish
     source ~/.asdf/asdf.fish
-    mkdir -p ~/.config/fish/completions; and ln -s ~/.asdf/completions/asdf.fish ~/.config/fish/completions
+    if not test -e ~/.config/fish/completions/asdf.fish
+        mkdir -p ~/.config/fish/completions; and ln -s ~/.asdf/completions/asdf.fish ~/.config/fish/completions
+    end
 end
