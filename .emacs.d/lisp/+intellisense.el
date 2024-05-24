@@ -95,6 +95,7 @@
   (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
 
 (with-eval-after-load 'eglot
+  (add-hook 'eglot-managed-mode-hook #'ra/tempel-setup-capf)
   (set-face-attribute 'eglot-highlight-symbol-face nil :underline t))
 
 (elpaca (eglot-booster :host github :repo "jdtsmith/eglot-booster")
@@ -115,11 +116,13 @@
 	(add-to-list 'apheleia-formatters '(eslintd . ("eslint_d" "--fix-to-stdout" "--stdin" "--stdin-filename" filepath)))
 	(setf (alist-get 'typescript-ts-mode apheleia-mode-alist) 'eslintd)))
 
+;; TODO setup tempel snippets
 (elpaca tempel
   (defun ra/tempel-setup-capf ()
 	"Setup capf to try tempel first
 Taken from tempel's readme"
-	(add-hook 'completion-at-point-functions #'tempel-expand -90 t)))
+	(add-hook 'completion-at-point-functions #'tempel-expand -90 t))
+  (ra/tempel-setup-capf))
 
 (elpaca tempel-collection)
 
