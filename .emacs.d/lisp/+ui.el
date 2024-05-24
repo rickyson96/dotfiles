@@ -29,8 +29,9 @@
   (setopt nerd-icons-scale-factor 1
 		  nerd-icons-font-family "IosevraRelaxed Nerd Font"))
 
-(elpaca hl-todo
+(elpaca (hl-todo :depth nil)
   (global-hl-todo-mode 1))
+(elpaca consult-todo)
 
 (elpaca ef-themes
   (setopt ef-themes-mixed-fonts t
