@@ -214,7 +214,8 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 
 (add-hook 'elpaca-after-init-hook (lambda () (require 'zone) (zone-when-idle 300)))
 
-(elpaca (commentize-conflict :host github :repo "zk-phi/commentize-conflict"))
+(elpaca (commentize-conflict :host github :repo "zk-phi/commentize-conflict")
+  (add-hook 'prog-mode-hook #'commentize-conflict-mode))
 
 (provide '+ui)
 ;;; +ui.el ends here
