@@ -10,6 +10,8 @@ c.bindings.commands['normal'] = {
 
     '<alt-h>': 'back',
     '<alt-l>': 'forward',
+    '<alt-shift-h>': 'cmd-set-text -s :back',
+    '<alt-shift-l>': 'cmd-set-text -s :forward',
     '<alt-t>': 'cmd-set-text -s :tab-focus',
     '<ctrl-k>': 'tab-close',
     '<ctrl-u>': 'undo',
@@ -96,7 +98,7 @@ c.bindings.commands['normal'] = {
     "<alt-u>po": "spawn -u qute-pass -m -d 'fuzzel -d' --otp-only",
     "<alt-u>pO": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --otp-only",
     '<alt-u>m': 'spawn umpv {url}',
-    '<alt-u>M': 'hint links spanw umpv {hint-url}',
+    '<alt-u>M': 'hint video spawn umpv {hint-url}',
 
     # modes
     '<ctrl-i>': 'mode-enter insert',

@@ -16,8 +16,7 @@
 
 ;;; Code:
 
-(setopt pixel-scroll-precision-mode t	; scroll image 1 line at a time
-		apropos-do-all t 		; apropos include all helps
+(setopt apropos-do-all t 		; apropos include all helps
 		mouse-yank-at-point t 		; middle-mouse yank at point instead of at cursor
 
 		custom-file (expand-file-name "custom.el" user-emacs-directory) ; do not clutter init.el
@@ -28,13 +27,12 @@
 		recentf-max-saved-items 500
 		recentf-max-menu-items 15
 
-		scroll-margin 0
-		scroll-conservatively 1000
-		scroll-preserve-screen-position 1
-
 		;; for eat purposes https://codeberg.org/akib/emacs-eat/issues/110
 		read-process-output-max (* 4 1024 1024)
 		process-adaptive-read-buffering nil
+
+		;; Make \\[universal-argument] on `browse-url' opens `eww'
+		browse-url-secondary-browser-function #'eww-browse-url
 
 		shell-command-prompt-show-cwd t
 		find-file-visit-truename t
@@ -67,14 +65,16 @@
 (elpaca dtrt-indent
   (require 'dtrt-indent)
   (setopt dtrt-indent-global-mode t
-	  tab-width 4))
+		  tab-width 4))
+
+;; Find a way to non-intrusively show whitespace using `whitespace-mode'
+;; \\`C-c T d' should then toggle between the intrusive version.
+(elpaca ws-butler
+  (ws-butler-global-mode 1))
 
 (elpaca editorconfig
   (editorconfig-mode 1)
   (setopt editorconfig-trim-whitespaces-mode 'ws-butler-mode))
-
-(elpaca ws-butler
-  (ws-butler-global-mode 1))
 
 (elpaca super-save
   (super-save-mode 1)

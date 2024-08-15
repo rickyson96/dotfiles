@@ -42,6 +42,7 @@ export LSP_USE_PLISTS=true
 export npm_config_prefix="$HOME/.local"
 export NODE_VERSION_PREFIX=v
 export NODE_VERSIONS={$HOME/.local/share/nvm}
+export NODE_OPTIONS="--max-old-space-size=2048"
 
 alias grep=rg
 alias ls="exa --icons"
@@ -53,6 +54,7 @@ if status is-interactive
     # Commands to run in interactive sessions can go here
     starship init fish | source
     direnv hook fish | source
+    atuin init fish | source
 end
 
 # Created by `pipx` on 2023-11-23 18:52:18

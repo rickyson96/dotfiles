@@ -17,6 +17,14 @@
   (with-eval-after-load 'org
 	(global-org-modern-mode 1)))
 
+(defun ra/verb-var-link (t)
+  (let* ((split (split-string t ":"))
+		 (name (car split))
+		 (content (nth 1 split)))
+	(if content
+		(format "(verb-set-var \"%s\" \"%s\")" name content)
+	  (format "(verb-set-var \"%s\")" name))))
+
 (setopt org-catch-invisible-edits 'show-and-error
 		org-special-ctrl-a/e t
 		org-hide-emphasis-markers t
@@ -26,8 +34,25 @@
 		org-startup-with-inline-images t
 		org-startup-indented t
 		org-fontify-quote-and-verse-blocks t
-		org-link-abbrev-alist '(("youtube" . "https://youtube.com/watch?v=%s")
-								("github" . "https://github.com/%s")))
+		org-use-sub-superscripts '{}
+		org-use-property-inheritance t
+		org-edit-src-content-indentation 0
+		org-link-abbrev-alist '(("ytni" . "yt:%s")
+								("github" . "https://github.com/%s")
+								("verb-var" . "elisp:%(ra/verb-var-link)")))
+
+(put 'ra/verb-var-link 'org-link-abbrev-safe t)
+
+(with-eval-after-load 'org
+  (add-to-list 'org-src-lang-modes '("json" . jsonian)))
+
+(setopt org-babel-load-languages '((emacs-lisp . t)
+								   (jq . t)
+								   (js . t)
+								   (shell . t)))
+
+(with-eval-after-load 'verb
+  (add-to-list 'org-babel-load-languages '(verb . t)))
 
 (elpaca org-appear
   (add-hook 'org-mode-hook #'org-appear-mode)
@@ -41,8 +66,8 @@
 							 (add-hook 'meow-normal-mode-hook #'org-appear-manual-stop nil t)
 							 (add-hook 'meow-insert-mode-hook #'org-appear-manual-start nil t))))
 
-(elpaca org-pdftools
-  (add-hook 'org-mode-hook #'org-pdftools-setup-link))
+;; (elpaca org-pdftools
+;;   (add-hook 'org-mode-hook #'org-pdftools-setup-link))
 
 (elpaca (org-yt :host github :repo "TobiasZawada/org-yt")
   (setopt org-yt-cache-directory (no-littering-expand-var-file-name "yt-cache"))
@@ -67,20 +92,18 @@
   (setopt org-capture-templates
 		  (doct '(("  Inbox" :keys "i"
 				   :file org-gtd-inbox-path
-				   :template ("* %^{Title: }"
+				   :template ("* %?"
 							  "%U"
 							  ""
 							  ""
-							  "%?"
 							  " %i")
 				   :kill-buffer t)
 				  ("  Inbox with link" :keys "l"
 				   :file org-gtd-inbox-path
-				   :template ("* %^{Title: }"
+				   :template ("* %?"
 							  "%U"
 							  ""
 							  ""
-							  "%?"
 							  " %i"
 							  " %a")
 				   :kill-buffer t)))))
@@ -89,6 +112,7 @@
   (org-super-agenda-mode 1))
 
 ;; Agenda styling
+(add-hook 'org-agenda-mode-hook #'hl-line-mode)
 (setopt org-agenda-tags-column 'auto
 		org-agenda-block-separator ?─
 		org-agenda-time-grid
@@ -117,7 +141,7 @@
 						(org-super-agenda-groups '((:time-grid t)))))
 			(todo "NEXT" ((org-agenda-overriding-header "⚡ Next Action")
 						  ;; (org-agenda-prefix-format " %i %-30:(my/org-gtd-agenda-prefix-format 30) ")
-						  (org-agenda-prefix-format '((todo . " %i %-12:(org-gtd-agenda--prefix-format)")))
+						  (org-agenda-prefix-format '((todo . " %i %-30:(org-gtd-agenda--prefix-format)")))
 						  ;; (org-agenda-prefix-format " %i %-12:(org-gtd--agenda-prefix-format)")
 						  (org-agenda-files `(,org-gtd-directory))))
 			(todo "WAIT" ((org-agenda-overriding-header " Delegated / Blocked")
@@ -125,6 +149,17 @@
 						  (org-agenda-prefix-format " %i %-12:(org-gtd--agenda-prefix-format)")
 						  (org-agenda-files `(,org-gtd-directory)))))))
 		org-link-elisp-confirm-function #'y-or-n-p)
+
+(elpaca org-fragtog
+  (add-hook 'org-mode-hook #'org-fragtog-mode))
+
+;; (defun ra/org-convert-link (link)
+;;   "Convert links to org-")
+
+(with-eval-after-load 'org
+  (ra/keymap-set org-mode-map
+	"C-c C-o" #'org-open-at-point
+	"C-'" nil))
 
 (provide '+lang-org)
 ;;; +lang-org.el ends here

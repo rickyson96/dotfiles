@@ -37,10 +37,10 @@
   (setopt ef-themes-mixed-fonts t
 		  ef-themes-variable-pitch-ui t
 		  ef-themes-headings ; read the manual's entry or the doc string
-		  '((0 variable-pitch 1.5)
-			(1 light variable-pitch 1.5)
-            (2 regular 1.3)
-            (3 1.1)))
+		  '((0 bold variable-pitch 1.2)
+			(1 bold variable-pitch 1.2)
+            (2 bold variable-pitch 1.1)
+            (t bold variable-pitch)))
 
   (with-eval-after-load 'org
 	(set-face-attribute 'org-quote nil :slant 'italic))
@@ -106,13 +106,14 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 										 ("t" "~/.local/share/Trash/files/" "TrashCan")
 										 (". ." "~/.dotfiles"               "Dotfiles")
 										 (". r" "~/.root-dotfiles"          "Root Dotfiles")))
-  (setopt dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index))
-		  dirvish-header-line-format '(:left (path) :right (vc-info file-user))
+  (setopt ;dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index))
+		  ;dirvish-header-line-format '(:left (path) :right (vc-info file-user))
 		  dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state git-msg)
 		  dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group"
 		  dirvish-reuse-session t
 		  dirvish-header-line-height '(20 . 25)
-		  dirvish-use-header-line 'global)
+		  dirvish-use-header-line 'global
+		  dirvish-side-width 25)
 
   (ra/keymap-set dirvish-mode-map
 	"b" #'dired-up-directory
@@ -150,34 +151,16 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
   (with-eval-after-load 'diredfl (set-face-attribute 'diredfl-dir-name nil :bold t)))
 
 (elpaca iscroll
-  (add-hook 'text-mode-hook #'iscroll-mode))
+  (mapc (lambda (x)
+		  (add-hook x #'iscroll-mode))
+		'(org-mode-hook)))
 
-(elpaca page-break-lines)
+(elpaca page-break-lines
+  (setopt page-break-lines-modes '( emacs-lisp-mode lisp-mode scheme-mode compilation-mode outline-mode
+									help-mode lisp-data-mode emacs-news-mode))
+  (global-page-break-lines-mode 1))
 
-(elpaca dashboard
-  (setopt dashboard-display-icons-p t
-		  dashboard-icon-type 'nerd-icons
-		  dashboard-set-navigator t
-		  dashboard-filter-agenda-entry #'dashboard-filter-agenda-by-todo)
-
-  (add-hook 'elpaca-after-init-hook #'dashboard-insert-startupify-lists)
-  (add-hook 'elpaca-after-init-hook #'dashboard-initialize)
-  (dashboard-setup-startup-hook)
-
-  (dashboard-modify-heading-icons '((recents . "nf-oct-file_text")
-									(bookmarks . "nf-oct-book")))
-
-
-  (ra/keymap-set dashboard-mode-map
-	"n" #'dashboard-next-line
-	"p" #'dashboard-previous-line)
-
-  (setopt dashboard-center-content t
-		  dashboard-vertically-center-content t)
-
-  ;; to work with daemon
-  ;; https://github.com/emacs-dashboard/emacs-dashboard?tab=readme-ov-file#emacs-daemon
-  (setopt initial-buffer-choice (lambda () (get-buffer-create dashboard-buffer-name))))
+(require '+ui-dashboard)
 
 (elpaca hide-mode-line)
 
@@ -212,10 +195,31 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 		(set-window-dedicated-p op-win nil)
 		(funcall orig-fn)))))
 
-(add-hook 'elpaca-after-init-hook (lambda () (require 'zone) (zone-when-idle 300)))
+(add-hook 'server-after-make-frame-hook (lambda () (require 'zone) (zone-when-idle 900)))
 
 (elpaca (commentize-conflict :host github :repo "zk-phi/commentize-conflict")
   (add-hook 'prog-mode-hook #'commentize-conflict-mode))
+
+(elpaca (indent-bars :host github :repo "jdtsmith/indent-bars")
+  (setopt indent-bars-treesit-support t
+		  indent-bars-treesit-ignore-blank-lines-types '("module")
+		  indent-bars-treesit-scope '((python function_definition class_definition for_statement
+											  if_statement with_statement while_statement)
+									  (yaml block_mapping))
+
+		  indent-bars-color '(highlight :face-bg t :blend 1.0)
+		  indent-bars-pattern ". . . . "
+		  indent-bars-width-frac 0.1
+		  indent-bars-pad-frac 0.1
+		  indent-bars-zigzag nil
+		  indent-bars-color-by-depth '(:regexp "outline-\\([0-9]+\\)" :blend 0.2)
+		  indent-bars-highlight-current-depth '(:pattern "." :blend 1) ; pump up the BG blend on current
+		  indent-bars-display-on-blank-lines t))
+
+(elpaca emojify
+  (global-emojify-mode 1))
+
+(elpaca emojify-logos)
 
 (provide '+ui)
 ;;; +ui.el ends here

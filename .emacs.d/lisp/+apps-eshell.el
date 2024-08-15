@@ -24,13 +24,6 @@
 
 ;;; Code:
 
-(with-eval-after-load 'corfu-candidate-overlay
-  (add-hook 'eshell-mode-hook (lambda () (corfu-candidate-overlay-mode -1))))
-
-(elpaca capf-autosuggest
-  (add-hook 'eshell-mode-hook #'capf-autosuggest-mode)
-  (add-hook 'comint-mode-hook #'capf-autosuggest-mode))
-
 (add-hook 'eshell-exit-hook #'quit-window)
 (setopt eshell-modules-list '( eshell-alias eshell-banner
                                eshell-basic eshell-cmpl
@@ -68,12 +61,20 @@
   (setup-esh-help-eldoc))
 
 ;; Completions
-(elpaca bash-completion)
+;; (elpaca bash-completion)
 
 (elpaca fish-completion
-  (setopt fish-completion-fallback-on-bash-p t)
+  (setopt fish-completion-fallback-on-bash-p nil)
   (autoload #'global-fish-completion-mode "fish-completion")
   (global-fish-completion-mode 1))
+
+(elpaca eshell-atuin
+  (setopt eshell-atuin-history-format "%->110c %-<50i %t + %d (%r ago) - %e"
+          eshell-atuin-search-fields '(time duration command relativetime directory exit))
+  (eshell-atuin-mode 1)
+  (with-eval-after-load 'em-hist
+    (ra/keymap-set eshell-hist-mode-map
+      "<remap> <eshell-previous-matching-input>"  #'eshell-atuin-history)))
 
 ;; Prompts
 
@@ -111,7 +112,7 @@
                                           ([(control down)] . eshell-next-input)
                                           ([(control ?r)]   . consult-history)
                                           ([(control ?s)]   . consult-history)
-                                          ([(meta ?r)]      . eshell-previous-matching-input)
+                                          ([(meta ?r)]      . eshell-atuin-history)
                                           ([(meta ?s)]      . eshell-next-matching-input)
                                           ([(meta ?p)]      . eshell-previous-matching-input-from-input)
                                           ([(meta ?n)]      . eshell-next-matching-input-from-input)
@@ -137,6 +138,20 @@
   (defun ra/eat-eshell-toggle-mode-disable ()
     (remove-hook 'meow-insert-enter-hook #'ra/eat-eshell-meow-insert-enter-hook)
     (remove-hook 'meow-insert-exit-hook #'ra/eat-eshell-meow-insert-exit-hook))
+
+  ;; TODO use same keybind for `eat-eshell-emacs-mode' and `eshell-lock-local-map'
+  (define-advice eat-eshell-emacs-mode (:after (&rest _) disable-lock-local-map)
+    "Disable `eshell-lock-local-map'."
+    (let ((inhibit-message t))
+      (eshell-lock-local-map nil)))
+
+  (defun ra/enable-lock-local-map ()
+    "Enable `eshell-lock-local-map'."
+    (let ((inhibit-message t))
+      (eshell-lock-local-map t)))
+
+  (add-hook 'eat--eshell-semi-char-mode-hook #'ra/enable-lock-local-map)
+  (add-hook 'eat--eshell-char-mode-hook #'ra/enable-lock-local-map)
 
   (add-hook 'eat-eshell-exec-hook #'ra/eat-eshell-toggle-mode-enable)
   (add-hook 'eat-eshell-exit-hook #'ra/eat-eshell-toggle-mode-disable)

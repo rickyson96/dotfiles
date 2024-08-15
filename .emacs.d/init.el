@@ -24,6 +24,9 @@
 
 ;;; Code:
 
+(setopt gc-cons-threshold (* 2000 1000 1000) ; 1GB gc-cons
+		gc-cons-percentage 0.8)
+
 ;; Add our `lisp' folder to load-path so that emacs can search them.
 (add-to-list 'load-path (locate-user-emacs-file "lisp"))
 
@@ -39,9 +42,6 @@
 				 (recentf-expand-file-name no-littering-var-directory))
     (add-to-list 'recentf-exclude
 				 (recentf-expand-file-name no-littering-etc-directory))))
-
-(elpaca gcmh
-  (gcmh-mode))
 
 ;; load exec-path-from-shell before configuration, so that our config
 ;; can rely on newly setup PATH. Some package also depends on
@@ -71,13 +71,13 @@ correctly when being run directly on startup.
 This macro will add the corresponding hooks and then remove them on startup.
 
 See https://emacs.stackexchange.com/questions/59791/font-and-frame-configuration-in-daemon-mode"
-  (declare (indent 2))
+  (declare (indent defun))
   (macroexp-progn
    (mapcan (lambda (hook) (let ((name (intern (format "%s@%s" name hook))))
 							`((defun ,name (&rest _) ,@body
 									 (remove-hook ',hook #',name))
 							  (add-hook ',hook #',name))))
-		    '(elpaca-after-init-hook server-after-make-frame-hook))))
+		   '(elpaca-after-init-hook server-after-make-frame-hook))))
 
 (ra/configure-frame ra/setup-font
   (set-face-attribute 'default nil :font "monospace" :height 110)
@@ -112,6 +112,10 @@ Taken from https://github.com/doomemacs/doomemacs/blob/844a82c4a0cacbb5a1aa558c8
 (defalias 'cmd! #'ra/cmd
   "Aliases for `ra/cmd'. Enables short cmd! command inspired from doomemacs.
 It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the namespaced variant.")
+
+(defun ra/fbound-and-true-p (fn &rest args)
+  "Return the result of FN called with ARGS."
+  (and (fboundp fn) (apply fn args)))
 
 (elpaca (define-repeat-map :repo "https://tildegit.org/acdw/define-repeat-map.el"))
 
@@ -175,16 +179,17 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 (require '+intellisense)
 
 ;; (elpaca fancy-compilation
-;;   (with-eval-after-load 'compile
-;; 	(fancy-compilation-mode)))
+;;   (fancy-compilation-mode 1)
+;;   (setopt fancy-compilation-override-colors nil
+;; 		  fancy-compilation-term "tmux-256color"))
 
-(elpaca xterm-color
-  (setopt compilation-environment '("TERM=xterm-256color"))
-
-  (defun ra/advice-compilation-filter (f proc string)
-	(funcall f proc (xterm-color-filter string)))
-
-  (advice-add 'compilation-filter :around #'ra/advice-compilation-filter))
+;; (elpaca xterm-color
+;;   (setopt compilation-environment '("TERM=xterm-256color"))
+;;
+;;   (defun ra/advice-compilation-filter (f proc string)
+;; 	(funcall f proc (xterm-color-filter string)))
+;;
+;;   (advice-add 'compilation-filter :around #'ra/advice-compilation-filter))
 
 ;; Remote development
 (setopt tramp-default-remote-shell "/bin/bash"
@@ -235,15 +240,29 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 	(require 'asdf)
 	(asdf-enable)))
 
-(setopt isearch-lazy-count t)
 (elpaca anzu
   (global-anzu-mode 1)
   (ra/keymap-set (current-global-map)
     "<remap> <query-replace>" #'anzu-query-replace
-    "<remap> <query-replace-regexp>" #'anzu-query-replace-regexp))
+    "<remap> <query-replace-regexp>" #'anzu-query-replace-regexp)
+  (ra/keymap-set isearch-mode-map
+	"<remap> <isearch-query-replace>" #'anzu-isearch-query-replace
+    "<remap> <isearch-query-replace-regexp>" #'anzu-isearch-query-replace-regexp))
+
+(with-eval-after-load 're-builder
+  (setopt reb-re-syntax 'string))
+
+(elpaca casual-suite
+  (with-eval-after-load 're-builder
+	(ra/keymap-set reb-mode-map "M-r" #'casual-re-builder-tmenu)
+	(ra/keymap-set reb-lisp-mode-map "M-r" #'casual-re-builder-tmenu))
+  (with-eval-after-load 'calc
+	(ra/keymap-set calc-mode-map "C-o" #'casual-calc-tmenu)))
 
 (elpaca ialign
-  (autoload 'ialign "ialign"))
+  (autoload 'ialign "ialign")
+  (ra/keymap-set (current-global-map)
+	"C-c |" #'ialign))
 
 (elpaca substitute
   (require 'substitute)
@@ -255,8 +274,8 @@ otherwise, use `substitute-target-in-buffer'"
 	(interactive)
 	(call-interactively
 	 (cond ((and (fboundp 'eglot-managed-p) (eglot-managed-p)) #'eglot-rename)
-		  ((and (boundp 'lsp-managed-mode) lsp-managed-mode) #'lsp-rename)
-		  (t #'substitute-target-in-buffer))))
+		   ((bound-and-true-p lsp-managed-mode) #'lsp-rename)
+		   (t #'substitute-target-in-buffer))))
 
   (defvar-keymap ra/substitute-map
 	:doc "Keymap for substitute package"
@@ -274,7 +293,51 @@ otherwise, use `substitute-target-in-buffer'"
 (elpaca deadgrep)
 
 (elpaca expand-region)
-(elpaca multiple-cursors)
+(elpaca multiple-cursors
+  (with-eval-after-load 'multiple-cursors
+	(ra/keymap-set mc/keymap
+	  "C->" #'mc/mark-next-like-this
+	  "C-<" #'mc/mark-prev-like-this)))
+;; (elpaca kmacro-x
+;;   (ra/keymap-set (current-global-map)
+;; 	"C->" #'kmacro-x-mc-mark-next
+;; 	"C-<" #'kmacro-x-mc-mark-previous))
+(elpaca iedit
+  (defun ra/iedit-down-to-occurrence ()
+	"Start `iedit-mode' but only mark current and next occurrence."
+	(interactive)
+	(unless (bound-and-true-p iedit-mode)
+	  (iedit-mode)
+	  (iedit-restrict-current-line))
+	(iedit-expand-down-to-occurrence))
+
+  (defun ra/iedit-up-to-occurrence ()
+	"Start `iedit-mode' but only mark current and previous occurrence."
+	(interactive)
+	(unless (bound-and-true-p iedit-mode)
+	  (iedit-mode)
+	  (iedit-restrict-current-line))
+	(iedit-expand-up-to-occurrence))
+
+  (ra/keymap-set (current-global-map)
+	"C-," #'iedit-mode
+	"C->" #'ra/iedit-down-to-occurrence
+	"C-<" #'ra/iedit-up-to-occurrence)
+
+  (with-eval-after-load 'isearch
+	(ra/keymap-set isearch-mode-map
+	  "C-," #'iedit-mode-from-isearch))
+
+  (with-eval-after-load 'iedit-mode
+	(with-eval-after-load '+mappings
+	  (defun ra/iedit-quit ()
+		"Function to quit `iedit-mode'."
+		(when iedit-mode
+		  (save-excursion
+			(deactivate-mark)
+			(iedit-mode))
+		  t))
+	  (add-hook 'ra/keyboard-quit-hook #'ra/iedit-quit 80))))
 (elpaca crux
   (require 'crux)
   (ra/keymap-set (current-global-map)
@@ -285,11 +348,139 @@ otherwise, use `substitute-target-in-buffer'"
   (ra/keymap-set (current-global-map)
     "<remap> <move-beginning-of-line>" #'mwim-beginning
 	"<remap> <move-end-of-line>" #'mwim-end))
+
+(setopt isearch-lazy-count t)
+
+;; See https://karthinks.com/software/avy-can-do-anything
+(defun ra/isearch-forward-other-window (prefix)
+  "Function to isearch-forward in other-window."
+  (interactive "P")
+  (unless (one-window-p)
+    (save-excursion
+      (let ((next (if prefix -1 1)))
+        (other-window next)
+        (isearch-forward)
+        (other-window (- next))))))
+
+(defun ra/isearch-backward-other-window (prefix)
+  "Function to isearch-backward in other-window."
+  (interactive "P")
+  (unless (one-window-p)
+    (save-excursion
+      (let ((next (if prefix 1 -1)))
+        (other-window next)
+        (isearch-backward)
+        (other-window (- next))))))
+
+(ra/keymap-set (current-global-map)
+  "C-M-s" #'ra/isearch-forward-other-window
+  "C-M-r" #'ra/isearch-backward-other-window)
+
+(elpaca avy
+  (ra/keymap-set (current-global-map)
+	"C-z" #'avy-goto-char-timer
+	"M-z" (cmd! (let ((avy-action-oneshot #'avy-action-zap-to-char)
+					  (avy-all-windows nil))
+				  (call-interactively #'avy-goto-char-timer))))
+  (ra/keymap-set isearch-mode-map
+	"C-z" #'avy-isearch)
+
+  ;; See https://karthinks.com/software/avy-can-do-anything
+  (defun ra/avy-action-kill-whole-line (pt)
+	"Avy action to kill whole line at PT."
+	(save-excursion
+	  (goto-char pt)
+	  (kill-whole-line))
+	(message "Killed: %s" (current-kill 0))
+	(select-window (cdr (ring-ref avy-ring 0)))
+	t)
+
+  (defun ra/avy-action-copy-whole-line (pt)
+	"Avy action to copy whole line at PT."
+	(save-excursion
+      (goto-char pt)
+      (cl-destructuring-bind (start . end)
+          (bounds-of-thing-at-point 'line)
+		(copy-region-as-kill start end)))
+	(select-window
+	 (cdr
+      (ring-ref avy-ring 0)))
+	t)
+
+  (defun ra/avy-action-yank-whole-line (pt)
+	"Avy action to yank whole line at PT."
+	(ra/avy-action-copy-whole-line pt)
+	(save-excursion (yank))
+	t)
+
+  (defun ra/avy-action-teleport-whole-line (pt)
+	"Avy action to teleport or transpose whole line from PT."
+    (ra/avy-action-kill-whole-line pt)
+    (save-excursion (yank)) t)
+
+  (defun ra/avy-action-mark-to-char (pt)
+	"Avy action to mark from `point' to PT."
+	(activate-mark)
+	(goto-char pt))
+
+  (defun ra/avy-action-embark (pt)
+	"Avy action to run `embark-act' on PT."
+	(goto-char pt)
+    (embark-act))
+
+  (defun ra/avy-action-embark-dwim (pt)
+	"Avy action to run `embark-dwim' on PT."
+	(goto-char pt)
+    (embark-dwim))
+
+  (setopt avy-keys '(?u ?e ?o ?a ?p ?g ?h ?n ?s)
+		  avy-dispatch-alist '((?k . avy-action-kill-stay)
+							   (?K . ra/avy-action-kill-whole-line)
+							   (?w . avy-action-copy)
+							   (?W . ra/avy-action-copy-whole-line)
+							   (?y . avy-action-yank)
+							   (?Y . ra/avy-action-yank-whole-line)
+							   (?t . avy-action-teleport)
+							   (?T . ra/avy-action-teleport-whole-line)
+							   (?m . avy-action-mark)
+							   (?  . ra/avy-action-mark-to-char)
+							   (?. . ra/avy-action-embark)
+							   (?, . ra/avy-action-embark-dwim)
+							   (?i . avy-action-ispell)
+							   (?z . avy-action-zap-to-char))))
+
+(elpaca separedit
+  (ra/keymap-set (current-global-map)
+	"C-c '" #'separedit)
+  (setopt separedit-preserve-string-indentation t
+		  separedit-continue-fill-column t
+		  separedit-write-file-when-execute-save t))
+
 (elpaca golden-ratio-scroll-screen
   (ra/keymap-set (current-global-map)
 	"<remap> <scroll-up-command>" #'golden-ratio-scroll-screen-up
 	"<remap> <scroll-down-command>" #'golden-ratio-scroll-screen-down)
-  (setopt golden-ratio-scroll-highlight-flag nil))
+  (setopt golden-ratio-scroll-highlight-flag nil
+		  golden-ratio-scroll-recenter nil)
+
+  (defun ra/scroll-all-golden-scroll-down ()
+	"scroll down in all buffers using `golden-ratio-scroll-screen-down'"
+	(interactive)
+	(scroll-all-function-all #'golden-ratio-scroll-screen-down nil))
+
+  (defun ra/scroll-all-golden-scroll-up ()
+	"scroll down in all buffers using `golden-ratio-scroll-screen-up'"
+	(interactive)
+	(scroll-all-function-all #'golden-ratio-scroll-screen-up nil))
+
+  (define-advice scroll-all-check-to-scroll (:around (orig-fn &rest _) golden-scroll)
+	"Enable golden-scroll on `scroll-all-mode'"
+	(let ((golden-ratio-scroll-recenter nil))
+	  (cond ((eq this-command 'golden-ratio-scroll-screen-up)
+			 (call-interactively #'ra/scroll-all-golden-scroll-up))
+			((eq this-command 'golden-ratio-scroll-screen-down)
+			 (call-interactively #'ra/scroll-all-golden-scroll-down))
+			(t (funcall orig-fn)))))) ; Pass through to call orig-fn
 
 (elpaca clipetty
   (global-clipetty-mode))
@@ -320,14 +511,16 @@ otherwise, use `substitute-target-in-buffer'"
   (defun ra/move-text-fix-eol (args)
 	"fix move-text not marking eol when already marking the whole line"
 	(cl-destructuring-bind (start end n) args
-	  (if (let ((point<mark (< (point) (mark)))
-				check)
-			(when (not point<mark) (exchange-point-and-mark))
-			(setq check (bolp))
-			(exchange-point-and-mark)
-			(and check
-				 (eolp)
-				 (not (bolp))))
+	  (if (and start
+			   end
+			   (let ((point<mark (< (point) (mark)))
+					 check)
+				 (when (not point<mark) (exchange-point-and-mark))
+				 (setq check (bolp))
+				 (exchange-point-and-mark)
+				 (and check
+					  (eolp)
+					  (not (bolp)))))
 		  (progn
 			(forward-char 1)
 			(list start (1+ end) n))
@@ -338,13 +531,16 @@ otherwise, use `substitute-target-in-buffer'"
   (define-advice move-text-down (:filter-args (args) fix-region-mark-eol)
 	(ra/move-text-fix-eol args)))
 
-(elpaca multi-line)
-
-(setopt eldoc-documentation-strategy #'eldoc-documentation-enthusiast
-		;; Set eldoc to only show single line on minibuffer
-		;; I use eldoc mainly to show function signature.
-		;; In depth documentation should only be show when requested.
-		eldoc-echo-area-use-multiline-p nil)
+(elpaca multi-line
+  (defvar ra/multi-line-highlighting nil
+	"Saves the state of `multi-line-highlight-current-candidates'")
+  (define-advice multi-line-highlight-current-candidate (:after (&rest _) setq-highlight-var)
+	"Set `ra/multi-line-highlighting' variable so that we know if it's currently active or not"
+	(setq ra/multi-line-highlighting t))
+  (define-advice multi-line-clear-highlights (:after (&rest _) setq-highlight-var)
+	"Set `ra/multi-line-highlighting' variable so that we know if it's currently active or not"
+	(setq ra/multi-line-highlighting nil))
+  (add-hook 'ra/keyboard-quit-hook #'multi-line-clear-highlights))
 
 (elpaca (envrc :host github :repo "purcell/envrc")
   (setopt envrc-remote t)
@@ -354,7 +550,9 @@ otherwise, use `substitute-target-in-buffer'"
   (add-hook 'makefile-mode-hook #'makefile-executor-mode))
 
 (elpaca num3-mode
-  (custom-set-faces '(num3-face-even ((t :weight ultra-bold :background nil)))))
+  (custom-set-faces '(num3-face-even ((t :underline t)))
+					'(num3-face-odd ((t :underline nil))))
+  (add-hook 'calc-start-hook #'num3-mode))
 
 (require '+vc)
 
@@ -376,7 +574,6 @@ otherwise, use `substitute-target-in-buffer'"
 (elpaca elisp-demos
   (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
 
-
 (require '+lang)
 
 (elpaca (mediator :host github :repo "dalanicolai/mediator")
@@ -384,7 +581,18 @@ otherwise, use `substitute-target-in-buffer'"
 	(ra/keymap-set embark-file-map
 	  "O" #'mediator-open-file)))
 
+;; Shell-command extensions
+(elpaca shell-command+
+  ;; TODO add directory changing for C-u on shell-command+
+  ;; TODO integrate `shell-command+' with `dwim-shell-command'
+  (ra/keymap-set (current-global-map)
+	"M-!" #'shell-command+)
+
+  (setopt shell-command+-prompt "Shell command+ in `%s': "))
+
 (require '+apps)
+
+(require '+toolbox)
 
 (with-eval-after-load 'info
   (add-to-list 'Info-default-directory-list (file-truename "~/books")))
@@ -414,15 +622,15 @@ otherwise, use `substitute-target-in-buffer'"
 	  (kill-new msg)
 	(message "Fail to copy mr message")))
 
-;; TODO: make openvpn run via emacs function
-(defun ra/start-openvpn (config)
-  "Start openvpn with designated config file"
-  (make-process :name "openvpn"
-				:buffer "*openvpn*"
-				:command '("openvpn")))
-
 (require '+mappings)
 
 (repeat-mode 1)
+
+(elpaca gcmh
+  (setopt gcmh-high-cons-threshold (* 500 1000 1000) ; 500MB
+		  gcmh-low-cons-threshold (* 16 1000 1000)	 ; 16MB
+		  gcmh-idle-delay 5
+		  gc-cons-percentage 0.2)
+  (gcmh-mode))
 
 ;;; init.el ends here

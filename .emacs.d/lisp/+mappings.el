@@ -46,6 +46,9 @@ Taken from: https://github.com/AmaiKinono/puni/wiki/Useful-commands"
     "C-w" #'ra/puni-C-w
     "C-<backspace>" #'puni-force-delete))
 
+(elpaca (combobulate :host github :repo "mickeynp/combobulate"))
+
+;;;###autoload
 (defun ra/narrow-or-widen-dwim (p)
   "Widen if buffer is narrowed, narrow-dwim otherwise.
 Dwim means: region, org-src-block, org-subtree, or
@@ -74,6 +77,7 @@ Taken from: http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html"
          (LaTeX-narrow-to-environment))
         (t (narrow-to-defun))))
 
+;;;###autoload
 (defun ra/C-w-dwim (p)
   "Run `kill-region' on region active, else run `backward-kill-word'"
   (interactive "P")
@@ -82,11 +86,10 @@ Taken from: http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html"
     (backward-kill-word (prefix-numeric-value p))))
 
 (defun ra/shell-command (&optional p)
-  "Improved `shell-command'!.
-\\[universal-argument] (default on `shell-command'): Insert output to buffer.
+  "Improved `shell-command'! Now using `shell-command+'.
+\\[universal-argument] (default on `shell-command+'): Insert output to buffer.
 \\[universal-argument] \\[universal-argument]: Select directory to execute.
-\\[universal-argument] \\[universal-argument] \\[universal-argument]: Select directory and insert output.
-It also tries to run `shell-command-on-region' instead if `use-region-p' is `t'"
+\\[universal-argument] \\[universal-argument] \\[universal-argument]: Select directory and insert output."
   (interactive "P")
   (let* ((num-prefix (prefix-numeric-value p))
          (default-directory (if (>= num-prefix 16)
@@ -95,11 +98,9 @@ It also tries to run `shell-command-on-region' instead if `use-region-p' is `t'"
          (current-prefix-arg (if (= num-prefix 16)
                                  nil
                                p)))
-    (if (use-region-p)
-        (call-interactively #'shell-command-on-region)
-      (call-interactively #'shell-command))))
+    (call-interactively #'shell-command+)))
 
-
+;;;###autoload
 (defun ra/eshell-command (&optional p)
   "`shell-command', which on prefix \[universal-argument], got to define `default-directory'"
   (interactive "P")
@@ -133,6 +134,7 @@ with \\[universal-argument] -, it will uncomment the region"
 (setopt comment-style 'extra-line
         comment-empty-lines 'eol)
 
+;;;###autoload
 (defun ra/comment-dwim (&optional p)
   "Custom comment-dwim style
 With region active: call `ra/comment-dwim-on-region'
@@ -151,6 +153,7 @@ Without prefix: comment line (a.k.a `comment-line')"
             (comment-dwim nil)))
     ((pred numberp) (comment-line p))))
 
+;;;###autoload
 (defun ra/cmd-or-project-cmd (cmd project-cmd)
   "Interactively run CMD or PROJECT-CMD based on whether current file is in
 project or not"
@@ -158,10 +161,91 @@ project or not"
       (call-interactively project-cmd)
     (call-interactively cmd)))
 
+;;;###autoload
 (defun ra/eshell-or-project-eshell ()
   "Run `project-eshell' on project, else run `eshell'"
   (interactive)
   (ra/cmd-or-project-cmd #'eshell #'project-eshell))
+
+;;;###autoload
+(defun ra/find-file (&optional arg)
+  "Run `project-find-file' when inside a project. If not, run `find-file'.
+\\[universal-argument] forces the latter."
+  (interactive "P")
+  (if (and (project-current) (not arg))
+      (project-find-file)
+    (call-interactively #'find-file)))
+
+(define-advice forward-page (:after (&rest _) recenter-to-top)
+  "Use `recenter-top-bottom' to recenter current page to top"
+  (recenter-top-bottom 0))
+
+;; Inspired by `doom/escape' from doomemacs
+(defcustom ra/keyboard-quit-hook nil
+  "Hook run by `ra/keyboard-quit'."
+  :type 'hook)
+
+(defun ra/keyboard-quit (&optional p)
+  "Run `ra/keyboard-quit-hook' until one of it succeeds.
+With \\[universal-argument], run all the hook and then `keyboard-quit'.
+With \\[universal-argument] \\[universal-argument], run `keyboard-escape-quit'"
+  (interactive "P")
+  (let ((inhibit-quit t)
+        (kbd-quit (lambda ()
+                    (unwind-protect (keyboard-quit)
+                      (setq this-command 'keyboard-quit)))))
+    (pcase p
+      ('(4) (progn (run-hook-with-args 'ra/keyboard-quit-hook)
+                   (funcall kbd-quit)))
+      ('(16) (keyboard-escape-quit))
+      (_ (cond ((use-region-p) (deactivate-mark))
+               ((run-hook-with-args-until-success 'ra/keyboard-quit-hook))
+               ((or defining-kbd-macro executing-kbd-macro) nil)
+               ((funcall kbd-quit)))))))
+
+(ra/keymap-set (current-global-map)
+  "<remap> <keyboard-quit>" #'ra/keyboard-quit)
+
+(elpaca transpose-mark
+  (defun ra/transpose-mark-quit-overlay ()
+    "Quit `transpose-mark' overlay. Return `t' if it succeeds, and `nil' if it
+doesn't find overlay"
+    (when (ra/fbound-and-true-p 'transpose-mark-region-overlay-active)
+      (transpose-mark-region-abort)
+      t))
+  (add-hook 'ra/keyboard-quit-hook #'ra/transpose-mark-quit-overlay))
+
+(defun ra/eval-region (beg end &optional p)
+  "Run `eval-region' on current region.
+\\[universal-argument] to replace the region with result"
+  (interactive "r\nP")
+  (save-excursion
+    (goto-char end)
+    (if p
+        (crux-eval-and-replace)
+      (eval-last-sexp nil)))
+  (deactivate-mark))
+
+(elpaca selected
+  (selected-global-mode 1)
+  (setopt selected-ignore-modes '(magit-status-mode diff-mode magit-revision-mode))
+  (ra/keymap-set selected-keymap
+    "u" #'crux-upcase-region
+    "d" #'crux-downcase-region
+    "e" #'ra/eval-region
+    "w" #'count-words-region
+    "c" #'crux-capitalize-region
+    "k" #'kill-region
+    "r" #'ra/replace-region-with-kill
+    "," #'iedit-mode
+    "'" #'er/expand-region
+    "t" #'transpose-mark
+    "SPC" #'iedit-rectangle-mode))
+
+(with-eval-after-load 'kmacro
+  (defalias 'kmacro-insert-macro #'insert-kbd-macro)
+  (ra/keymap-set kmacro-keymap
+    "I" #'kmacro-insert-macro))
 
 (ra/keymap-set narrow-map
   "n" #'ra/narrow-or-widen-dwim
@@ -188,17 +272,33 @@ project or not"
   "e" #'puni-barf-forward
   "u" #'puni-slurp-forward)
 
+(defvar-keymap ra/multi-line-repeat-map
+  :doc "`multi-line' repeating map"
+  :repeat t
+  "m" #'multi-line
+  "-" #'multi-line-single-line
+  "h" #'multi-line-highlight-current-candidates)
+
 (defvar-keymap ra/manipulate-map
   :doc "Keymap for text and region manipulation"
-  :parent ra/manipulate-repeat-map
+  :prefix 'ra/manipulate-map
+  "a" #'puni-slurp-backward
+  "o" #'puni-barf-backward
+  "e" #'puni-barf-forward
+  "u" #'puni-slurp-forward
   "s" #'puni-splice
   "k" #'puni-squeeze
   "r" #'puni-raise
   "c" #'puni-convolute
-  "l" #'puni-split
+  "|" #'puni-split
   "t" #'puni-transpose
   "d" #'crux-duplicate-current-line-or-region
-  "D" #'crux-duplicate-and-comment-current-line-or-region)
+  "D" #'crux-duplicate-and-comment-current-line-or-region
+  "j" #'join-line
+  "J" #'crux-top-join-line
+  "." #'mc/mark-all-like-this-dwim
+  "n" #'mc/mark-next-like-this
+  "m" #'multi-line)
 
 (defvar-keymap ra/completion-map
   :doc "Keymap for hosting multiple completion type"
@@ -207,8 +307,8 @@ project or not"
 (defvar-keymap ra/toggle-map
   :doc "Keymap for toggling emacs state"
   :prefix 'ra/toggle-map
-  "*" #'literate-calc-mode
-  "c" #'literate-calc-mode
+  "*" #'literate-calc-minor-mode
+  "c" #'literate-calc-minor-mode
   "d" #'toggle-debug-on-error
   "f" #'auto-fill-mode
   "l" #'visual-line-mode
@@ -226,7 +326,8 @@ project or not"
   "f" #'elfeed
   "m" #'consult-man
   "n" #'denote-open-or-create
-  "c" #'calc
+  "d" #'dashboard-open
+  "D" #'docker
   "RET" #'mediator-open
   "'" #'proced)
 
@@ -247,12 +348,30 @@ project or not"
   "h" #'shrink-window-horizontally
   "n" #'enlarge-window-horizontally)
 
-(defvar-keymap ra/window-map
-  :doc "Keymap for modifying emacs' windows"
-  :parent ra/window-repeat-map
-  "o" #'switch-window
-  "u" #'ra/toggle-maximize-window)
-(defalias 'ra/window-map ra/window-map)
+(defun ra/mark-line (&optional p)
+  "Mark line"
+  (interactive "p")
+  (beginning-of-line)
+  (set-mark (point))
+  (end-of-line p))
+
+(defvar-keymap ra/object-map
+  :doc "Keymap for marking objects"
+  :prefix 'ra/object-map
+  "l" #'ra/mark-line
+  "d" #'er/mark-defun
+  "g" #'er/mark-inside-python-string
+  "s" #'puni-mark-sexp-at-point
+  "." #'er/mark-symbol
+  "w" #'er/mark-word
+  "b" #'er/mark-inside-pairs
+  "B" #'er/mark-outside-pairs)
+
+(ra/keymap-set window-prefix-map
+  "c" #'enlarge-window
+  "t" #'shrink-window
+  "h" #'shrink-window-horizontally
+  "n" #'enlarge-window-horizontally)
 
 (defvar-keymap ra/eglot-map
   :doc "Keymap for invoking eglot features"
@@ -267,14 +386,21 @@ project or not"
   "e" ra/eval-map
   "o" #'ra/open-map
   "w" #'ra/window-map
-  "T" #'ra/toggle-map)
+  "T" #'ra/toggle-map
+  "f" #'ra/find-file
+  "s" #'save-buffer
+  "r" #'bookmark-jump
+  "p" project-prefix-map
+  "c" #'org-capture
+  "," #'ra/substitute-map)
 
 ;; C-x keymap
 (ra/keymap-set ctl-x-map
   "SPC" #'set-rectangular-region-anchor
   "b" #'consult-buffer
   "d" #'dirvish-dwim
-  "o" #'ace-window)
+  "o" #'ace-window
+  "O" #'ra/ace-window-prefix)
 
 (ra/keymap-set (current-global-map)
   "C-h B" #'embark-bindings
@@ -282,7 +408,7 @@ project or not"
   "C-<tab>" #'corfu-candidate-overlay-complete-at-point
   "C-o" #'crux-smart-open-line
   "C-." #'embark-act
-  "C-," #'ra/substitute-map
+  "C-'" #'ra/object-map
   "C-w" #'ra/C-w-dwim
 
   "M-." #'embark-dwim
@@ -292,16 +418,18 @@ project or not"
   "M-#" #'eat
   "M-$" #'ra/eshell-or-project-eshell
   "M-y" #'consult-yank-pop
-  "M-m" ra/manipulate-map
-  "M-o" #'switch-window
+  "M-m" 'ra/manipulate-map
+  "M-o" #'ra/other-window-alternating
   "M-n" #'flymake-goto-next-error
   "M-p" #'flymake-goto-prev-error
   "M-N" #'move-text-down
   "M-P" #'move-text-up
   "M-l" #'ra/eglot-map
+  "M-r" #'re-builder
   "<remap> <Info-goto-emacs-command-node>" #'describe-face)
 
-(require '+mappings-modal)
+;; remove modal
+;; (require '+mappings-modal)
 
 (provide '+mappings)
 ;;; +mappings.el ends here

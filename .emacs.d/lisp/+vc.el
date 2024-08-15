@@ -24,7 +24,21 @@
 		  magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1
 		  auto-revert-buffer-list-filter #'magit-auto-revert-repository-buffer-p
 		  magit-diff-refine-hunk t
-		  magit-commit-squash-confirm nil)
+		  magit-commit-squash-confirm nil
+		  magit-clone-name-alist `(("\\`\\(?:github:\\|gh:\\)?\\([^:]+\\)\\'" "github.com" "github.user")
+								   ("\\`\\(?:gitlab:\\|gl:\\)\\([^:]+\\)\\'" "gitlab.com" "gitlab.user")
+								   ("\\`\\(?:sourcehut:\\|sh:\\)\\([^:]+\\)\\'" "git.sr.ht" "sourcehut.user")
+								   (,(rx bos (opt (or "nicejob:" "nj:" "nicejobinc:")) (group (1+ (not (any ":")))) eos) "github.com" "nicejobinc")))
+
+  (ra/keymap-set project-prefix-map
+	"m" #'magit-project-status)
+
+  (with-eval-after-load 'magit
+	(require 'forge))
+
+  (define-advice magit-whitespace-disallowed (:override (&rest _) use-dash-instead)
+	"Use `-' instead of beeping when space is not allowed"
+	(insert "-"))
 
   (magit-wip-mode 1)
 
@@ -32,7 +46,7 @@
 	(transient-replace-suffix 'magit-branch 'magit-checkout
 	  '("b" "dwim" magit-branch-or-checkout))
 	(transient-append-suffix 'magit-branch 'magit-branch-checkout
-	  '("B" "branch/revision" magit-checkout))
+	  '("y" "branch/revision" magit-checkout))
 	(transient-append-suffix 'magit-fetch "-t"
 	  '("-u" "Unshallow repository" "--unshallow"))
 
@@ -79,7 +93,8 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (when (executable-find "delta")
   (elpaca magit-delta
-	(add-hook 'magit-mode-hook #'magit-delta-mode)))
+	;; (add-hook 'magit-mode-hook #'magit-delta-mode)
+	(setopt magit-delta-hide-plus-minus-markers nil)))
 
 (setopt ediff-window-setup-function 'ediff-setup-windows-plain
 		ediff-split-window-function 'split-window-horizontally
@@ -117,21 +132,26 @@ n,SPC -next diff     |     h -highlighting       |  B -copy both region to C
 
 (elpaca forge
   (autoload #'forge-read-pullreq "forge")
-  (with-eval-after-load 'forge
-	(transient-append-suffix 'forge-topic-menu 'forge-create-pullreq-from-issue
-	  '("R" "Review Pull Request" ra/checkout-and-review-forge-pr-topic
-		:transient transient--do-exit
-		:if (lambda () (forge-pullreq-p (forge-current-topic t))))))
+
+  (defconst ra/transient-review-pr
+	'("/r" "Review Pull Request" ra/checkout-and-review-forge-pr
+	  :transient transient--do-exit))
+
+  (with-eval-after-load 'forge-commands
+	(transient-append-suffix 'forge-dispatch 'forge-add-repository ra/transient-review-pr))
+  (with-eval-after-load 'forge-topic
+	(transient-append-suffix 'forge-topic-menu 'forge-browse-this-topic ra/transient-review-pr))
 
   ;; TODO probably upstream this?
   (defun ra/forge-post-eldoc-function (callback)
 	"use `bug-reference--url-at-point' to display the bug url at point"
-	(when-let* ((topic (forge-topic-at-point))
+	(if-let* ((topic (forge-topic-at-point))
 			  (title (oref topic title))
 			  (num (oref topic number)))
 	  (format "%s %s"
 			  (propertize (format "#%s:" num) 'face 'bold)
-			  title)))
+			  title)
+	  (bug-reference--url-at-point)))
 
   (defun ra/forge-post-setup ()
 	"extra setup for `forge-post-mode'"
@@ -160,24 +180,17 @@ n,SPC -next diff     |     h -highlighting       |  B -copy both region to C
 (elpaca (closql :depth nil))
 
 (elpaca (code-review :host github :repo "doomelpa/code-review")
-  (defun ra/checkout-and-review-forge-pr-topic ()
-	"Checkout using `forge-checkout-pullreq' and immediately start code-review session.
-This ensures that we can visit correct pullreq file when reviewing.
-This is used from `forge-topic-menu', so it's safe to assume we are on a topic."
-	(interactive)
-	(let ((pullreq (forge-current-topic t)))
-	  (forge-checkout-pullreq pullreq)
-	  (magit-fetch-all-no-prune)
-	  (call-interactively #'code-review-forge-pr-at-point)))
-
-  (defun ra/checkout-and-review-forge-pr (pullreq)
+  (defun ra/checkout-and-review-forge-pr (&optional pullreq)
 	"Checkout using `forge-checkout-pullreq' and immediately start code-review session.
 This ensures that we can visit correct pullreq file when reviewing."
-	(interactive (list (forge-read-pullreq "Review pull-request")))
-	(forge-checkout-pullreq pullreq)
-	(magit-fetch-all-no-prune)
-	(forge-visit-pullreq pullreq)
-	(call-interactively #'code-review-forge-pr-at-point)))
+	(interactive)
+	(let ((pullreq (or pullreq
+					   (forge-current-topic)
+					   (forge-read-pullreq "Review pull-request: "))))
+	  (magit-fetch-all-no-prune)
+	  (forge-checkout-pullreq pullreq)
+	  (forge-visit-pullreq pullreq)
+	  (call-interactively #'code-review-forge-pr-at-point))))
 
 (provide '+vc)
 ;;; +vc.el ends here

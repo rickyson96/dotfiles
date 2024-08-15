@@ -49,3 +49,5 @@
 	enabled = true
 [gpg]
 	program = gpg2
+[maintenance]
+	repo = /home/randerson/work/paystone/atom-communications

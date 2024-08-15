@@ -15,3 +15,8 @@ ps-hub https://hub.paystone.com/
 ps-bitbucket https://bitbucket.org/zomaron/
 ps-nj-company https://nicejobsite.webflow.io/
 ps-nj-dev https://app.exp.nicejob.com/login
+tokped https://tokopedia.com
+shopee https://shopee.co.id
+yt https://youtube.com
+paystone-grafana https://grafana.gke-ops.platform.nicejob.com
+atom-dev-gcs https://console.cloud.google.com/storage/browser?project=atom-pay-dev-be1b

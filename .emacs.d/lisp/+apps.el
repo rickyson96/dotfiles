@@ -34,7 +34,7 @@
 
   (with-eval-after-load 'pass
     (ra/keymap-set pass-view-mode-map
-      "<remap> <meow-quit>" #'kill-this-buffer)))
+      "<remap> <meow-quit>" #'kill-current-buffer)))
 
 (defun ra/scan-otp-uri (&optional direct-insert)
   "Scan otp-uri using `hyprshot' and put it in `kill-ring'"
@@ -48,7 +48,7 @@
 (auth-source-pass-enable)
 
 (elpaca eat
-  (add-hook 'eat-exit-hook #'quit-window)
+  ;; (add-hook 'eat-exit-hook #'quit-window)
   (add-hook 'eshell-load-hook #'eat-eshell-mode)
   (eat-eshell-mode 1)
 
@@ -78,7 +78,42 @@
                                          (eat-emacs-mode))))
     (add-hook 'meow-insert-enter-hook (lambda () (when (eq major-mode 'eat-mode)
                                                    ;; (hide-mode-line-mode -1)
-                                                   (eat-semi-char-mode))))))
+                                                   (eat-semi-char-mode)))))
+
+  ;; Taken from https://codeberg.org/akib/emacs-eat/issues/33#issuecomment-1127805
+  (define-advice compilation-start (:override (command &optional mode name-function highlight-regexp continue) eat-compilation-start)
+    (let ((name-of-mode "compilation")
+          (dir default-directory)
+          outbuf)
+      (if (or (not mode) (eq mode t))
+          (setq mode #'compilation-minor-mode)
+        (setq name-of-mode (replace-regexp-in-string "-mode\\'" "" (symbol-name mode))))
+      (with-current-buffer
+          (setq outbuf
+                (get-buffer-create
+                 (compilation-buffer-name name-of-mode mode name-function)))
+        (setq default-directory dir)
+        (setq buffer-read-only nil)
+        (erase-buffer)
+        (compilation-insert-annotation
+         "-*- mode: " name-of-mode
+         "; default-directory: "
+         (prin1-to-string (abbreviate-file-name default-directory))
+         " -*-\n")
+        (compilation-insert-annotation
+         (format "%s started at %s\n\n"
+                 mode-name
+	         (substring (current-time-string) 0 19))
+         command "\n")
+        (eat-mode)
+        (eat-exec outbuf "*compile*" shell-file-name nil (list "-lc" command))
+        (run-hook-with-args 'compilation-start-hook (get-buffer-process outbuf))
+        (eat-emacs-mode)
+        (funcall mode)
+        (setq next-error-last-buffer outbuf)
+        (display-buffer outbuf '(nil (allow-no-window . t)))
+        (when-let (w (get-buffer-window outbuf))
+          (set-window-start w (point-min)))))))
 
 (elpaca coterm)
 
@@ -95,6 +130,8 @@
 (elpaca daemons
   (add-hook 'daemons-mode-hook #'eldoc-mode))
 
+(elpaca journalctl-mode)
+
 (elpaca bluetooth)
 
 (elpaca trashed)
@@ -106,7 +143,8 @@
 
 (elpaca denote
   (require 'denote-journal-extras)
-  (setopt denote-journal-extras-title-format 'day-date-month-year)
+  (setopt denote-journal-extras-title-format 'day-date-month-year
+          denote-directory "/home/randerson/org/notes")
 
   (with-eval-after-load 'doct
     (setopt org-capture-templates (doct-add-to org-capture-templates
@@ -127,10 +165,28 @@
 
 (elpaca verb
   (setopt verb-json-use-mode 'jsonian-mode
-          verb-auto-show-headers-buffer t)
+          verb-auto-show-headers-buffer nil)
   (with-eval-after-load 'org
     (ra/keymap-set org-mode-map
-      "C-c C-r" verb-command-map)))
+      "C-c C-r" verb-command-map))
+  (defun ra/verb-generate-url-encoded-body (&rest pairs)
+    "Turn pairs of KEY VALUE into url-encoded format
+
+\(fn [KEY VALUE]...)"
+    (unless (zerop (mod (length pairs) 2))
+      (error "PAIRS must be pair of KEY VALUE"))
+    (string-join (seq-map (lambda (pair)
+                            (format "%s=%s" (car pair) (cadr pair)))
+                          (seq-split pairs 2))
+                 "&"))
+  (defun ra/verb-url-encoded-body-parser (rs)
+    "`Verb-Map-Request' compatible version to convert newline into &"
+    (when-let (body (oref rs body))
+      (thread-last
+        (string-trim body)
+        (replace-regexp-in-string "\n" "&")
+        (oset rs body)))
+    rs))
 
 (elpaca impostman)
 
@@ -144,12 +200,53 @@
     (global-wakatime-mode 1)))
 
 (setopt calc-algebraic-mode 1)
+(setopt math-additional-units '((cfm "ft^3/min" "Cubic feet / meter")
+                                (b nil "bit")
+                                (B "8 * b" "byte")
+                                (KiB "1024 * B" "KibiByte")
+                                (MiB "1024 * KiB" "MibiByte")
+                                (GiB "1024 * MiB" "GibiByte")
+                                (TiB "1024 * GiB" "TebiByte")
+                                (PiB "1024 * TiB" "PebiByte")
+                                (EiB "1024 * PiB" "ExbiByte")
+                                (ZiB "1024 * EiB" "ZebiByte")
+                                (YiB "1024 * ZiB" "YobiByte")
+                                (Kib "1024 * b" "KibiBit")
+                                (Mib "1024 * Kib" "MibiBit")
+                                (Gib "1024 * Mib" "GibiBit")
+                                (Tib "1024 * Gib" "TebiBit")
+                                (Pib "1024 * Tib" "PebiBit")
+                                (Eib "1024 * Pib" "ExbiBit")
+                                (Zib "1024 * Eib" "ZebiBit")
+                                (Yib "1024 * Zib" "YobiBit")))
+(setq math-units-table nil)
+(elpaca (calc-currency :host github :repo "jws85/calc-currency")
+  (autoload #'calc-currency-load "calc-currency")
+  (add-hook 'calc-start-hook #'calc-currency-load))
 
+(elpaca plz
+  (autoload #'plz "plz"))
 (elpaca plz-see)
 
 (elpaca devdocs)
 
 (elpaca (emacs-conflict :host github :repo "ibizaman/emacs-conflict"))
+
+;; (elpaca mu4e)
+
+(setopt zoneinfo-style-world-list '(("Asia/Jakarta" "Indonesia")
+                                    ("Asia/Makassar" "Bali")
+                                    ("Canada/Atlantic" "Atlantic")
+                                    ("Canada/Pacific" "Pacific")
+                                    ("UTC" "UTC"))
+        world-clock-time-format "%R %z (%Z) %t%A %d %B"
+        world-clock-buffer-name "*world clock*")
+
+(elpaca docker
+  (setopt docker-command "podman"))
+
+(elpaca (ready-player :host github :repo "xenodium/ready-player")
+  (ready-player-add-to-auto-mode-alist))
 
 (provide '+apps)
 ;;; +apps.el ends here

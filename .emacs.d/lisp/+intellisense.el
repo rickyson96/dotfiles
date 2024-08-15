@@ -13,13 +13,14 @@
 
 ;;; Code:
 
-;; TODO: checkout `lsp-mode'
-;; TODO: checkout `flycheck'
-;; TODO: checkout `projectile'
-
 (setopt completion-ignore-case t
 		read-file-name-completion-ignore-case t
-		read-buffer-completion-ignore-case t)
+		read-buffer-completion-ignore-case t
+
+		xref-prompt-for-identifier '(not xref-find-definitions
+										 xref-find-definitions-other-window
+										 xref-find-definitions-other-frame
+										 xref-find-references))
 
 (elpaca corfu
   (global-corfu-mode 1)
@@ -33,12 +34,22 @@
 (elpaca nerd-icons-corfu
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
-(elpaca corfu-candidate-overlay
-  (corfu-candidate-overlay-mode 1))
+(elpaca capf-autosuggest
+  (setopt capf-autosuggest-dwim-next-line nil
+		  capf-autosuggest-capf-functions '(capf-autosuggest-history-capf))
+  (add-hook 'eshell-mode-hook #'capf-autosuggest-mode)
+  (add-hook 'comint-mode-hook #'capf-autosuggest-mode))
 
 (elpaca corfu-terminal
   (unless (display-graphic-p)
 	(corfu-terminal-mode +1)))
+
+(setopt eldoc-documentation-strategy #'eldoc-documentation-default
+		;; Set eldoc to only show single line on minibuffer
+		;; I use eldoc mainly to show function signature.
+		;; In depth documentation should only be show when requested.
+		eldoc-echo-area-use-multiline-p 1
+		eldoc-echo-area-display-truncation-message nil)
 
 (elpaca lsp-mode
   (setopt lsp-idle-delay 0.3
@@ -47,7 +58,9 @@
 		  lsp-diagnostics-provider t
 		  lsp-inlay-hint-enable t
 		  lsp-enable-suggest-server-download nil
-		  lsp-eldoc-render-all t)
+		  lsp-eldoc-render-all t
+		  lsp-enable-on-type-formatting nil ; It often formats when it doesn't expected. e.g.: Remove recently inserted trailing comma
+		  lsp-headerline-breadcrumb-enable nil)
 
   (with-eval-after-load 'lsp-mode
 	(ra/keymap-set lsp-mode-map
@@ -59,10 +72,12 @@
   (defun ra/lsp-mode-setup-completion ()
 	"Taken from corfu's wiki"
 	(setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-          '(orderless)))
+          '(orderless))
+	(add-hook 'completion-at-point-functions #'lsp-completion-at-point -70 t))
 
-  (add-hook 'lsp-completion-mode #'ra/lsp-mode-setup-completion)
-  (add-hook 'lsp-mode-hook #'yas-minor-mode)
+  (add-hook 'lsp-completion-mode-hook #'ra/lsp-mode-setup-completion)
+  (add-hook 'lsp-managed-mode-hook #'ra/tempel-setup-capf)
+  (add-hook 'lsp-managed-mode-hook #'ra/tiny-setup-capf)
 
   ;; LSP Booster
   (defun lsp-booster--advice-json-parse (old-fn &rest args)
@@ -94,46 +109,71 @@
 		orig-result)))
   (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
 
+(elpaca consult-lsp)
+
 (with-eval-after-load 'eglot
   (add-hook 'eglot-managed-mode-hook #'ra/tempel-setup-capf)
+  (add-hook 'eglot-managed-mode-hook #'ra/tiny-setup-capf)
   (set-face-attribute 'eglot-highlight-symbol-face nil :underline t))
 
 (elpaca (eglot-booster :host github :repo "jdtsmith/eglot-booster")
   (with-eval-after-load 'eglot
 	(eglot-booster-mode 1)))
 
-(elpaca (lsp-bridge :host github :repo "manateelazycat/lsp-bridge"
-					:files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
-					:build (:not elpaca--byte-compile))
-  (setopt lsp-bridge-enable-log nil
-		  lsp-bridge-enable-inlay-hint t))
-
-(elpaca yasnippet)
-
 (elpaca apheleia
   (with-eval-after-load 'apheleia-formatters
 	(add-to-list 'apheleia-formatters '(eslint . ("apheleia-npx" "eslint" "--fix" file)))
 	(add-to-list 'apheleia-formatters '(eslintd . ("eslint_d" "--fix-to-stdout" "--stdin" "--stdin-filename" filepath)))
-	(setf (alist-get 'typescript-ts-mode apheleia-mode-alist) 'eslintd)))
+	(setf (alist-get 'typescript-ts-mode apheleia-mode-alist) 'eslintd))
 
-;; TODO setup tempel snippets
+  ;; Apheleia LSP
+  (cl-defun apheleia-lsp-organize-import-formatter (&key buffer scratch callback stdin &allow-other-keys)
+      (with-current-buffer buffer
+	(when (lsp-feature? "textDocument/codeAction")
+	  (if-let ((action (->> (lsp-get-or-calculate-code-actions "source.organizeImports")
+							(-filter (-lambda ((&CodeAction :kind?))
+									   (and kind? (s-prefix? "source.organizeImports" kind?))))
+				lsp--select-action)))
+	      (with-current-buffer scratch
+		(lsp-execute-code-action action)))))
+      (funcall callback)))
+
 (elpaca tempel
   (defun ra/tempel-setup-capf ()
 	"Setup capf to try tempel first
 Taken from tempel's readme"
-	(add-hook 'completion-at-point-functions #'tempel-expand -90 t))
-  (ra/tempel-setup-capf))
+	(add-hook 'completion-at-point-functions #'tempel-expand -80 t))
+  (ra/tempel-setup-capf)
+  (add-hook 'conf-mode-hook #'ra/tempel-setup-capf)
+  (add-hook 'prog-mode-hook #'ra/tempel-setup-capf)
+  (add-hook 'text-mode-hook #'ra/tempel-setup-capf)
+
+  (defun ra/tempel-insert-template (elt)
+	"Tempel elements that expands `t' for another template"
+	(when (eq (car-safe elt) 't)
+      (if-let (template (alist-get (cadr elt) (tempel--templates)))
+          (cons 'l template)
+		(message "Template %s not found" (cadr elt))
+		nil)))
+
+  (with-eval-after-load 'tempel
+	(add-to-list 'tempel-user-elements #'ra/tempel-insert-template)
+
+	(ra/keymap-set tempel-map
+	  "TAB" #'tempel-next
+	  "<backtab>" #'tempel-previous
+	  "M-n" #'tempel-next
+	  "M-p" #'tempel-previous
+	  "C-g" #'tempel-abort)))
 
 (elpaca tempel-collection)
 
 (elpaca (lsp-snippet :host github :repo "svaante/lsp-snippet")
-  ;; (when (featurep 'lsp-mode)
-  ;; 	(lsp-snippet-tempel-lsp-mode-init))
-  (when (featurep 'eglot)
-	(lsp-snippet-tempel-eglot-init)))
+  (when (featurep 'lsp-mode)
+	(lsp-snippet-tempel-lsp-mode-init)))
 
-;; TODO: need to find a way to partially enable aggressive indent
-(elpaca aggressive-indent)
+(elpaca aggressive-indent
+  (global-aggressive-indent-mode 1))
 
 (elpaca flymake-flycheck
   (add-hook 'flymake-mode-hook 'flymake-flycheck-auto)
@@ -143,6 +183,19 @@ Taken from tempel's readme"
 	  (add-to-list 'flycheck-disabled-checkers checkers))))
 
 (elpaca eldoc-box)
+
+(elpaca imenu-extra)
+
+(defmacro ra/imenu-extra-setup-hook (hook imenu-pattern)
+	"Add hook function to HOOK to setup imenu using `imenu-extra-auto-setup'
+with IMENU-PATTERN"
+	(let* ((hook-name (symbol-name hook))
+		   (name (format "%s@%s" "imenu-extra" hook-name))
+		   (sym (intern name)))
+	  (macroexp-progn `((defun ,sym ()
+						  ,(format "Set up imenu-extra on %s" hook-name)
+						  (imenu-extra-auto-setup ,imenu-pattern))
+						(add-hook ',hook #',sym)))))
 
 (elpaca (copilot :host github :repo "copilot-emacs/copilot.el")
   ;; (add-hook 'prog-mode-hook #'copilot-mode)
@@ -170,6 +223,25 @@ If BASE-URL is not specified, it defaults to `openai-base-url'."
 		  openai-user "ricky.anderson2696@gmail.com"))
 (elpaca (chatgpt :host github :repo "emacs-openai/chatgpt"))
 (elpaca (codegpt :host github :repo "emacs-openai/codegpt"))
+
+(elpaca tiny
+  (defun ra/tiny-setup-capf ()
+	"Setup capf to try tiny first "
+	(add-hook 'completion-at-point-functions #'tiny-expand -90 t))
+  (ra/tiny-setup-capf))
+
+(elpaca sideline
+  (setopt sideline-order-left 'up
+		  sideline-order-right 'down))
+
+(elpaca sideline-lsp)
+(elpaca sideline-flymake
+  (setopt sideline-flymake-display-mode 'point
+		  sideline-flymake-show-backend-name nil))
+(elpaca (sideline-load-cost :host github :repo "emacs-sideline/sideline-load-cost"))
+
+(setopt sideline-backends-left '(sideline-lsp))
+(setopt sideline-backends-right '(sideline-flymake sideline-load-cost))
 
 (provide '+intellisense)
 ;;; +intellisense.el ends here

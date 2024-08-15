@@ -34,7 +34,8 @@
   (ra/keymap-set vertico-map
 	"RET" #'vertico-directory-enter
 	"DEL" #'vertico-directory-delete-char
-	"M-DEL" #'vertico-directory-delete-word)
+	"M-DEL" #'vertico-directory-delete-word
+	"C-z" #'vertico-quick-exit)
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
 
 (elpaca orderless
@@ -62,6 +63,14 @@
 
   (advice-add #'register-preview :override #'consult-register-window))
 
+;;;###autoload
+(defun ra/replace-region-with-kill ()
+  "Replace region content with kill-ring"
+  (interactive)
+  (when (use-region-p)
+    (delete-active-region)
+    (yank)))
+
 ;; TODO add embark elpaca integration?
 (elpaca embark
   (setopt prefix-help-command #'embark-prefix-help-command)
@@ -69,7 +78,12 @@
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
-                 (window-parameters (mode-line-format . none)))))
+                 (window-parameters (mode-line-format . none))))
+
+  (with-eval-after-load 'embark
+	(ra/keymap-set embark-region-map
+	"R" #'reverse-region
+	"r" #'ra/replace-region-with-kill)))
 
 (elpaca embark-consult
   (add-hook 'embark-collect-mode #'consult-preview-at-point-mode))

@@ -15,14 +15,15 @@
 
 (require 'treesit)
 (setopt treesit-font-lock-level 4)		; more colors
-(defmacro ra/treesitter-setup (language url &rest extra)
+(cl-defmacro ra/treesitter-setup (language url &rest extra &key no-mode-remap &allow-other-keys)
   "Setup Emacs's treesitter for LANGUAGE"
   (macroexp-progn
    `((add-to-list 'treesit-language-source-alist '(,language ,url ,@extra))
 	 (unless (treesit-language-available-p ',language)
 	   (treesit-install-language-grammar ',language))
-	 (add-to-list 'major-mode-remap-alist '(,(intern (concat (symbol-name language) "-mode")) .
-											,(intern (concat (symbol-name language) "-ts-mode")))))))
+	 (unless ,no-mode-remap
+	   (add-to-list 'major-mode-remap-alist '(,(intern (concat (symbol-name language) "-mode")) .
+											  ,(intern (concat (symbol-name language) "-ts-mode"))))))))
 
 (elpaca go-mode)
 (elpaca gotest)
@@ -48,9 +49,23 @@
 
 (require '+lang-web)
 
+(elpaca php-mode)
+
 ;; TODO make markdown tab to autocomplete and `markdown-cycle' only works in normal mode
 (setopt markdown-fontify-code-blocks-natively t
 		markdown-wiki-link-fontify-missing t)
+(defun ra/setup-extra-pair-markdown ()
+  "Add extra pairs for typescript"
+  (let ((pairs '((?` . ?`)
+				 (?* . ?*))))
+	(setq-local electric-pair-pairs (append electric-pair-pairs pairs))
+	(setq-local electric-pair-text-pairs (append electric-pair-text-pairs pairs))))
+(add-hook 'markdown-mode-hook #'ra/setup-extra-pair-markdown)
+(add-hook 'markdown-mode-hook #'variable-pitch-mode)
+
+;; create markdown that starts with markdown-view-mode and integrate with read-only-mode
+;; (ra/keymap-set markdown-mode-map
+;; )
 
 (with-eval-after-load 'meow
   (add-hook 'markdown-mode-hook (lambda () (markdown-toggle-markup-hiding 1)))
@@ -58,9 +73,11 @@
 									  (when (derived-mode-p 'markdown-mode)
 										(markdown-toggle-markup-hiding -1)))))
 
-(elpaca jsonian)
+(elpaca jsonian
+  (add-hook 'jsonian-mode-hook #'lsp-deferred))
+
 (elpaca (hjson :host github :repo "hjson/hjson-emacs" :main "hjson-mode.el"))
-;; TODO: improve `jq-interactively' using `make-process'.
+
 (elpaca jq-mode
   (setopt jq-interactive-command "yq"
 		  jq-interactive-default-options "--prettyPrint --input-format json --output-format json"
@@ -75,13 +92,19 @@
 		  (jq-interactive-default-prompt "yq: "))
 	  (call-interactively #'jq-interactively))))
 
-(ra/treesitter-setup yaml "https://github.com/ikatyang/tree-sitter-yaml")
+(ra/treesitter-setup yaml "https://github.com/ikatyang/tree-sitter-yaml"
+					 :no-mode-remap t)
 (elpaca yaml-pro
   (autoload #'yaml-pro-ts-mode "yaml-pro" "" t)
-  (add-hook 'yaml-ts-mode-hook #'yaml-pro-ts-mode)
-  (add-to-list 'auto-mode-alist `(,(rx (or ".yml" ".yaml") eos) . yaml-ts-mode)))
+  (add-hook 'yaml-mode-hook #'yaml-pro-ts-mode)
+  (add-to-list 'auto-mode-alist `(,(rx (or ".yml" ".yaml") eos) . yaml-mode)))
+
+(add-hook 'yaml-mode-hook #'indent-bars-mode)
+(add-hook 'yaml-mode-hook #'lsp-deferred)
 
 (elpaca dockerfile-mode)
+(elpaca docker-compose-mode)
+(setopt tramp-docker-program "podman")
 
 (elpaca nix-mode)
 
@@ -104,6 +127,7 @@
 	  "p" #'pair-tree-nav-up)))
 (elpaca macrostep)
 (elpaca suggest)
+(elpaca elisp-autofmt)
 
 (elpaca (pdf-tools :host github :repo "vedang/pdf-tools"
 				   ;; :remotes ("roll" :repo "dalanicolai/pdf-tools" :branch "pdf-roll")
@@ -123,6 +147,7 @@
 (elpaca etc-sudoers-mode)
 
 (elpaca	fish-mode)
+(add-hook 'sh-mode-hook #'lsp-deferred)
 
 ;; literate calc
 (elpaca literate-calc-mode)
@@ -152,6 +177,11 @@
 						  (list "-d" sql-database)))))
 	(sql-comint product params buffer)))
 
+(defun ra/sql-spanner-setup-history ()
+  (setq-local sql-input-ring-file-name (file-truename "~/.cache/spanner/history.sql")
+			  sql-input-ring-separator ";\n"))
+(add-hook 'sql-interactive-mode-hook #'ra/sql-spanner-setup-history)
+
 (with-eval-after-load 'sql
   (add-to-list 'sql-product-alist `(spanner :name "Spanner"
 											:font-lock sql-mode-ansi-font-lock-keywords
@@ -161,7 +191,10 @@
 											:sqli-comint-func sql-comint-spanner
 											:prompt-regexp ,(rx bol "spanner> ")
 											:prompt-cont-regexp ,(rx bol "      -> ")
-											:prompt-length 9)))
+											:prompt-length 9
+											:list-all "SHOW TABLES;"
+											:list-table "SHOW COLUMNS FROM %s;"
+											:terminator ";")))
 (defun sql-spanner (&optional buffer)
   (interactive "P")
   (sql-product-interactive 'spanner buffer))
@@ -169,6 +202,11 @@
 (elpaca caddyfile-mode
   (add-to-list 'auto-mode-alist `(,(rx "Caddyfile" eos) . caddyfile-mode))
   (add-to-list 'auto-mode-alist `(,(rx "caddy.conf" eos) . caddyfile-mode)))
+
+(elpaca terraform-mode
+  (add-hook 'terraform-mode-hook #'lsp-deferred)
+  (add-hook 'terraform-mode-hook #'apheleia-mode))
+(elpaca terraform-doc)
 
 (provide '+lang)
 ;;; +lang.el ends here

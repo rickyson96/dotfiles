@@ -182,6 +182,11 @@ mode "layout" {
 	bindsym $mod+tab focus next
 
 	bindsym $mod+shift+tab move workspace to output up
+
+	bindsym XF86AudioRaiseVolume exec pulsemixer --unmute --change-volume +5 --max-volume 150
+	bindsym XF86AudioLowerVolume exec pulsemixer --change-volume -5
+	bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
+    bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
 #
 # Scratchpad:
 #

@@ -13,17 +13,20 @@ c.tabs.position = "left"
 c.url.searchengines = {
     "DEFAULT": "https://duckduckgo.com/?q={}",
     "w": "https://en.wikipedia.org/wiki/Special:Search?search={}&go=Go&ns0=1",
-    "n": "https://search.nixos.org/packages?channel=unstable&query={}",
-    "no": "https://search.nixos.org/options?channel=23.05&query={}",
-    "nw": "https://nixos.wiki/index.php?search={}",
-    "hm": "https://mipmip.github.io/home-manager-option-search/?query={}",
+    # "n": "https://search.nixos.org/packages?channel=unstable&query={}",
+    # "no": "https://search.nixos.org/options?channel=23.05&query={}",
+    # "nw": "https://nixos.wiki/index.php?search={}",
+    # "hm": "https://mipmip.github.io/home-manager-option-search/?query={}",
     "g": "https://www.google.com/search?hl=en&q={}",
     "d": "https://duckduckgo.com/?q={}",
     "akops": "https://gamepress.gg/arknights/search?query={}",
     "gmeet": "https://meet.google.com/{}",
     "gmeetbit": "https://meet.google.com/{}?authuser=1",
     "genius": "https://genius.com/search?q={}",
-    "shopee": "https://shopee.co.id/search?keyword={}"
+    "shopee": "https://shopee.co.id/search?keyword={}",
+    "tokped": "https://tokopedia.com/search?q={}",
+    "yt": "https://youtube.com/results?search_query={}",
+    "atom-dev-cf-log": "https://console.cloud.google.com/functions/details/us-central1/{}?env=gen2&project=atom-pay-dev-be1b&tab=logs"
 }
 
 # config.unbind("co")
@@ -85,6 +88,8 @@ c.tabs.padding = {
     "left": 5,
     "right": 5
 }
+
+c.hints.selectors['video'] = ['video']
 
 # Themes
 white = "#fcf7ef"

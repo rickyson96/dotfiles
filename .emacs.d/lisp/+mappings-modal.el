@@ -30,6 +30,7 @@
       (embrace-add-pair (car lst) (cadr lst) (cddr lst))))
   (add-hook 'markdown-mode-hook 'embrace-markdown-mode-hook))
 
+;;;###autoload
 (defun ra/meow-block-to-block (arg)
   "Run `meow-block' initially, and `meow-to-block' for next invocation"
   (interactive "P")
@@ -37,6 +38,7 @@
       (meow-to-block arg)
     (meow-block arg)))
 
+;;;###autoload
 (defun ra/meow-next-word-expand (n)
   "`meow-next-word' but expand selection"
   (interactive "p")
@@ -48,22 +50,20 @@
                 (meow--select))
   (meow-next-word 1))
 
-(defun meow-xah-adapt ()
-  "Meow modal adapted from xah-fly-keys"
-  (meow-normal-define-key
-   ;; Movement
-   '("c" . meow-prev)
-   '("C" . meow-prev-expand)
-   '("t" . meow-next)
-   '("T" . meow-next-expand)
-   '("h" . meow-left)
-   '("H" . meow-left-expand)
-   '("n" . meow-right)
-   '("N" . meow-right-expand)
-   '("g" . meow-back-word)
-   '("r" . meow-next-word)
-   '("R" . ra/meow-next-word-expand)))
+;;;###autoload
+(defun ra/meow-yank-grab ()
+  "Yank or replace region with secondary selection"
+  (interactive)
+  (let* ((rbeg (region-beginning))
+         (rend (region-end))
+         (str (meow--second-sel-get-string))
+         ;; (next-marker (make-marker))
+         )
+    ;; (move-marker next-marker (overlay-end mouse-secondary-overlay))
+    (when (region-active-p) (delete-region rbeg rend))
+    (insert str)))
 
+;;;###autoload
 (defun meow-setup ()
   (el-patch-defun meow-change-save ()
     (interactive)
@@ -83,16 +83,13 @@
 
   (setq meow-cheatsheet-layout meow-cheatsheet-layout-dvorak)
   (ra/keymap-set mode-specific-map
-    "?" #'meow-cheatsheet
-    "f" #'find-file
-    "s" #'save-buffer
-    "r" #'bookmark-jump
-    "p" project-prefix-map
-    "'" #'org-capture)
+    "?" #'meow-cheatsheet)
   (meow-motion-overwrite-define-key
    ;; custom keybinding for motion state
    '("<escape>" . ignore)
    '("SPC" . "H-SPC"))
+  (ra/keymap-set meow-keypad-state-keymap
+    "C-g" #'meow-keypad-quit)
   (meow-normal-define-key
    '("0" . meow-expand-0)
    '("9" . meow-expand-9)
@@ -109,6 +106,7 @@
    '("b" . meow-back-word)
    '("B" . meow-back-symbol)
    '("c" . meow-change-save)
+   '("C" . ra/meow-yank-grab)
    '("d" . meow-delete)
    '("D" . meow-backward-delete)
    '("e" . meow-line)
@@ -174,6 +172,7 @@
   (setopt meow-expand-hint-remove-delay 0
           meow-use-clipboard t))
 
+;;;###autoload
 (defun ra/meow-kmacro ()
   "Run kmacro function based on mode.
 NORMAL: toggle kmacro state using `meow-start-kmacro' and `meow-end-or-call-kmacro'.

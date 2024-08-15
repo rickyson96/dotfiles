@@ -13,11 +13,22 @@
 
 ;;; Code:
 
-;; TODO: integrate this https://karthinks.com/software/emacs-window-management-almanac/#this-article-is-not-about
-;; maybe use `other-window' / `other-window-alternating?' / IDEA: `other-window-dwim' - which, with subsequent call, acts like `other-window'
+;; NOTE: might need to use `windresize' when resizing becomes cumbersome
 
 (setopt focus-follows-mouse t
-		mouse-autoselect-window -0.1)
+		mouse-autoselect-window t
+		;; split window should split horizontally on laptop's fullscreen
+		split-width-threshold 120
+
+		pixel-scroll-precision-large-scroll-height 30
+		pixel-scroll-precision-use-momentum t
+		pixel-scroll-precision-interpolate-page t
+		pixel-scroll-precision-interpolation-factor 1.0
+		scroll-margin 0
+		scroll-conservatively 1000
+		scroll-preserve-screen-position 1)
+
+(pixel-scroll-precision-mode 1)
 
 (elpaca ace-window
   ;; Karthink's blog post has a very useful tricks to use embark.
@@ -28,22 +39,20 @@
 
   ;; I have decided to use left-hand keys as window selector, and
   ;; right-hand keys for dispatch command.
-  (setopt aw-keys '(?u ?e ?a ?p ?. ?, ?k ?j ?i ?y ?x)
+  (setopt aw-keys '(?u ?e ?a ?p ?. ?, ?j ?' ?q)
 		  aw-dispatch-alist '((?o aw-flip-window)    ; switch to previous window (belongs to left-hand)
-							  (?\M-o aw-flip-window) ; for use with "M-o" keybind
 
 							  (?g aw-delete-window "Delete Window")
-							  (?w aw-swap-window "Swap Windows")
-							  (?v aw-move-window "Move Window")
-							  (?b aw-copy-window "Copy Window")
+							  (?m aw-swap-window "Swap Windows")
+							  (?f aw-transpose-frame "Transpose Frame")
 
-							  (?c aw-switch-buffer-in-window "Select Buffer")
+							  (?s aw-switch-buffer-in-window "Select Buffer")
+							  (?n aw-execute-command-other-window "Execute Command Other Window")
 							  (?r aw-switch-buffer-other-window "Switch Buffer Other Window")
-							  (?t aw-switch-to-window "Switch to Window")
-							  (?n aw-split-window-vert "Split Vert Window")
+							  (?v aw-split-window-vert "Split Vert Window")
 							  (?h aw-split-window-horz "Split Horz Window")
 
-							  (?m delete-other-windows "Delete Other Windows")
+							  (?z delete-other-windows "Delete Other Windows")
 							  (?? aw-show-dispatch-help))
 		  aw-make-frame-char ?\;
 		  aw-dispatch-always t)
@@ -66,19 +75,52 @@
 	(ra/keymap-set embark-bookmark-map
 	  "o" (ra/embark-ace-action bookmark-jump))))
 
+;; Taken from nhttps://karthinks.com/software/emacs-window-management-almanac/
+(defun ra/ace-window-prefix ()
+  "Use `ace-window' to display the buffer of the next command.
+The next buffer is the buffer displayed by the next command invoked
+immediately after this command (ignoring reading from the minibuffer).
+Creates a new window before displaying the buffer.
+When `switch-to-buffer-obey-display-actions' is non-nil,
+`switch-to-buffer' commands are also supported."
+  (interactive)
+  (display-buffer-override-next-command
+   (lambda (buffer _)
+     (let (window type)
+       (setq
+        window (aw-select (propertize " ACE" 'face 'mode-line-highlight))
+        type 'reuse)
+       (cons window type)))
+   nil "[ace-window]")
+  (message "Use `ace-window' to display next command buffer..."))
 
-(elpaca switch-window
-  (setopt switch-window-shortcut-style 'qwerty
-		  switch-window-qwerty-shortcuts '("u" "e" "o" "a" "h" "t" "n" "s" "p" "." "," "k" "j" "i" "y" "x")
-		  switch-window-background t
-		  switch-window-threshold 2)
-  (with-eval-after-load 'switch-window
-	(set-face-attribute 'switch-window-label nil :height 2.0)))
+(with-eval-after-load 'ace-window
+  (set-face-attribute 'aw-leading-char-face nil :height 2.0))
 
 (defvar ra/eldoc-window nil)
 (defun ra/eldoc-window-delete ()
   (when (window-live-p ra/eldoc-window)
-	(delete-window ra/eldoc-window)))
+	(delete-window ra/eldoc-window)
+	(setq ra/eldoc-window nil)
+	t))
+
+;; Shameless plug from https://karthinks.com/software/emacs-window-management-almanac/
+(defvar ra/other-window-alt-direction 1
+  "The current `ra/other-window-alternating' direction")
+
+(defun ra/other-window-alternating (&optional arg)
+  "Call `other-window', switching directions each time."
+  (interactive)
+  (if (equal last-command 'ra/other-window-alternating)
+	  (other-window (* ra/other-window-alt-direction (or arg 1)))
+    (setq ra/other-window-alt-direction (- ra/other-window-alt-direction))
+    (other-window (* ra/other-window-alt-direction (or arg 1)))))
+
+(setopt other-window-scroll-default
+      (lambda ()
+        (or (get-mru-window nil t 'not-this-one-dummy) ; Need to set DEDICATED to `t'
+			(next-window)					 ; fall back to next window
+			(next-window nil nil 'visible))))
 
 (setopt switch-to-buffer-obey-display-actions t ; Sane `switch-to-buffer'
 		switch-to-buffer-in-dedicated-window 'pop
@@ -87,6 +129,9 @@
 		display-buffer-alist `((,(rx bol "*helpful" (1+ nonl) eol)
 								(display-buffer-reuse-mode-window)
 								(mode . helpful-mode))
+							   (,(rx bol "*Man " (1+ nonl) eol)
+								(display-buffer-reuse-mode-window)
+								(mode . Man-mode))
 							   (,(rx bol "*" (0+ nonl) "eshell" (0+ nonl) "*" eol)
 								(display-buffer-in-direction)
 								(direction . bottom)
@@ -96,6 +141,11 @@
 								(display-buffer-in-direction)
 								(direction . bottom)
 								(window-height . 0.35))
+							   (,(rx bol "*" (0+ nonl) "Async Shell Command" (0+ nonl) "*" eol)
+								(display-buffer-in-direction)
+								(direction . bottom)
+								(window-height . 0.35)
+								(dedicated . t))
 							   (,(rx bol "*eldoc*" eol)
 								(display-buffer-in-direction)
 								(direction . bottom)
@@ -105,7 +155,7 @@
 								(body-function . ,(lambda (w)
 													(setq ra/eldoc-window w))))
 							   (,(rx bol "*compilation*" eol)
-								(display-buffer-in-direction)
+								(display-buffer-in-side-window)
 								(direction . bottom)
 								(window-height . 0.35))
 							   (,(rx bol "*pair-tree*" eol)
@@ -125,8 +175,8 @@
 								(slot . 1)
 								(mode-line-format . ""))))
 
-(ra/keymap-set (current-global-map)
-  "C-g" (ra/cmd (ra/eldoc-window-delete) (keyboard-quit)))
+(with-eval-after-load '+mappings
+  (add-hook 'ra/keyboard-quit-hook #'ra/eldoc-window-delete))
 
 (elpaca popper
   (ra/keymap-set (current-global-map)
@@ -148,15 +198,7 @@
   (popper-mode +1)
   (popper-echo-mode +1))
 
-(defvar ra/maximize-window-configuration nil)
-(defun ra/toggle-maximize-window ()
-  "Toggle maximize current buffer."
-  (interactive)
-  (if ra/maximize-window-configuration
-	  (progn
-		(set-window-configuration ra/maximize-window-configuration)
-		(setq ra/maximize-window-configuration nil))
-	(setq ra/maximize-window-configuration (current-window-configuration))))
+(winner-mode 1)
 
 (provide '+window)
 ;;; +window.el ends here
