@@ -57,7 +57,6 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 
 (save-place-mode 1)
-(show-paren-mode 1)
 (savehist-mode 1)
 (recentf-mode 1)
 (global-auto-revert-mode 1)

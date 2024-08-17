@@ -54,13 +54,7 @@
 ;; TODO make markdown tab to autocomplete and `markdown-cycle' only works in normal mode
 (setopt markdown-fontify-code-blocks-natively t
 		markdown-wiki-link-fontify-missing t)
-(defun ra/setup-extra-pair-markdown ()
-  "Add extra pairs for typescript"
-  (let ((pairs '((?` . ?`)
-				 (?* . ?*))))
-	(setq-local electric-pair-pairs (append electric-pair-pairs pairs))
-	(setq-local electric-pair-text-pairs (append electric-pair-text-pairs pairs))))
-(add-hook 'markdown-mode-hook #'ra/setup-extra-pair-markdown)
+
 (add-hook 'markdown-mode-hook #'variable-pitch-mode)
 
 ;; create markdown that starts with markdown-view-mode and integrate with read-only-mode

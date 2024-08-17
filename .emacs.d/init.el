@@ -230,7 +230,26 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 ;; Enable view-mode on read-only buffer
 (setopt view-read-only t)
 
-(electric-pair-mode 1)
+;; (electric-pair-mode 1)
+;; (show-paren-mode 1)
+(elpaca smartparens
+  (smartparens-global-mode 1)
+  ;; still debating this between show-paren-mode
+  (show-smartparens-global-mode 1)
+  (setopt sp-highlight-pair-overlay nil
+		  sp-highlight-wrap-overlay nil
+		  sp-highlight-wrap-tag-overlay nil
+		  ;; Value taken from doomemacs
+		  sp-max-pair-length 10
+		  sp-max-prefix-length 100)
+
+  (with-eval-after-load 'smartparens
+	(require 'smartparens-config)
+
+	;; Snatched from doomemacs, remove harmless message
+	(dolist (key '(:unmatched-expression :no-matching-tag))
+      (setf (alist-get key sp-message-alist) nil))))
+
 
 (elpaca outshine
   (setopt outline-minor-mode-prefix "\C-c o"))
