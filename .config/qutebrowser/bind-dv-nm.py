@@ -97,8 +97,10 @@ c.bindings.commands['normal'] = {
     "<alt-u>pW": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --password-only",
     "<alt-u>po": "spawn -u qute-pass -m -d 'fuzzel -d' --otp-only",
     "<alt-u>pO": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --otp-only",
-    '<alt-u>m': 'spawn umpv {url}',
-    '<alt-u>M': 'hint video spawn umpv {hint-url}',
+    '<alt-u>mm': 'spawn umpv {url}',
+    '<alt-u>mv': 'hint video spawn umpv {hint-url}',
+    '<alt-u>ml': 'hint links spawn umpv {hint-url}',
+    '<alt-u>ma': 'hint all spawn umpv {hint-url}',
 
     # modes
     '<ctrl-i>': 'mode-enter insert',
