@@ -53,9 +53,16 @@
 
 ;; TODO make markdown tab to autocomplete and `markdown-cycle' only works in normal mode
 (setopt markdown-fontify-code-blocks-natively t
-		markdown-wiki-link-fontify-missing t)
+		markdown-wiki-link-fontify-missing t
+		markdown-italic-underscore t
+		markdown-asymmetric-header t
+		markdown-gfm-additional-languages '("sh")
+		markdown-make-gfm-checkboxes-buttons t
+		markdown-fontify-whole-heading-line t)
 
 (add-hook 'markdown-mode-hook #'variable-pitch-mode)
+
+(add-to-list 'auto-mode-alist `(,(rx "README" (opt ".md") eos) . gfm-mode))
 
 ;; create markdown that starts with markdown-view-mode and integrate with read-only-mode
 ;; (ra/keymap-set markdown-mode-map
