@@ -45,7 +45,7 @@ export NODE_VERSIONS={$HOME/.local/share/nvm}
 export NODE_OPTIONS="--max-old-space-size=2048"
 
 alias grep=rg
-alias ls="exa --icons"
+alias ls="eza --icons"
 
 abbr --add rm rmtrash
 abbr --add rmdir rmdirtrash
