@@ -18,7 +18,7 @@ set $term foot
 # Your preferred application launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
-set $menu tofi-drun | xargs -0 swaymsg exec --
+set $menu fuzzel
 
 include /etc/sway/config-vars.d/*
 
@@ -79,7 +79,7 @@ input * {
 
     # Start your launcher
     bindsym $mod+Space exec $menu
-	bindsym $mod+Shift+Space exec tofi-run | xargs -0 swaymsg exec --
+	bindsym $mod+Shift+Space exec stest -flx $(echo $PATH | tr ':' ' ') | sort -u | fuzzel --dmenu | xargs -0 swaymsg exec --
 
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.
@@ -200,8 +200,8 @@ mode "layout" {
     # If there are multiple scratchpad windows, this command cycles through them.
     bindsym $mod+minus scratchpad show
 
-	bindsym $mod+p exec "~/.config/sway/passmenu"
-	bindsym $mod+o exec "~/.config/sway/passmenu otp"
+	bindsym $mod+p exec "~/.config/sway/passmenu-fuzzel"
+	bindsym $mod+o exec "~/.config/sway/passmenu-fuzzel" otp
 #
 # Resizing containers:
 #
@@ -237,7 +237,7 @@ bindsym $mod+ctrl+print exec grimshot save screen - | swappy -f -
 exec wl-paste --type text --watch cliphist store
 exec wl-paste --type image --watch cliphist store
 
-bindsym $mod+v exec cliphist list | tofi --width 800 --prompt-text " : " | cliphist decode | wl-copy
+bindsym $mod+v exec cliphist list | fuzzel --width 80 --prompt " : " --dmenu | cliphist decode | wl-copy
 
 #
 # Status Bar:
