@@ -532,8 +532,19 @@ otherwise, use `substitute-target-in-buffer'"
 
 (elpaca string-inflection
   (with-eval-after-load 'embark
-    (keymap-set embark-identifier-map "~" #'string-inflection-all-cycle)
-    (add-to-list 'embark-repeat-actions #'string-inflection-all-cycle)))
+    (keymap-set embark-identifier-map "~" #'ra/transient-string-inflection))
+
+  (with-eval-after-load 'string-inflection
+	(require 'transient)
+	(transient-define-prefix ra/transient-string-inflection ()
+	  "Transient menu for running string-inflection"
+	  ["String Inflection"
+	   [("s" "snake_case" string-inflection-underscore)
+		("k" "kebab-case" string-inflection-kebab-case)]
+	   [("p" "PascalCase" string-inflection-camelcase)
+		("m" "mixedCase" string-inflection-lower-camelcase)]
+	   [("u" "UPPER_CAMEL_CASE" string-inflection-upcase)
+		("c" "Capital_Camel_Case" string-inflection-capital-underscore)]])))
 
 (elpaca move-text
   (defun indent-region-advice (&rest _)

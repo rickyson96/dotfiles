@@ -230,6 +230,7 @@ doesn't find overlay"
   (selected-global-mode 1)
   (setopt selected-ignore-modes '(magit-status-mode diff-mode magit-revision-mode))
   (ra/keymap-set selected-keymap
+    "~" #'ra/transient-string-inflection
     "u" #'crux-upcase-region
     "d" #'crux-downcase-region
     "e" #'ra/eval-region
