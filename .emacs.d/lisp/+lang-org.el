@@ -14,6 +14,9 @@
 ;;; Code:
 
 (elpaca org-modern
+  (setopt org-modern-list '((?+ . "•")
+							(?- . "›")
+							(?* . "◦")))
   (with-eval-after-load 'org
 	(global-org-modern-mode 1)))
 
@@ -35,6 +38,9 @@
 		org-startup-indented t
 		org-fontify-quote-and-verse-blocks t
 		org-use-sub-superscripts '{}
+		org-list-demote-modify-bullet '(("-" . "+")
+										("+" . "-")
+										("*" . "+"))
 		org-use-property-inheritance t
 		org-edit-src-content-indentation 0
 		org-link-abbrev-alist '(("ytni" . "yt:%s")
