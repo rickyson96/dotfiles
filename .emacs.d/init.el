@@ -377,7 +377,14 @@ otherwise, use `substitute-target-in-buffer'"
     "<remap> <move-beginning-of-line>" #'mwim-beginning
 	"<remap> <move-end-of-line>" #'mwim-end))
 
-(setopt isearch-lazy-count t)
+(setopt isearch-lazy-count t
+		isearch-repeat-on-direction-change t
+		isearch-allow-motion t
+		isearch-allow-scroll 'unlimited
+		isearch-motion-changes-direction t
+		isearch-wrap-pause 'no-ding
+		isearch-yank-on-move nil
+		search-exit-option nil)
 
 ;; See https://karthinks.com/software/avy-can-do-anything
 (defun ra/isearch-forward-other-window (prefix)
