@@ -79,11 +79,6 @@ See https://emacs.stackexchange.com/questions/59791/font-and-frame-configuration
 							  (add-hook ',hook #',name))))
 		   '(elpaca-after-init-hook server-after-make-frame-hook))))
 
-(ra/configure-frame ra/setup-font
-  (set-face-attribute 'default nil :font "monospace" :height 110)
-  (set-face-attribute 'fixed-pitch nil :font "monospace")
-  (set-face-attribute 'variable-pitch nil :font "sans-serif"))
-
 (require '+defaults)
 
 (elpaca xr)

@@ -25,6 +25,45 @@
 (scroll-bar-mode -1)
 (horizontal-scroll-bar-mode -1)
 
+(setopt use-default-font-for-symbols nil
+		face-font-rescale-alist '(("-cdac$" . 1.3)
+								  ("Sarasa" . 1.2)))
+
+;; Test fonts
+;; aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+;; iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+;; 云云云云云云云云云云云云云云云云云云云云云云云云云云云云云云云云云云云云云云云云
+;; 雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲雲
+;; ㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞㄞ
+;; ああああああああああああああああああああああああああああああああああああああああ
+;; 가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가
+;; aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+;; ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
+;; ○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○
+;; ────────────────────────────────────────────────────────────────────────────────
+;; ││││││││││││││││││││││││││││││││││││││││││││││││││││││││││││││││││││││││││││││││
+;; ├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├├
+;; └└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└└
+;; The quick brown fox jumps over the lazy dog.‘’“”
+;; ABC.DEF.GHI.JKL.MNO.PQRS.TUV.WXYZ abc.def.ghi.jkl.mno.pqrs.tuv.wxyz
+;; !iIlL17|¦ ¢coO08BDQ $5SZ2zs ∂96µm float il1[]={1-2/3.4,5+6=7/8%90};
+;; 1234567890 ,._-+= >< «¯-¬_» ~–÷+× {*}[]()<>`+-=$/#_%^@\&|~?'" !,.;:
+;; G6Qg9q¶ Þẞðþſß ΓΔΛαβγδιλμνξπτυφχψ ЖЗКНРУЭЯавжзклмнруфчьыэя <= != ==
+
+(defun ra/set-font (&optional frame)
+  "Set font configurations. FRAME determine the frame to set the font"
+  (set-face-font 'default "monospace-11" frame)
+  ;; (set-fontset-font "fontset-default" 'unicode (font-spec :family "monospace") frame 'prepend)
+  ;; (dolist (charset '(kana han cjk-misc hangul kanbun bopomofo))
+  ;; 	(set-fontset-font "fontset-default" charset
+  ;; 					  (font-spec :family "Sarasa Term SC")
+  ;; 					  frame 'prepend))
+  )
+
+(ra/set-font)
+
+(add-hook 'after-make-frame-functions #'ra/set-font)
+
 (elpaca nerd-icons
   (setopt nerd-icons-scale-factor 1
 		  nerd-icons-font-family "IosevraRelaxed Nerd Font"))
