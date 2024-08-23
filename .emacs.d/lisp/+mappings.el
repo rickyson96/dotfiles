@@ -226,6 +226,13 @@ doesn't find overlay"
       (eval-last-sexp nil)))
   (deactivate-mark))
 
+(defun ra/isearch-next-from-region (beg end)
+  "Run `isearch' with the search string from region."
+  (interactive "r")
+  (let ((search-string (buffer-substring-no-properties beg end)))
+    (deactivate-mark)
+    (isearch-resume search-string nil nil t search-string case-fold-search)))
+
 (elpaca selected
   (selected-global-mode 1)
   (setopt selected-ignore-modes '(magit-status-mode diff-mode magit-revision-mode))
@@ -241,7 +248,12 @@ doesn't find overlay"
     "," #'iedit-mode
     "'" #'er/expand-region
     "t" #'transpose-mark
-    "SPC" #'iedit-rectangle-mode))
+    "s" #'ra/isearch-from-region
+    "C-s" #'ra/isearch-from-region
+    "C-r" #'ra/isearch-from-region
+    "SPC" #'iedit-rectangle-mode
+    "TAB" #'indent-rigidly-right-to-tab-stop
+    "S-TAB" #'indent-rigidly-left-to-tab-stop))
 
 (with-eval-after-load 'kmacro
   (defalias 'kmacro-insert-macro #'insert-kbd-macro)
