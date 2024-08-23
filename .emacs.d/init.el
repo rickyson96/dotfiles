@@ -280,12 +280,15 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 (with-eval-after-load 're-builder
   (setopt reb-re-syntax 'string))
 
-(elpaca casual-suite
+(elpaca casual-re-builder
   (with-eval-after-load 're-builder
 	(ra/keymap-set reb-mode-map "M-r" #'casual-re-builder-tmenu)
-	(ra/keymap-set reb-lisp-mode-map "M-r" #'casual-re-builder-tmenu))
-  (with-eval-after-load 'calc
-	(ra/keymap-set calc-mode-map "C-o" #'casual-calc-tmenu)))
+	(ra/keymap-set reb-lisp-mode-map "M-r" #'casual-re-builder-tmenu)))
+
+(elpaca casual-calc
+  (add-hook 'calc-start-hook (defun ra/setup-calc-map ()
+							   "Setup `calc-mode-map' on hook so that it doesn't get overwritten."
+							   (ra/keymap-set calc-mode-map "C-o" #'casual-calc-tmenu))))
 
 (elpaca ialign
   (autoload 'ialign "ialign")
