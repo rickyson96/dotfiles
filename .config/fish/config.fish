@@ -43,6 +43,7 @@ export npm_config_prefix="$HOME/.local"
 export NODE_VERSION_PREFIX=v
 export NODE_VERSIONS={$HOME/.local/share/nvm}
 export NODE_OPTIONS="--max-old-space-size=2048"
+export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/ripgreprc"
 
 alias grep=rg
 alias ls="eza --icons"
