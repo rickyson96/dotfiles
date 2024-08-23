@@ -81,12 +81,16 @@ c.bindings.commands['normal'] = {
     '<alt-y>y': 'open -- {clipboard}',
     '<alt-y>t': 'open -t -- {clipboard}',
     '<alt-y>s': 'open -t -- {primary}',
-    '<ctrl-y>': 'insert-text {clipboard}',
+    '<ctrl-y>': 'fake-key <Ctrl-v>',
 
     # zoom
     '<ctrl-=>': 'zoom-in',
     '<ctrl-->': 'zoom-out',
     '<ctrl-0>': 'zoom',
+
+    # macro
+    '<F3>': 'macro-record q',
+    '<F4>': 'macro-run q',
 
     # userscript
     "<alt-u>pp": "spawn -u qute-pass -m -d 'fuzzel -d'",
@@ -164,7 +168,7 @@ c.bindings.commands['insert'] = {
     '<alt-backspace>': 'fake-key <Ctrl-Backspace>',
     '<ctrl-w>': 'fake-key <ctrl-c>',
     '<ctrl-c>': 'fake-key <ctrl-c>',
-    '<ctrl-y>': 'insert-text {clipboard}',
+    '<ctrl-y>': 'fake-key <ctrl-v>',
     '<ctrl-v>': 'fake-key <PgDown>',
     '<alt-v>': 'fake-key <PgUp>',
     '<ctrl-k>': 'fake-key <Shift-End> ;; fake-key <ctrl-x>',

@@ -29,6 +29,8 @@ c.url.searchengines = {
     "atom-dev-cf-log": "https://console.cloud.google.com/functions/details/us-central1/{}?env=gen2&project=atom-pay-dev-be1b&tab=logs"
 }
 
+c.hints.chars = 'aoeuhtnsid'
+
 # config.unbind("co")
 
 # c.input.insert_mode.auto_load = True
