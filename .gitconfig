@@ -16,7 +16,8 @@
 	postBuffer = 1524288000
 
 [branch]
-	autoSetupMerge = true
+	autoSetupMerge = always
+	autoSetupRebase = never
 
 [init]
 	defaultBranch = main
