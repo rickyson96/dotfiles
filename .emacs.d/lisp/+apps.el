@@ -236,8 +236,8 @@
 
 (setopt zoneinfo-style-world-list '(("Asia/Jakarta" "Indonesia")
                                     ("Asia/Makassar" "Bali")
-                                    ("Canada/Atlantic" "Atlantic")
-                                    ("Canada/Pacific" "Pacific")
+                                    ("America/Halifax" "Atlantic")
+                                    ("America/Los_Angeles" "Pacific")
                                     ("UTC" "UTC"))
         world-clock-time-format "%R %z (%Z) %t%A %d %B"
         world-clock-buffer-name "*world clock*")
