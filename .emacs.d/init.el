@@ -248,7 +248,16 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 
 	;; Snatched from doomemacs, remove harmless message
 	(dolist (key '(:unmatched-expression :no-matching-tag))
-      (setf (alist-get key sp-message-alist) nil))))
+      (setf (alist-get key sp-message-alist) nil))
+
+	(add-hook 'eval-expression-minibuffer-setup-hook (defun ra/smartparens-eval-expression ()
+													   "Enable smartparens in minibuffer"
+													   (when smartparens-global-mode
+														 (smartparens-mode 1))))
+
+	;; Disable pairs that don't work well with lisp on minibuffer
+	(sp-local-pair '(minibuffer-mode minibuffer-inactive-mode) "'" nil :actions nil)
+	(sp-local-pair '(minibuffer-mode minibuffer-inactive-mode) "`" nil :actions nil)))
 
 
 (elpaca outshine

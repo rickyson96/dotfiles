@@ -31,8 +31,8 @@
 (dolist (actions '(apheleia-mode
 				   lsp-deferred
 				   indent-bars-mode
-				   ra/setup-extra-pair-typescript
 				   combobulate-mode
+				   ;; ra/setup-extra-pair-typescript
 				   ;;eglot-ensure
 				   ))
   (add-hook 'typescript-ts-base-mode-hook actions))
@@ -134,6 +134,11 @@
 						   )
 					  1 2 3)))
 ;;       at Object.<anonymous> (library/loyalty-utils/lib/sendCollectNameSMS.test.ts:87:54)
+
+(with-eval-after-load 'smartparens-javascript
+  (sp-with-modes sp--javascript-modes
+	(sp-local-pair "{" nil :post-handlers '(("||\n[i]" "RET")
+											("| " "SPC")))))
 
 (provide '+lang-jsts)
 ;;; +lang-jsts.el ends here
