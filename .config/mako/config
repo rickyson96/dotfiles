@@ -10,12 +10,13 @@ border-radius=15
 progress-color=source #375cc6
 icons=1
 max-icon-size=64
-default-timeout=3000
+default-timeout=5000
 ignore-timeout=0
 max-visible=5
 output=eDP-1
 font=IosevraRelaxedNerdFont 10
 format=<span font="8" weight="light">%a</span>\n<span font="12" weight="bold" underline="low">%s</span>\n\n%b
+on-notify=exec mpv ~/Downloads/level-up-2-199574.mp3 --volume=60
 
 [urgency=low]
 border-color=#cccccc
@@ -30,3 +31,10 @@ default-timeout=0
 [category=mpd]
 default-timeout=2000
 group-by=category
+
+[app-name=nohang]
+on-notify=none
+
+# use default notification sound from app
+[app-name=Ferdium]
+on-notify=none

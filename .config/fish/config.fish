@@ -29,21 +29,21 @@ fish_add_path --universal /Users/rickyson/opensource/kotlin-language-server/serv
 fish_add_path --universal ~/.cargo/bin
 fish_add_path --universal /Users/rickyson/opensource/mermaid-cli/node_modules/.bin
 
-export YDOTOOL_SOCKET=/tmp/.ydotool_socket
-export SSH_AGENT_PID=""
-export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
-export LANG='en_US.UTF-8'
-export LC_ALL='en_US.UTF-8'
-export EDITOR='emacsclient -r'
-export LESS="-g -i -M -R -w -z-4"
-export BAT_PAGER="less -RF"
-export STARSHIP_CONFIG="~/.config/starship/starship.toml"
-export LSP_USE_PLISTS=true
-export npm_config_prefix="$HOME/.local"
-export NODE_VERSION_PREFIX=v
-export NODE_VERSIONS={$HOME/.local/share/nvm}
-export NODE_OPTIONS="--max-old-space-size=2048"
-export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/ripgreprc"
+set -Ux YDOTOOL_SOCKET /tmp/.ydotool_socket
+set -Ux SSH_AGENT_PID ""
+set -Ux SSH_AUTH_SOCK "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+set -Ux LANG 'en_US.UTF-8'
+set -Ux LC_ALL 'en_US.UTF-8'
+set -Ux EDITOR 'emacsclient -r'
+set -Ux LESS "-g -i -M -R -w -z-4"
+set -Ux BAT_PAGER "less -RF"
+set -Ux STARSHIP_CONFIG "~/.config/starship/starship.toml"
+set -Ux LSP_USE_PLISTS true
+set -Ux npm_config_prefix "$HOME/.local"
+set -Ux NODE_VERSION_PREFIX v
+set -Ux NODE_VERSIONS {$HOME/.local/share/nvm}
+set -Ux NODE_OPTIONS "--max-old-space-size=2048"
+set -Ux RIPGREP_CONFIG_PATH "$HOME/.config/ripgrep/ripgreprc"
 
 alias grep=rg
 alias ls="eza --icons"
