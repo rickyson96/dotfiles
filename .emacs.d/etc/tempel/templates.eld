@@ -61,7 +61,13 @@ typescript-ts-mode :when (string-match-p (rx (0+ nonl) ".test.ts" eos) (file-nam
 ;; jest
 
 (be "beforeEach(() => {" n> q n> "});")
+(ba "beforeAll(() => {" n> q n> "});")
+(ae "afterEach(() => {" n> q n> "});")
+(aa "afterAll(() => {" n> q n> "});")
 (bea "beforeEach(async () => {" n> q n> "});")
+(baa "beforeAll(async () => {" n> q n> "});")
+(aea "afterEach(async () => {" n> q n> "});")
+(aaa "afterAll(async () => {" n> q n> "});")
 (i "it('" p "', () => {" n> q n> "});")
 (ia "it('" p "', async () => {" n> q n> "});")
 (d "describe('" p "', () => {" n> q n> "});")
