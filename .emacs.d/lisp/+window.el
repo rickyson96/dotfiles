@@ -35,10 +35,9 @@
   ;; And I also learned how to configure ace-window from there!
   ;; https://karthinks.com/software/fifteen-ways-to-use-embark/
 
-  ;; TODO: integrate this and switch from `switch-window'
-
   ;; I have decided to use left-hand keys as window selector, and
   ;; right-hand keys for dispatch command.
+  ;; TODO update this so that it reflects emacs keybinding instead
   (setopt aw-keys '(?u ?e ?a ?p ?. ?, ?j ?' ?q)
           aw-dispatch-alist '((?o aw-flip-window)    ; switch to previous window (belongs to left-hand)
 
