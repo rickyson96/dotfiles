@@ -226,7 +226,7 @@ doesn't find overlay"
       (eval-last-sexp nil)))
   (deactivate-mark))
 
-(defun ra/isearch-next-from-region (beg end)
+(defun ra/isearch-from-region (beg end)
   "Run `isearch' with the search string from region."
   (interactive "r")
   (let ((search-string (buffer-substring-no-properties beg end)))
@@ -241,7 +241,8 @@ doesn't find overlay"
     "u" #'crux-upcase-region
     "d" #'crux-downcase-region
     "e" #'ra/eval-region
-    "w" #'count-words-region
+    "w" #'kill-ring-save
+    "=" #'count-words-region
     "c" #'crux-capitalize-region
     "k" #'kill-region
     "r" #'ra/replace-region-with-kill
@@ -323,6 +324,7 @@ doesn't find overlay"
   "*" #'literate-calc-minor-mode
   "c" #'literate-calc-minor-mode
   "d" #'toggle-debug-on-error
+  "e" #'emojify-mode
   "f" #'auto-fill-mode
   "l" #'visual-line-mode
   "L" #'toggle-truncate-lines
@@ -355,11 +357,17 @@ doesn't find overlay"
 
 (defvar-keymap ra/window-repeat-map
   :doc "Keymap for repeatedly modify emacs' windows"
+  :prefix 'ra/window-repeat-map
   :repeat t
   "c" #'enlarge-window
   "t" #'shrink-window
   "h" #'shrink-window-horizontally
-  "n" #'enlarge-window-horizontally)
+  "n" #'enlarge-window-horizontally
+  "f" #'transpose-frame
+  "r" #'rotate-frame-clockwise
+  "g" #'rotate-frame-anticlockwise
+  "w" #'flop-frame
+  "v" #'flip-frame)
 
 (defun ra/mark-line (&optional p)
   "Mark line"
@@ -398,7 +406,7 @@ doesn't find overlay"
   "a" #'org-agenda
   "e" ra/eval-map
   "o" #'ra/open-map
-  "w" #'ra/window-map
+  "w" #'ra/window-repeat-map
   "T" #'ra/toggle-map
   "f" #'ra/find-file
   "s" #'save-buffer

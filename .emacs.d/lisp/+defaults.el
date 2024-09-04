@@ -60,6 +60,7 @@
 (savehist-mode 1)
 (recentf-mode 1)
 (global-auto-revert-mode 1)
+(indent-tabs-mode 0)
 
 (elpaca dtrt-indent
   (require 'dtrt-indent)

@@ -64,6 +64,9 @@
 
 (add-to-list 'auto-mode-alist `(,(rx "README" (opt ".md") eos) . gfm-mode))
 
+(elpaca grip-mode
+  (setopt grip-use-mdopen t))
+
 ;; create markdown that starts with markdown-view-mode and integrate with read-only-mode
 ;; (ra/keymap-set markdown-mode-map
 ;; )
@@ -75,7 +78,9 @@
 										(markdown-toggle-markup-hiding -1)))))
 
 (elpaca jsonian
-  (add-hook 'jsonian-mode-hook #'lsp-deferred))
+  (add-hook 'jsonian-mode-hook #'lsp-deferred)
+  (with-eval-after-load 'markdown-mode
+	(add-to-list 'markdown-code-lang-modes '("json" . jsonian-mode))))
 
 (elpaca (hjson :host github :repo "hjson/hjson-emacs" :main "hjson-mode.el"))
 
@@ -206,8 +211,19 @@
 
 (elpaca terraform-mode
   (add-hook 'terraform-mode-hook #'lsp-deferred)
-  (add-hook 'terraform-mode-hook #'apheleia-mode))
+  (add-hook 'terraform-mode-hook #'apheleia-mode)
+  (setq lsp-disabled-clients '(tfls)))
 (elpaca terraform-doc)
+
+;; https://christiantietze.de/posts/2024/01/emacs-sqlite-mode-open-sqlite-files-automatically/
+(defun ra/sqlite-view-file-magically ()
+  "Runs `sqlite-mode-open-file' on the file name visited by the
+current buffer, killing it."
+  (require 'sqlite-mode)
+  (let ((file-name buffer-file-name))
+    (sqlite-mode-open-file file-name)))
+
+(add-to-list 'magic-mode-alist '("SQLite format 3\x00" . ra/sqlite-view-file-magically))
 
 (provide '+lang)
 ;;; +lang.el ends here

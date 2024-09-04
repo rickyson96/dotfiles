@@ -56,7 +56,8 @@
 				   "LC_ALL"
 				   "LSP_USE_PLISTS"
 				   "DISPLAY"
-				   "WAYLAND_DISPLAY"))
+				   "WAYLAND_DISPLAY"
+				   "RIPGREP_CONFIG_PATH"))
 	  (add-to-list 'exec-path-from-shell-variables var))
 
 	(exec-path-from-shell-initialize)))
@@ -139,6 +140,8 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 
   (ra/keymap-set tabspaces-mode-map
 	"<remap> <project-switch-project>" #'tabspaces-open-or-create-project-and-workspace)
+
+  (add-to-list 'tabspaces-project-switch-commands '(magit-project-status "Magit"))
 
   (with-eval-after-load 'marginalia
 	(add-to-list 'marginalia-command-categories '(tabspaces-switch-or-create-workspace . tab)))
@@ -275,15 +278,17 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 (with-eval-after-load 're-builder
   (setopt reb-re-syntax 'string))
 
-(elpaca casual-re-builder
+(elpaca casual-suite
   (with-eval-after-load 're-builder
 	(ra/keymap-set reb-mode-map "M-r" #'casual-re-builder-tmenu)
-	(ra/keymap-set reb-lisp-mode-map "M-r" #'casual-re-builder-tmenu)))
+	(ra/keymap-set reb-lisp-mode-map "M-r" #'casual-re-builder-tmenu))
 
-(elpaca casual-calc
   (add-hook 'calc-start-hook (defun ra/setup-calc-map ()
 							   "Setup `calc-mode-map' on hook so that it doesn't get overwritten."
-							   (ra/keymap-set calc-mode-map "C-o" #'casual-calc-tmenu))))
+							   (ra/keymap-set calc-mode-map "C-o" #'casual-calc-tmenu)))
+
+  (with-eval-after-load 'org-agenda
+	(ra/keymap-set org-agenda-mode-map "C-o" #'casual-agenda-tmenu)))
 
 (elpaca ialign
   (autoload 'ialign "ialign")
@@ -382,7 +387,7 @@ otherwise, use `substitute-target-in-buffer'"
 		isearch-motion-changes-direction t
 		isearch-wrap-pause 'no-ding
 		isearch-yank-on-move nil
-		search-exit-option nil)
+		search-exit-option t)
 
 ;; See https://karthinks.com/software/avy-can-do-anything
 (defun ra/isearch-forward-other-window (prefix)
@@ -466,8 +471,17 @@ otherwise, use `substitute-target-in-buffer'"
 	(goto-char pt)
     (embark-dwim))
 
+  (defun ra/avy-action-kill-whole-line-and-move (pt)
+	"Avy action to kill whole line at PT and then move to that line."
+	(goto-char pt)
+	(kill-whole-line)
+	(point))
+
   (setopt avy-keys '(?u ?e ?o ?a ?p ?g ?h ?n ?s)
-		  avy-dispatch-alist '((?k . avy-action-kill-stay)
+		  avy-single-candidate-jump nil
+		  avy-dispatch-alist '((?c . avy-action-kill-move)
+							   (?C . ra/avy-action-kill-whole-line-and-move)
+							   (?k . avy-action-kill-stay)
 							   (?K . ra/avy-action-kill-whole-line)
 							   (?w . avy-action-copy)
 							   (?W . ra/avy-action-copy-whole-line)
@@ -528,18 +542,16 @@ otherwise, use `substitute-target-in-buffer'"
 (elpaca string-inflection
   (with-eval-after-load 'embark
     (keymap-set embark-identifier-map "~" #'ra/transient-string-inflection))
-
-  (with-eval-after-load 'string-inflection
-	(require 'transient)
-	(transient-define-prefix ra/transient-string-inflection ()
-	  "Transient menu for running string-inflection"
-	  ["String Inflection"
-	   [("s" "snake_case" string-inflection-underscore)
-		("k" "kebab-case" string-inflection-kebab-case)]
-	   [("p" "PascalCase" string-inflection-camelcase)
-		("m" "mixedCase" string-inflection-lower-camelcase)]
-	   [("u" "UPPER_CAMEL_CASE" string-inflection-upcase)
-		("c" "Capital_Camel_Case" string-inflection-capital-underscore)]])))
+  (require 'transient)
+  (transient-define-prefix ra/transient-string-inflection ()
+	"Transient menu for running string-inflection"
+	["String Inflection"
+	 [("s" "snake_case" string-inflection-underscore)
+	  ("k" "kebab-case" string-inflection-kebab-case)]
+	 [("p" "PascalCase" string-inflection-camelcase)
+	  ("m" "mixedCase" string-inflection-lower-camelcase)]
+	 [("u" "UPPER_CAMEL_CASE" string-inflection-upcase)
+	  ("c" "Capital_Camel_Case" string-inflection-capital-underscore)]]))
 
 (elpaca move-text
   (defun indent-region-advice (&rest _)
@@ -677,4 +689,5 @@ otherwise, use `substitute-target-in-buffer'"
 		  gc-cons-percentage 0.2)
   (gcmh-mode))
 
+(put 'list-timers 'disabled nil)
 ;;; init.el ends here

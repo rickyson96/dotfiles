@@ -188,7 +188,7 @@ This ensures that we can visit correct pullreq file when reviewing."
 					   (forge-current-topic)
 					   (forge-read-pullreq "Review pull-request: "))))
 	  (magit-fetch-all-no-prune)
-	  (forge-checkout-pullreq pullreq)
+	  (magit-checkout (forge--pullreq-ref pullreq))
 	  (forge-visit-pullreq pullreq)
 	  (call-interactively #'code-review-forge-pr-at-point))))
 

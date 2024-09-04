@@ -67,7 +67,7 @@
 	  "<remap> <display-local-help>" #'eldoc))
 
   (with-eval-after-load 'lsp-mode
-	  (set-face-attribute 'lsp-face-highlight-read nil :inherit 'bold :underline t))
+	(set-face-attribute 'lsp-face-highlight-read nil :inherit 'bold :underline t))
 
   (defun ra/lsp-mode-setup-completion ()
 	"Taken from corfu's wiki"
@@ -120,23 +120,47 @@
   (with-eval-after-load 'eglot
 	(eglot-booster-mode 1)))
 
-(elpaca apheleia
-  (with-eval-after-load 'apheleia-formatters
-	(add-to-list 'apheleia-formatters '(eslint . ("apheleia-npx" "eslint" "--fix" file)))
-	(add-to-list 'apheleia-formatters '(eslintd . ("eslint_d" "--fix-to-stdout" "--stdin" "--stdin-filename" filepath)))
-	(setf (alist-get 'typescript-ts-mode apheleia-mode-alist) 'eslintd))
+(cl-defun apheleia-lsp-organize-import-formatter (&key buffer scratch callback stdin &allow-other-keys)
+  (with-current-buffer buffer
+	(if-let ((_ (lsp-feature? "textDocument/codeAction"))
+			 (action (->> (lsp-get-or-calculate-code-actions "source.organizeImports")
+						  lsp--select-action)))
+		(-let* ((workspace-edit (cadr action))
+				((&WorkspaceEdit :document-changes?) workspace-edit)
+				(document-changes (seq-reverse document-changes?)))
+		  (lsp--check-document-changes-version document-changes)
+		  (->> document-changes
+			   (seq-do (lambda (change)
+						 (with-current-buffer scratch
+						   (lsp--apply-text-edits (lsp:text-document-edit-edits change) 'code-action)))))))
+	(funcall callback)))
 
+(defun apheleia-lsp-formatter-buffer (buffer scratch)
+  (with-current-buffer buffer
+    (if (lsp-feature? "textDocument/formatting")
+        (let ((edits (lsp-request
+					  "textDocument/formatting"
+					  (lsp--make-document-formatting-params))))
+		  (unless (seq-empty-p edits)
+            (with-current-buffer scratch
+			  (lsp--apply-text-edits edits 'format)))))))
+
+(cl-defun apheleia-lsp-formatter
+    (&key buffer scratch formatter callback &allow-other-keys)
+  (apheleia-lsp-formatter-buffer buffer scratch)
+  (funcall callback))
+
+(elpaca apheleia
   ;; Apheleia LSP
-  (cl-defun apheleia-lsp-organize-import-formatter (&key buffer scratch callback stdin &allow-other-keys)
-      (with-current-buffer buffer
-	(when (lsp-feature? "textDocument/codeAction")
-	  (if-let ((action (->> (lsp-get-or-calculate-code-actions "source.organizeImports")
-							(-filter (-lambda ((&CodeAction :kind?))
-									   (and kind? (s-prefix? "source.organizeImports" kind?))))
-				lsp--select-action)))
-	      (with-current-buffer scratch
-		(lsp-execute-code-action action)))))
-      (funcall callback)))
+  (with-eval-after-load 'apheleia-formatters
+	(mapc (lambda (x)
+			(add-to-list 'apheleia-formatters x))
+		  '((eslint . ("apheleia-npx" "eslint" "--fix" file))
+			(eslintd . ("eslint_d" "--fix-to-stdout" "--stdin" "--stdin-filename" filepath))
+			(lsp-format . apheleia-lsp-formatter)
+			(lsp-organize . apheleia-lsp-organize-import-formatter)))
+
+	(setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(lsp-organize eslintd))))
 
 (elpaca tempel
   (defun ra/tempel-setup-capf ()
@@ -173,7 +197,7 @@ Taken from tempel's readme"
 	(lsp-snippet-tempel-lsp-mode-init)))
 
 (elpaca aggressive-indent
-  (global-aggressive-indent-mode 1))
+  (global-aggressive-indent-mode 0))
 
 (elpaca flymake-flycheck
   (add-hook 'flymake-mode-hook 'flymake-flycheck-auto)
@@ -187,37 +211,37 @@ Taken from tempel's readme"
 (elpaca imenu-extra)
 
 (defmacro ra/imenu-extra-setup-hook (hook imenu-pattern)
-	"Add hook function to HOOK to setup imenu using `imenu-extra-auto-setup'
+  "Add hook function to HOOK to setup imenu using `imenu-extra-auto-setup'
 with IMENU-PATTERN"
-	(let* ((hook-name (symbol-name hook))
-		   (name (format "%s@%s" "imenu-extra" hook-name))
-		   (sym (intern name)))
-	  (macroexp-progn `((defun ,sym ()
-						  ,(format "Set up imenu-extra on %s" hook-name)
-						  (imenu-extra-auto-setup ,imenu-pattern))
-						(add-hook ',hook #',sym)))))
+  (let* ((hook-name (symbol-name hook))
+		 (name (format "%s@%s" "imenu-extra" hook-name))
+		 (sym (intern name)))
+	(macroexp-progn `((defun ,sym ()
+						,(format "Set up imenu-extra on %s" hook-name)
+						(imenu-extra-auto-setup ,imenu-pattern))
+					  (add-hook ',hook #',sym)))))
 
 (elpaca (copilot :host github :repo "copilot-emacs/copilot.el")
   ;; (add-hook 'prog-mode-hook #'copilot-mode)
   (with-eval-after-load 'copilot
 	(ra/keymap-set copilot-completion-map
-	"C-g" #'copilot-clear-overlay
-	"M-p" #'copilot-previous-completion
-	"M-n" #'copilot-next-completion
-	"C-e" #'copilot-accept-completion-by-line
-	"M-f" #'copilot-accept-completion-by-word
-	"C-<return>" #'copilot-accept-completion)))
+	  "C-g" #'copilot-clear-overlay
+	  "M-p" #'copilot-previous-completion
+	  "M-n" #'copilot-next-completion
+	  "C-e" #'copilot-accept-completion-by-line
+	  "M-f" #'copilot-accept-completion-by-word
+	  "C-<return>" #'copilot-accept-completion)))
 
 (elpaca (openai :host github :repo "emacs-openai/openai")
 
   (defun ra/openai-key-auth-source (&optional base-url)
-  "Retrieve the OpenAI API key from auth-source given a BASE-URL.
+	"Retrieve the OpenAI API key from auth-source given a BASE-URL.
 If BASE-URL is not specified, it defaults to `openai-base-url'."
-  (if-let ((auth-info (auth-source-search :max 1
-										  :host (url-host (url-generic-parse-url (or nil openai-base-url)))
-					  :require '(:secret))))
-      (funcall (plist-get (car auth-info) :secret))
-    (error "OpenAI API key not found in auth-source")))
+	(if-let ((auth-info (auth-source-search :max 1
+											:host (url-host (url-generic-parse-url (or nil openai-base-url)))
+											:require '(:secret))))
+		(funcall (plist-get (car auth-info) :secret))
+      (error "OpenAI API key not found in auth-source")))
 
   (setopt openai-key #'ra/openai-key-auth-source
 		  openai-user "ricky.anderson2696@gmail.com"))
@@ -242,6 +266,42 @@ If BASE-URL is not specified, it defaults to `openai-base-url'."
 
 (setopt sideline-backends-left '(sideline-lsp))
 (setopt sideline-backends-right '(sideline-flymake sideline-load-cost))
+
+;; (defun ra/compile-multi-parse-package-json ()
+;;   "Parse package.json file and format it to use with `compile-multi-config'."
+;;   (let* ((json-object-type 'alist)
+;; 		 (json-array-type 'list)
+;; 		 (default-directory (project-root (project-current)))
+;; 		 (buf (find-file-noselect "package.json"))
+;; 		 (content (with-current-buffer buf
+;; 					(beginning-of-buffer)
+;; 					(json-read)))
+;; 		 (scripts (alist-get 'scripts content)))
+;; 	(mapcar (lambda (x)
+;; 			  (cons (format "yarn:%s" (car x)) (cdr x)))
+;; 			scripts)))
+
+(elpaca compile-multi
+  (setopt compile-multi-config `(((file-exists-p ".stowrc")
+								  ("stow:stow" . ("stow" ".")))))
+  (setopt compile-multi-default-directory (lambda () (project-root (project-current)))
+		  compile-multi-annotate-limit 120))
+(elpaca consult-compile-multi
+  (with-eval-after-load 'consult
+	(consult-compile-multi-mode 1)))
+(elpaca compile-multi-embark
+  (compile-multi-embark-mode 1))
+
+(elpaca projection
+  (ra/keymap-set ctl-x-map
+	"P" projection-map))
+(elpaca projection-multi
+  (with-eval-after-load 'project
+	(ra/keymap-set project-prefix-map
+	  "c" #'projection-multi-compile
+	  "g" #'compile-multi-recompile)))
+(elpaca projection-multi-embark
+  (projection-multi-embark-setup-command-map))
 
 (provide '+intellisense)
 ;;; +intellisense.el ends here

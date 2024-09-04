@@ -36,7 +36,9 @@
 	"DEL" #'vertico-directory-delete-char
 	"M-DEL" #'vertico-directory-delete-word
 	"C-z" #'vertico-quick-exit)
-  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+
+  (set-face-attribute 'vertico-group-title nil :box nil :italic t))
 
 (elpaca orderless
   (setopt completion-styles '(substring orderless partial-completion)
@@ -81,8 +83,8 @@
 
   (with-eval-after-load 'embark
 	(ra/keymap-set embark-region-map
-	"R" #'reverse-region
-	"r" #'ra/replace-region-with-kill)))
+	  "R" #'reverse-region
+	  "r" #'ra/replace-region-with-kill)))
 
 (elpaca embark-consult
   (add-hook 'embark-collect-mode #'consult-preview-at-point-mode))

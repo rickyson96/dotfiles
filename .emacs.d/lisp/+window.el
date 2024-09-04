@@ -67,13 +67,31 @@
 			 (aw-switch-to-window (aw-select nil))
 			 (call-interactively (symbol-function ',fn)))))))
 
+  (eval-when-compile
+	(defmacro ra/embark-split-action (fn split-type)
+      `(defun ,(intern (concat "my/embark-"
+							   (symbol-name fn)
+							   "-"
+							   (car (last  (split-string
+											(symbol-name split-type) "-"))))) ()
+		 (interactive)
+		 (let ((window (funcall #',split-type)))
+		   (select-window window))
+		 (call-interactively #',fn))))
+
   (with-eval-after-load 'embark
 	(ra/keymap-set embark-file-map
-	  "o" (ra/embark-ace-action find-file))
+	  "o" (ra/embark-ace-action find-file)
+	  "2" (ra/embark-split-action find-file split-window-below)
+	  "3" (ra/embark-split-action find-file split-window-right))
 	(ra/keymap-set embark-buffer-map
-	  "o" (ra/embark-ace-action switch-to-buffer))
+	  "o" (ra/embark-ace-action switch-to-buffer)
+	  "2" (ra/embark-split-action switch-to-buffer split-window-below)
+	  "3" (ra/embark-split-action switch-to-buffer split-window-right))
 	(ra/keymap-set embark-bookmark-map
-	  "o" (ra/embark-ace-action bookmark-jump))))
+	  "o" (ra/embark-ace-action bookmark-jump)
+	  "2" (ra/embark-split-action bookmark-jump split-window-below)
+	  "3" (ra/embark-split-action bookmark-jump split-window-right))))
 
 ;; Taken from nhttps://karthinks.com/software/emacs-window-management-almanac/
 (defun ra/ace-window-prefix ()
@@ -84,6 +102,7 @@ Creates a new window before displaying the buffer.
 When `switch-to-buffer-obey-display-actions' is non-nil,
 `switch-to-buffer' commands are also supported."
   (interactive)
+  (require 'ace-window)
   (display-buffer-override-next-command
    (lambda (buffer _)
      (let (window type)
@@ -173,7 +192,11 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
 								(display-buffer-in-side-window)
 								(side . right)
 								(slot . 1)
-								(mode-line-format . ""))))
+								(mode-line-format . ""))
+							   (,(rx bol "*plz-see-" (0+ nonl) "*" eol)
+								(display-buffer-in-side-window)
+								(side . right)
+								(slot . 2))))
 
 (with-eval-after-load '+mappings
   (add-hook 'ra/keyboard-quit-hook #'ra/eldoc-window-delete))
@@ -194,11 +217,14 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
 									 eshell-mode
 									 ,(rx bol "*eldoc*" eol)
 									 ,(rx bol "*HTTP Response" (0+ nonl) "*" eol)
-									 ,(rx bol "*HTTP Headers" (0+ nonl) "*" eol)))
+									 ,(rx bol "*HTTP Headers" (0+ nonl) "*" eol)
+									 ,(rx bol "*plz-see-" (0+ nonl) "*" eol)))
   (popper-mode +1)
   (popper-echo-mode +1))
 
 (winner-mode 1)
+
+(elpaca transpose-frame)
 
 (provide '+window)
 ;;; +window.el ends here

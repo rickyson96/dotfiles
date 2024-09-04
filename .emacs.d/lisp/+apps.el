@@ -226,7 +226,11 @@
 
 (elpaca plz
   (autoload #'plz "plz"))
-(elpaca plz-see)
+(elpaca plz-see
+  (with-eval-after-load 'plz-see
+    (add-to-list 'plz-see-content-type-alist `("\\`application/json" . ,(lambda ()
+                                                                          (jsonian-format-region (point-min) (point-max))
+                                                                          (jsonian-mode))))))
 
 (elpaca devdocs)
 
@@ -247,6 +251,19 @@
 
 (elpaca (ready-player :host github :repo "xenodium/ready-player")
   (ready-player-add-to-auto-mode-alist))
+
+(elpaca calfw
+  (defun ra/calendar ()
+    "open calendar using calfw"
+    (interactive)
+    (require 'calfw)
+    (require 'calfw-org)
+    (cfw:open-calendar-buffer
+     :contents-sources
+     (list (cfw:org-create-file-source "personal" (file-name-concat org-directory "schedule/personal.org") "Blue")
+           (cfw:org-create-file-source "work" (file-name-concat org-directory "schedule/work.org") "Cyan")))))
+
+(elpaca (show-font :host github :repo "protesilaos/show-font"))
 
 (provide '+apps)
 ;;; +apps.el ends here

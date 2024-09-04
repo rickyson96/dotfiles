@@ -136,7 +136,8 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 
 (elpaca (dired-plus :host github :repo "emacsmirror/dired-plus" :main "dired+.el"))
 
-(elpaca dirvish
+(elpaca (dirvish :host github :repo "alexluigit/dirvish"
+				 :remotes ("hlissner" :repo "hlissner/dirvish"))
   (dirvish-override-dired-mode)
   (dirvish-peek-mode)
   (setopt dirvish-quick-access-entries '(("h" "~/"                          "Home")
@@ -145,14 +146,13 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 										 ("t" "~/.local/share/Trash/files/" "TrashCan")
 										 (". ." "~/.dotfiles"               "Dotfiles")
 										 (". r" "~/.root-dotfiles"          "Root Dotfiles")))
-  (setopt ;dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index))
-		  ;dirvish-header-line-format '(:left (path) :right (vc-info file-user))
+  (setopt dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index))
+		  dirvish-header-line-format '(:left (path) :right (vc-info file-user))
 		  dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state git-msg)
 		  dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group"
 		  dirvish-reuse-session t
 		  dirvish-header-line-height '(20 . 25)
-		  dirvish-use-header-line 'global
-		  dirvish-side-width 25)
+		  dirvish-use-header-line 'global)
 
   (ra/keymap-set dirvish-mode-map
 	"b" #'dired-up-directory
@@ -234,7 +234,8 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 		(set-window-dedicated-p op-win nil)
 		(funcall orig-fn)))))
 
-(add-hook 'server-after-make-frame-hook (lambda () (require 'zone) (zone-when-idle 900)))
+;; Disable zone
+;; (add-hook 'server-after-make-frame-hook (lambda () (require 'zone) (zone-when-idle 900)))
 
 (elpaca (commentize-conflict :host github :repo "zk-phi/commentize-conflict")
   (add-hook 'prog-mode-hook #'commentize-conflict-mode))
@@ -255,9 +256,7 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
 		  indent-bars-highlight-current-depth '(:pattern "." :blend 1) ; pump up the BG blend on current
 		  indent-bars-display-on-blank-lines t))
 
-(elpaca emojify
-  (global-emojify-mode 1))
-
+(elpaca emojify)
 (elpaca emojify-logos)
 
 (provide '+ui)
