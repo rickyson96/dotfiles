@@ -103,7 +103,7 @@
         (compilation-insert-annotation
          (format "%s started at %s\n\n"
                  mode-name
-	         (substring (current-time-string) 0 19))
+             (substring (current-time-string) 0 19))
          command "\n")
         (eat-mode)
         (eat-exec outbuf "*compile*" shell-file-name nil (list "-lc" command))

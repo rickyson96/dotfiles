@@ -32,18 +32,18 @@
 
   (require 'vertico-directory)
   (ra/keymap-set vertico-map
-	"RET" #'vertico-directory-enter
-	"DEL" #'vertico-directory-delete-char
-	"M-DEL" #'vertico-directory-delete-word
-	"C-z" #'vertico-quick-exit)
+    "RET" #'vertico-directory-enter
+    "DEL" #'vertico-directory-delete-char
+    "M-DEL" #'vertico-directory-delete-word
+    "C-z" #'vertico-quick-exit)
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
   (set-face-attribute 'vertico-group-title nil :box nil :italic t))
 
 (elpaca orderless
   (setopt completion-styles '(substring orderless partial-completion)
-		  completion-category-defaults nil
-		  completion-category-overrides '((file (styles basic partial-completion)))))
+          completion-category-defaults nil
+          completion-category-overrides '((file (styles basic partial-completion)))))
 
 (elpaca marginalia
   (marginalia-mode)
@@ -55,10 +55,10 @@
 
 (elpaca consult
   (setopt register-preview-delay 0.5
-		  register-preview-function #'consult-register-format
-		  xref-show-xrefs-function #'consult-xref
-		  xref-show-definitions-function #'consult-xref
-		  consult-narrow-key "<")
+          register-preview-function #'consult-register-format
+          xref-show-xrefs-function #'consult-xref
+          xref-show-definitions-function #'consult-xref
+          consult-narrow-key "<")
 
   (add-hook 'completion-list-mode #'consult-preview-at-point-mode)
 
@@ -82,9 +82,9 @@
                  (window-parameters (mode-line-format . none))))
 
   (with-eval-after-load 'embark
-	(ra/keymap-set embark-region-map
-	  "R" #'reverse-region
-	  "r" #'ra/replace-region-with-kill)))
+    (ra/keymap-set embark-region-map
+      "R" #'reverse-region
+      "r" #'ra/replace-region-with-kill)))
 
 (elpaca embark-consult
   (add-hook 'embark-collect-mode #'consult-preview-at-point-mode))

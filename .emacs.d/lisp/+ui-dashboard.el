@@ -26,34 +26,34 @@
 
 (elpaca dashboard
   (setopt dashboard-display-icons-p t
-		  dashboard-icon-type 'nerd-icons
-		  dashboard-set-navigator t
-		  dashboard-navigation-cycle t
-		  dashboard-filter-agenda-entry #'dashboard-filter-agenda-by-time
-		  dashboard-week-agenda nil
-		  dashboard-set-heading-icons t
-		  dashboard-set-file-icons t)
+          dashboard-icon-type 'nerd-icons
+          dashboard-set-navigator t
+          dashboard-navigation-cycle t
+          dashboard-filter-agenda-entry #'dashboard-filter-agenda-by-time
+          dashboard-week-agenda nil
+          dashboard-set-heading-icons t
+          dashboard-set-file-icons t)
 
   (setopt dashboard-navigator-buttons
-		  `((("󰃭" "Agenda" "Org GTD Agenda" ,(cmd! (org-agenda nil "u")))
-			 ("󱖟" "Process" "Org GTD Process Inbox" ,(cmd! (org-gtd-process-inbox)))
-			 ("" "Edit" "Edit gtd inbox" ,(cmd! (find-file (file-name-concat org-directory "gtd/inbox.org" nil)))))
-			(("" "Elfeed" "Browse elfeed" ,(cmd! (elfeed)))
-			 ("" "Edit" "Edit elfeed-org" ,(cmd! (find-file (file-name-concat org-directory "elfeed.org" nil)))))))
+          `((("󰃭" "Agenda" "Org GTD Agenda" ,(cmd! (org-agenda nil "u")))
+             ("󱖟" "Process" "Org GTD Process Inbox" ,(cmd! (org-gtd-process-inbox)))
+             ("" "Edit" "Edit gtd inbox" ,(cmd! (find-file (file-name-concat org-directory "gtd/inbox.org" nil)))))
+            (("" "Elfeed" "Browse elfeed" ,(cmd! (elfeed)))
+             ("" "Edit" "Edit elfeed-org" ,(cmd! (find-file (file-name-concat org-directory "elfeed.org" nil)))))))
 
   (setopt dashboard-items '((projects . 5)
-							(agenda . 15)))
+                            (agenda . 15)))
 
   (setopt dashboard-startupify-list `( dashboard-insert-banner-title
-									   dashboard-insert-newline
-									   dashboard-insert-navigator
-									   dashboard-insert-newline
-									   dashboard-insert-items
-									   dashboard-insert-newline
-									   dashboard-insert-footer
-									   dashboard-insert-newline
-									   dashboard-insert-init-info
-									   dashboard-insert-newline))
+                                       dashboard-insert-newline
+                                       dashboard-insert-navigator
+                                       dashboard-insert-newline
+                                       dashboard-insert-items
+                                       dashboard-insert-newline
+                                       dashboard-insert-footer
+                                       dashboard-insert-newline
+                                       dashboard-insert-init-info
+                                       dashboard-insert-newline))
 
 
   (add-hook 'elpaca-after-init-hook #'dashboard-insert-startupify-lists)
@@ -61,15 +61,15 @@
   (dashboard-setup-startup-hook)
 
   (dashboard-modify-heading-icons '((recents . "nf-oct-file")
-									(bookmarks . "nf-oct-book")))
+                                    (bookmarks . "nf-oct-book")))
 
 
   (ra/keymap-set dashboard-mode-map
-	"n" #'dashboard-next-line
-	"p" #'dashboard-previous-line)
+    "n" #'dashboard-next-line
+    "p" #'dashboard-previous-line)
 
   (setopt dashboard-center-content t
-		  dashboard-vertically-center-content t)
+          dashboard-vertically-center-content t)
 
   ;; to work with daemon
   ;; https://github.com/emacs-dashboard/emacs-dashboard?tab=readme-ov-file#emacs-daemon

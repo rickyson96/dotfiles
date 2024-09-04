@@ -42,7 +42,7 @@
 
 (with-eval-after-load 'consult
   (ra/keymap-set eshell-mode-map
-	"C-r" #'consult-history))
+    "C-r" #'consult-history))
 
 (elpaca eshell-syntax-highlighting
   (eshell-syntax-highlighting-global-mode 1))
