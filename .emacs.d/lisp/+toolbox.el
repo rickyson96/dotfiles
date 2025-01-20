@@ -67,16 +67,37 @@
      :shell-args "-c"
      :error-autofocus nil))
 
-  (autoload #'dwim-shell-command "dwim-shell-command")
-  (autoload #'dwim-shell-command-on-marked-files "dwim-shell-command")
-
   (defun ra/convert-video-to-mp4 ()
     "Convert video to mp4 using ffmpeg."
     (interactive)
     (dwim-shell-command-on-marked-files
      "Convert Video to mp4"
      "ffmpeg -i '<<f>>' '<<fne>>.mp4'"
-     :utils '("ffmpeg"))))
+     :utils '("ffmpeg")))
+
+  (defun ra/dragon ()
+    "run `dragon' on current file"
+    (interactive)
+    (dwim-shell-command-on-marked-files
+     "Drag and Drop on Files"
+     "dragon '<<*>>'"
+     :utils '("dragon")))
+
+  (autoload #'dwim-shell-command "dwim-shell-command")
+  (autoload #'dwim-shell-command-on-marked-files "dwim-shell-command"))
+
+(elpaca (emacs-everywhere :host github :repo "tecosaur/emacs-everywhere"
+                          :remotes ("wayland" :repo "zauster/emacs-everywhere")))
+
+(defun ra/parse-date-from-unix (time &optional zone)
+  "Parse time from unix to human readable format. `universal-argument' to define zone"
+  (interactive (list (read-number "Unix Millis: ")
+                     (when current-prefix-arg (read-string "Zone: " "UTC" nil '("UTC-7" "Asia/Jakarta")))))
+  (when (> (/ time (expt 10 10)) 0)
+    (setq time (/ time 1000)))
+  (let ((result (format-time-string "%Y-%m-%d %H:%M:%S %z" time zone)))
+    (kill-new result)
+    (message result)))
 
 (provide '+toolbox)
 ;;; +toolbox.el ends here

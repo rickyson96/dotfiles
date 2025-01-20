@@ -55,7 +55,8 @@
   (add-hook 'eshell-banner-load-hook 'eshell-info-banner-update-banner))
 
 (elpaca eshell-fringe-status
-  (add-hook 'eshell-mode-hook #'eshell-fringe-status-mode))
+  ;; (add-hook 'eshell-mode-hook #'eshell-fringe-status-mode)
+  )
 
 (elpaca esh-help
   (setup-esh-help-eldoc))
@@ -79,10 +80,10 @@
 ;; Prompts
 
 (elpaca eshell-prompt-extras
-  ;; (autoload 'epe-theme-multiline-with-status "eshell-prompt-extras")
+  (autoload 'epe-theme-multiline-with-status "eshell-prompt-extras")
   ;; (with-eval-after-load 'esh-opt
-  ;; (setopt eshell-highlight-prompt nil
-  ;; eshell-prompt-function 'epe-theme-multiline-with-status))
+  ;;   (setopt eshell-highlight-prompt t
+  ;;           eshell-prompt-function 'epe-theme-multiline-with-status))
   )
 
 (elpaca eshell-git-prompt
@@ -167,6 +168,16 @@
 ;; TODO: create starship eshell integration
 (defun ra/eshell-starship ()
   )
+
+;; Eshell alias
+(defun eshell/dired (&optional dir)
+  (dired (or dir default-directory)))
+(defalias 'eshell/d 'eshell/dired)
+
+;; Mappings
+(with-eval-after-load 'eshell
+(keymap-unset 'eshell-command-map "C-w" t)
+(keymap-unset eshell-mode-map "C-w" t))
 
 (provide '+apps-eshell)
 ;;; +apps-eshell.el ends here

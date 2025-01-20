@@ -20,3 +20,4 @@ shopee https://shopee.co.id
 yt https://youtube.com
 paystone-grafana https://grafana.gke-ops.platform.nicejob.com
 atom-dev-gcs https://console.cloud.google.com/storage/browser?project=atom-pay-dev-be1b
+atom-jira https://paystone.atlassian.net/jira/software/c/projects/ATOM/boards/1165

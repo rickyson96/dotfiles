@@ -3,6 +3,7 @@
 # pylint: disable=C0111
 from qutebrowser.config.configfiles import ConfigAPI  # noqa: F401
 from qutebrowser.config.config import ConfigContainer  # noqa: F401
+
 config: ConfigAPI = config  # noqa: F821 pylint: disable=E0602,C0103
 c: ConfigContainer = c  # noqa: F821 pylint: disable=E0602,C0103
 
@@ -11,7 +12,7 @@ config.load_autoconfig(True)
 c.tabs.position = "left"
 
 c.url.searchengines = {
-    "DEFAULT": "https://duckduckgo.com/?q={}",
+    "DEFAULT": "https://search.brave.com/search?q={}",
     "w": "https://en.wikipedia.org/wiki/Special:Search?search={}&go=Go&ns0=1",
     # "n": "https://search.nixos.org/packages?channel=unstable&query={}",
     # "no": "https://search.nixos.org/options?channel=23.05&query={}",
@@ -19,6 +20,7 @@ c.url.searchengines = {
     # "hm": "https://mipmip.github.io/home-manager-option-search/?query={}",
     "g": "https://www.google.com/search?hl=en&q={}",
     "d": "https://duckduckgo.com/?q={}",
+    "p": "https://perplexity.ai/?q={}",
     "akops": "https://gamepress.gg/arknights/search?query={}",
     "gmeet": "https://meet.google.com/{}",
     "gmeetbit": "https://meet.google.com/{}?authuser=1",
@@ -26,10 +28,10 @@ c.url.searchengines = {
     "shopee": "https://shopee.co.id/search?keyword={}",
     "tokped": "https://tokopedia.com/search?q={}",
     "yt": "https://youtube.com/results?search_query={}",
-    "atom-dev-cf-log": "https://console.cloud.google.com/functions/details/us-central1/{}?env=gen2&project=atom-pay-dev-be1b&tab=logs"
+    "atom-dev-cf-log": "https://console.cloud.google.com/functions/details/us-central1/{}?env=gen2&project=atom-pay-dev-be1b&tab=logs",
 }
 
-c.hints.chars = 'aoeuhtnsid'
+c.hints.chars = "aoeuhtnsid"
 
 # config.unbind("co")
 
@@ -67,31 +69,27 @@ normal_bindings = {
     "zlO": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --otp-only",
     "zm": "spawn umpv {url}",
     "zM": "hint links spawn umpv {hint-url}",
-    "<alt-shift-.>": 'scroll-to-perc'
+    "<alt-shift-.>": "scroll-to-perc",
 }
-for k,v in normal_bindings.items():
+for k, v in normal_bindings.items():
     config.bind(k, v)
 
 # config.source('bind-dvorak.py')
-config.source('bind-dv-nm.py')
+config.source("bind-dv-nm.py")
 
 command_bindings = {
     "<Alt+n>": "command-history-next",
     "<Alt+p>": "command-history-prev",
     "<Ctrl+n>": "completion-item-focus next",
-    "<Ctrl+p>": "completion-item-focus prev"
+    "<Ctrl+p>": "completion-item-focus prev",
 }
-for k,v in command_bindings.items():
+for k, v in command_bindings.items():
     config.bind(k, v, mode="command")
 
-c.tabs.padding = {
-    "bottom": 5,
-    "top": 5,
-    "left": 5,
-    "right": 5
-}
+c.tabs.padding = {"bottom": 5, "top": 5, "left": 5, "right": 5}
 
-c.hints.selectors['video'] = ['video']
+c.hints.selectors["video"] = ["video", 'video>source[type^="video"]']
+c.hints.selectors["video-src"] = ["source[src]"]
 
 # Themes
 white = "#fcf7ef"
@@ -200,9 +198,10 @@ c.colors.tabs.selected.even.fg = black
 c.colors.tabs.selected.even.bg = white_alt
 c.colors.webpage.bg = "#FFFFFF"
 
+c.qt.environ = {"NODE_PATH": "/home/randerson/.local/lib/node_modules"}
 
 # workaround for https://github.com/qutebrowser/qutebrowser/issues/7489
-c.qt.chromium.low_end_device_mode = "never";
+c.qt.chromium.low_end_device_mode = "never"
 
 # c.qt.force_software_rendering = "chromium"
 c.qt.highdpi = True

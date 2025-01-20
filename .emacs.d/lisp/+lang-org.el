@@ -53,7 +53,6 @@
   (add-to-list 'org-src-lang-modes '("json" . jsonian)))
 
 (setopt org-babel-load-languages '((emacs-lisp . t)
-                                   (jq . t)
                                    (js . t)
                                    (shell . t)))
 
@@ -82,6 +81,8 @@
 
 (setopt org-directory "~/org"
         org-gtd-directory (file-name-concat org-directory "gtd"))
+
+(require 'org-protocol)
 
 (elpaca org-gtd
   (setopt org-edna-use-inheritance t
@@ -126,29 +127,48 @@
 
 (elpaca doct
   (setopt org-capture-templates
-          (doct '(("  Inbox" :keys "i"
-                   :file org-gtd-inbox-path
-                   :template ("* %?"
+          (doct `(("🖉 Todo" :keys "t"
+                   :file ,(file-name-concat org-directory "todos.org")
+                   :template ("* TODO %?"
                               "%U"
                               ""
                               ""
                               " %i")
                    :kill-buffer t)
-                  ("  Inbox with link" :keys "l"
-                   :file org-gtd-inbox-path
-                   :template ("* %?"
+                  ("  Todo with link" :keys "l"
+                   :file ,(file-name-concat org-directory "schedule/private.org")
+                   :template ("* TODO %?"
                               "%U"
                               ""
                               ""
                               " %i"
                               " %a")
-                   :kill-buffer t)))))
+                   :kill-buffer t)
+                  ("🗓 Schedule" :keys "s"
+                   :file ,(file-name-concat org-directory "schedule/private.org")
+                   :template ("* TODO %?"
+                              "SCHEDULED: %^T"
+                              ""
+                              ""
+                              " %i"))
+                  ("🗓 Agenda" :keys "a"
+                   :file ,(file-name-concat org-directory "schedule/private.org")
+                   :template ("* %?"
+                              "%^T"
+                              ""
+                              ""
+                              " %i"))
+                  ("Protocols" :keys "p"
+                   :children ("Capture Protocol" :keys "c"
+                              :file ,(file-name-concat org-directory "todos.org")
+                              :template ("* TODO")))))))
 
 (elpaca org-super-agenda
   (org-super-agenda-mode 1))
 
 ;; Agenda styling
 (add-hook 'org-agenda-mode-hook #'hl-line-mode)
+
 (setopt org-agenda-tags-column 'auto
         org-agenda-block-separator ?─
         org-agenda-time-grid
@@ -158,13 +178,25 @@
         org-agenda-current-time-string
         "◀── now ─────────────────────────────────────────────────"
         org-agenda-window-setup 'only-window
-        org-agenda-restore-windows-after-quit t)
+        org-agenda-restore-windows-after-quit t
+        org-link-elisp-confirm-function #'y-or-n-p
+        org-log-done 'time
+        org-log-reschedule 'note
+        org-log-redeadline 'note
+        org-log-into-drawer t
+        org-return-follows-link t
+        org-extend-today-until 4)
 
-(setopt org-agenda-files (list org-directory org-gtd-directory (file-name-concat org-directory "schedule"))
+(setopt denote-directory "/home/randerson/org/notes"
+        org-agenda-files (list org-directory (file-name-concat org-directory "schedule") denote-directory)
         org-agenda-current-time-string "◀═════ now ═════▶"
         org-agenda-custom-commands
         '(("u" "My GTD Agenda"
-           ((agenda "" ((org-agenda-span 'day)
+           ((tags "PRIORITY=\"A\"" ((org-agenda-overriding-header " Urgent")
+                                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                                    (org-agenda-prefix-format "   %i %?-2 t%s")))
+            (agenda "" ((org-agenda-span 'day)
+                        (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                         (org-agenda-breadcrumbs-separator " ❱ ")
                         (org-agenda-current-time-string "◀═════ now ═════▶")
                         (org-agenda-time-grid '((today require-timed remove-match)
@@ -175,8 +207,12 @@
                         (org-agenda-start-day "+0")
                         ;; (org-agenda-prefix-format " %i %-12:c%?-12t% s")
                         (org-agenda-overriding-header "󰃭 Calendar")
-                        (org-agenda-files '("~/org" "~/org/gtd" "~/org/schedule"))
+                        (org-super-agenda-header-separator "")
                         (org-super-agenda-groups '((:time-grid t)))))
+            (org-ql-block '(and (todo "TODO")
+                                (not (ts-active))
+                                (not (priority "A")))
+                           ((org-ql-block-header "⚡ New TODO")))
             (todo "NEXT" ((org-agenda-overriding-header "⚡ Next Action")
                           ;; (org-agenda-prefix-format " %i %-30:(my/org-gtd-agenda-prefix-format 30) ")
                           (org-agenda-prefix-format '((todo . " %i %-30:(org-gtd-agenda--prefix-format)")))
@@ -185,8 +221,23 @@
             (todo "WAIT" ((org-agenda-overriding-header " Delegated / Blocked")
                           (org-agenda-todo-ignore-with-date t)
                           (org-agenda-prefix-format " %i %-12:(org-gtd--agenda-prefix-format)")
-                          (org-agenda-files `(,org-gtd-directory)))))))
-        org-link-elisp-confirm-function #'y-or-n-p)
+                          (org-agenda-files `(,org-gtd-directory))))))))
+
+(add-hook 'org-agenda-finalize-hook #'beginning-of-buffer 90)
+
+;; https://www.reddit.com/r/emacs/comments/1h532zl/how_to_automatically_narrow_to_subtree_when/?rdt=57629
+(defun ra/org-agenda-goto-narrow ()
+  "`org-agenda-goto' and then narrow that subtree"
+  (interactive)
+  (org-agenda-goto)
+  (org-narrow-to-subtree))
+
+(with-eval-after-load 'org-agenda
+  (ra/keymap-set org-agenda-mode-map
+    "<remap> <org-agenda-goto>" #'ra/org-agenda-goto-narrow))
+
+(elpaca org-agenda-property
+  (setopt org-agenda-property-list '("LOCATION" "DELEGATED_TO")))
 
 (elpaca org-fragtog
   (add-hook 'org-mode-hook #'org-fragtog-mode))
@@ -198,6 +249,14 @@
   (ra/keymap-set org-mode-map
     "C-c C-o" #'org-open-at-point
     "C-'" nil))
+
+(setopt org-format-latex-options '( :foreground default
+                                    :background default
+                                    :scale 0.3
+                                    :html-foreground "Black"
+                                    :html-background "Transparent"
+                                    :html-scale 1.0
+			                        :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
 
 (provide '+lang-org)
 ;;; +lang-org.el ends here

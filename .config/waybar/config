@@ -180,6 +180,7 @@
 	    "on-click-middle": "pavucontrol"
     },
     "pulseaudio/slider": {
+        "min": 1,
     	"max": 150
     },
     "custom/media": {

@@ -4,6 +4,12 @@ fundamental-mode
 (calc (p "taylor(sin(x),x=0,3)" formula) n "----" n (format "%s" (calc-eval formula)))
 
 
+prog-mode
+(boxes (make-string (+ 4 (length str)) (aref comment-start 0)) n
+       (string-trim comment-start) " " (s str) " " (string-trim comment-start) n
+       (make-string (+ 4 (length str)) (aref comment-start 0)) q)
+
+
 emacs-lisp-mode
 
 (defadvice "(define-advice " (p "fun")

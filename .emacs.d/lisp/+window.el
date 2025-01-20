@@ -30,6 +30,16 @@
 
 (pixel-scroll-precision-mode 1)
 
+(defun ra/give-buffer-to-other-window (window)
+  "Give current buffer to the targeted window.
+This behaves like `aw-swap-window', but it switches to previous buffer on
+current window instead of swapping it."
+  (interactive (list (get-mru-window nil t 'not-this-one-dummy)))
+  (let ((buffer (window-buffer)))
+    (previous-buffer)
+    (set-window-buffer window buffer)
+    (select-window window)))
+
 (elpaca ace-window
   ;; Karthink's blog post has a very useful tricks to use embark.
   ;; And I also learned how to configure ace-window from there!
@@ -43,6 +53,7 @@
 
                               (?g aw-delete-window "Delete Window")
                               (?m aw-swap-window "Swap Windows")
+                              (?w ra/give-buffer-to-other-window "Give Buffer to Other Window")
                               (?f aw-transpose-frame "Transpose Frame")
 
                               (?s aw-switch-buffer-in-window "Select Buffer")
@@ -92,7 +103,7 @@
       "2" (ra/embark-split-action bookmark-jump split-window-below)
       "3" (ra/embark-split-action bookmark-jump split-window-right))))
 
-;; Taken from nhttps://karthinks.com/software/emacs-window-management-almanac/
+;; Taken from https://karthinks.com/software/emacs-window-management-almanac/
 (defun ra/ace-window-prefix ()
   "Use `ace-window' to display the buffer of the next command.
 The next buffer is the buffer displayed by the next command invoked
@@ -112,6 +123,15 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
    nil "[ace-window]")
   (message "Use `ace-window' to display next command buffer..."))
 
+(defun ra/dwim-window-prefix ()
+  "Use `same-window-prefix' if there's only one window.
+Use `other-window-prefix' if there's only two windows.
+Use `ra/ace-window-prefix' if there's more than two windows."
+  (interactive)
+  (pcase (count-windows)
+    ((or 1 2) (other-window-prefix))
+    (_ (ra/ace-window-prefix))))
+
 (with-eval-after-load 'ace-window
   (set-face-attribute 'aw-leading-char-face nil :height 2.0))
 
@@ -123,16 +143,53 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
     t))
 
 ;; Shameless plug from https://karthinks.com/software/emacs-window-management-almanac/
-(defvar ra/other-window-alt-direction 1
-  "The current `ra/other-window-alternating' direction")
+;; (defvar ra/other-window-alt-direction 1
+;;   "The current `ra/other-window-alternating' direction")
+;;
+;; (defun ra/other-window-alternating (&optional arg)
+;;   "Call `other-window', switching directions each time."
+;;   (interactive)
+;;   (if (equal last-command 'ra/other-window-alternating)
+;;       (other-window (* ra/other-window-alt-direction (or arg 1)))
+;;     (setq ra/other-window-alt-direction (- ra/other-window-alt-direction))
+;;     (other-window (* ra/other-window-alt-direction (or arg 1)))))
 
-(defun ra/other-window-alternating (&optional arg)
-  "Call `other-window', switching directions each time."
+;; After using the `ra/other-window-alternating' method, it seems to
+;; be too complicated It is the fact that I usually only use 2
+;; windows, more than that seems to be too crowded, but I often brings
+;; up to 3, which the other one usually stay for documentation or
+;; easier view of related code.
+
+;; It feels like using the `ra/other-window-mru' is easier for my
+;; workflow. When it's needed to break through, we can use
+;; `ace-window' to select first, it will change the MRU to that
+;; window.
+
+;; It also pairs well with `get-mru-window' for `other-window-scroll-default'
+
+(defun ra/other-window-mru ()
+  "Select the most recently used window on this frame."
   (interactive)
-  (if (equal last-command 'ra/other-window-alternating)
-      (other-window (* ra/other-window-alt-direction (or arg 1)))
-    (setq ra/other-window-alt-direction (- ra/other-window-alt-direction))
-    (other-window (* ra/other-window-alt-direction (or arg 1)))))
+  (when-let ((mru-window
+              (get-mru-window nil t 'not-this-one-dummy)))
+    (select-window mru-window)))
+
+;; (defun ra/avy-select-window-as-mru ()
+;;   "use `ace-window' to select a window, but goes back so that we can set it
+;; as mru-window"
+;;   (interactive)
+;;   (ace-window nil)
+;;   (ra/other-window-mru))
+
+(defun ra/switch-window (&optional arg)
+  "switch window using `ra/other-window-mru', \\[universal-argument] to set
+the mru window using `ra/avy-select-window-as-mru'."
+  (interactive "P")
+  (let ((force-ace (and arg
+                        (> (count-windows) 2))))
+    (if force-ace
+        (ace-window nil)
+      (ra/other-window-mru))))
 
 (setopt other-window-scroll-default
       (lambda ()
@@ -155,7 +212,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
                                 (direction . bottom)
                                 (window-height . 0.35)
                                 (dedicated . t))
-                               (,(rx bol "*" (0+ nonl) "eat" (0+ nonl) "*" eol)
+                               (,(rx bol "*" (0+ nonl) "eat*" (opt "<" (any digit) ">") eol)
                                 (display-buffer-in-direction)
                                 (direction . bottom)
                                 (window-height . 0.35))

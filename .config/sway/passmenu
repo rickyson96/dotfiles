@@ -15,7 +15,7 @@ fi
 dmenu_switches=""
 if [[ -n $WAYLAND_DISPLAY ]]; then
 	dmenu=tofi
-	dmenu_switches="--prompt $prompt --width 700"
+	dmenu_switches="--prompt $prompt --width 0"
 	xdotool="wtype"
 elif [[ -n $DISPLAY ]]; then
 	dmenu=dmenu
@@ -35,7 +35,7 @@ password=$(printf '%s\n' "${password_files[@]}" | "$dmenu" $dmenu_switches "$@")
 [[ -n $password ]] || exit
 
 if [[ $otp -eq 0 ]]; then
-	pass show "$password" | { IFS= read -r pass; printf %s "$pass"; } | xargs -0 $xdotool
+	pass show "$password" | { IFS= read -r pass; printf %s "$pass"; } | xargs -0 -I {} $xdotool '{}'
 else
-	pass otp "$password" | { IFS= read -r pass; printf %s "$pass"; } | xargs -0 $xdotool
+	pass otp "$password" | { IFS= read -r pass; printf %s "$pass"; } | xargs -0 -I{} $xdotool '{}'
 fi

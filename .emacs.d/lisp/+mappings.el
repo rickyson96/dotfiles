@@ -235,7 +235,9 @@ doesn't find overlay"
 
 (elpaca selected
   (selected-global-mode 1)
-  (setopt selected-ignore-modes '(magit-status-mode diff-mode magit-revision-mode))
+  (setopt selected-ignore-modes '(magit-status-mode diff-mode magit-revision-mode magit-log-mode))
+  (with-eval-after-load 'multiple-cursors
+    (add-hook 'multiple-cursors-mode-hook #'selected-off))
   (ra/keymap-set selected-keymap
     "~" #'ra/transient-string-inflection
     "u" #'crux-upcase-region
@@ -246,15 +248,15 @@ doesn't find overlay"
     "c" #'crux-capitalize-region
     "k" #'kill-region
     "r" #'ra/replace-region-with-kill
+    "R" #'ra/replace-region-with-consult-yank-pop
     "," #'iedit-mode
     "'" #'er/expand-region
     "t" #'transpose-mark
     "s" #'ra/isearch-from-region
     "C-s" #'ra/isearch-from-region
     "C-r" #'ra/isearch-from-region
-    "SPC" #'iedit-rectangle-mode
-    "TAB" #'indent-rigidly-right-to-tab-stop
-    "S-TAB" #'indent-rigidly-left-to-tab-stop))
+    "q" #'selected-off
+    "SPC" #'iedit-rectangle-mode))
 
 (with-eval-after-load 'kmacro
   (defalias 'kmacro-insert-macro #'insert-kbd-macro)
@@ -337,12 +339,14 @@ doesn't find overlay"
   :doc "Keymap for opening various apps on Emacs"
   :prefix 'ra/open-map
   "p" #'pass
-  "t" #'eat
+  "t" #'tmr-list-timers
   "f" #'elfeed
   "m" #'consult-man
   "n" #'denote-open-or-create
   "d" #'dashboard-open
   "D" #'docker
+  "b" #'bluetooth-list-devices
+  "a" #'ra/calendar
   "RET" #'mediator-open
   "'" #'proced)
 
@@ -421,7 +425,9 @@ doesn't find overlay"
   "b" #'consult-buffer
   "d" #'dirvish-dwim
   "o" #'ace-window
-  "O" #'ra/ace-window-prefix)
+  "O" #'ra/ace-window-prefix
+  "r C-y" #'ra/yank-rectangle-to-string
+  "r C-w" #'ra/kill-new-rectangle-to-string)
 
 (ra/keymap-set (current-global-map)
   "C-h B" #'embark-bindings
@@ -440,13 +446,20 @@ doesn't find overlay"
   "M-$" #'ra/eshell-or-project-eshell
   "M-y" #'consult-yank-pop
   "M-m" 'ra/manipulate-map
-  "M-o" #'ra/other-window-alternating
+  "M-o" #'ra/switch-window
   "M-n" #'flymake-goto-next-error
   "M-p" #'flymake-goto-prev-error
+  "M-w" #'ra/kill-ring-save
   "M-N" #'move-text-down
   "M-P" #'move-text-up
   "M-l" #'ra/eglot-map
   "M-r" #'re-builder
+
+  "C-M-1" #'same-window-prefix
+  "C-M-2" #'other-window-prefix
+  "C-M-4" #'ra/dwim-window-prefix
+  "C-M-o" #'ra/give-buffer-to-other-window
+
   "<remap> <Info-goto-emacs-command-node>" #'describe-face)
 
 ;; remove modal

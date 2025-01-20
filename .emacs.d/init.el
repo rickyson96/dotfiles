@@ -86,6 +86,8 @@ See https://emacs.stackexchange.com/questions/59791/font-and-frame-configuration
 (elpaca pcre2el)
 (elpaca 0xc)
 (elpaca el-patch)
+(elpaca hmac
+  (autoload 'hmac "hmac"))
 
 (defun ra/keymap-set (keymap &rest pairs)
   "Bind multiple pairs of KEY/DEFINITION to KEYMAP using `keymap-set'.
@@ -318,6 +320,18 @@ otherwise, use `substitute-target-in-buffer'"
     "d" #'substitute-target-in-defun
     "b" #'substitute-target-in-buffer))
 
+(defun ra/kill-ring-save (&optional p)
+  "Like `kill-ring-save', but with extra action on \\[universal-argument].
+\\[universal-argument]: use `copy-as-format' and select the type to copy"
+  (interactive "P")
+  (if (and p (fboundp #'copy-as-format))
+      (call-interactively #'copy-as-format)
+    (call-interactively #'kill-ring-save)))
+
+(elpaca copy-as-format
+  (ra/keymap-set (current-global-map)
+    "<remap> <kill-ring-save>"))
+
 (elpaca kurecolor)
 (elpaca rainbow-mode)
 
@@ -329,6 +343,34 @@ otherwise, use `substitute-target-in-buffer'"
     (ra/keymap-set mc/keymap
       "C->" #'mc/mark-next-like-this
       "C-<" #'mc/mark-prev-like-this)))
+
+;; Rectangle functions
+(defun ra/yank-rectangle-to-string (separator wrap-str)
+  "Yank the `killed-rectangle', but do a `string-join' with separator
+first, and wrap it in `wrap-str'."
+  (interactive "sSeparator: \nsWrap each word with: ")
+  (insert (string-join
+           (mapcar (lambda (rect-str)
+                     (format "%s%s%s"
+                             wrap-str
+                             (substring-no-properties rect-str)
+                             wrap-str))
+                   killed-rectangle)
+           separator)))
+
+(defun ra/kill-new-rectangle-to-string (separator wrap-str)
+  "`kill-new' the `killed-rectangle', but do a `string-join' with separator
+first, and wrap it in `wrap-str'."
+  (interactive "sSeparator: \nsWrap each word with: ")
+  (kill-new (string-join
+             (mapcar (lambda (rect-str)
+                       (format "%s%s%s"
+                               wrap-str
+                               (substring-no-properties rect-str)
+                               wrap-str))
+                     killed-rectangle)
+             separator)))
+
 ;; (elpaca kmacro-x
 ;;   (ra/keymap-set (current-global-map)
 ;;  "C->" #'kmacro-x-mc-mark-next
@@ -602,8 +644,7 @@ otherwise, use `substitute-target-in-buffer'"
   (setopt envrc-remote t)
   (envrc-global-mode 1))
 
-(elpaca makefile-executor
-  (add-hook 'makefile-mode-hook #'makefile-executor-mode))
+(elpaca makefile-executor)
 
 (elpaca num3-mode
   (custom-set-faces '(num3-face-even ((t :underline t)))
@@ -691,3 +732,4 @@ otherwise, use `substitute-target-in-buffer'"
 
 (put 'list-timers 'disabled nil)
 ;;; init.el ends here
+(put 'set-goal-column 'disabled nil)

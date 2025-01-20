@@ -28,7 +28,10 @@
           magit-clone-name-alist `(("\\`\\(?:github:\\|gh:\\)?\\([^:]+\\)\\'" "github.com" "github.user")
                                    ("\\`\\(?:gitlab:\\|gl:\\)\\([^:]+\\)\\'" "gitlab.com" "gitlab.user")
                                    ("\\`\\(?:sourcehut:\\|sh:\\)\\([^:]+\\)\\'" "git.sr.ht" "sourcehut.user")
-                                   (,(rx bos (opt (or "nicejob:" "nj:" "nicejobinc:")) (group (1+ (not (any ":")))) eos) "github.com" "nicejobinc")))
+                                   (,(rx bos "dc:" (group (1+ (not (any ":")))) eos) "git.datacandy.com" "gitlab.git.datacandy.com/api.user")
+                                   (,(rx bos (or "nicejob:" "nj:" "nicejobinc:") (group (1+ (not (any ":")))) eos) "git.datacandy.com" "nicejob")
+                                   (,(rx bos (or "atom:" "a:") (group (1+ (not (any ":")))) eos) "git.datacandy.com" "atom")
+                                   (,(rx bos (or "zomaron:" "zm:") (group (1+ (not (any ":")))) eos) "git.datacandy.com" "zomaron")))
 
   (ra/keymap-set project-prefix-map
     "m" #'magit-project-status)
@@ -86,10 +89,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
             (save-buffer)
             (bury-buffer))
      "Save and bury buffer" :color blue)
-    ("q" nil "cancel" :color blue))
-
-  (add-hook 'smerge-mode-hook (lambda () (when smerge-mode
-                                           (smerge-hydra/body)))))
+    ("q" nil "cancel" :color blue)))
 
 (when (executable-find "delta")
   (elpaca magit-delta
@@ -98,7 +98,8 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (setopt ediff-window-setup-function 'ediff-setup-windows-plain
         ediff-split-window-function 'split-window-horizontally
-        ediff-diff-options "-w")
+        ediff-diff-options "-w"
+        ediff-show-ancestor nil)
 
 (defun ra/ediff-copy-both-to-C ()
   "`ediff' function to combine both on conflict merge.
@@ -112,12 +113,12 @@ Taken from: https://stackoverflow.com/a/29757750"
 
 (add-hook 'ediff-keymap-setup-hook (lambda ()
                                      (keymap-set ediff-mode-map
-                                       "B" 'ra/ediff-copy-both-to-C)))
+                                       "c" 'ra/ediff-copy-both-to-C)))
 
 (add-hook 'ediff-startup-hook (lambda ()
                                 (setopt ediff-long-help-message-merge "
 p,DEL -previous diff |     | -vert/horiz split   |  x -copy buf X's region to C
-n,SPC -next diff     |     h -highlighting       |  B -copy both region to C
+n,SPC -next diff     |     h -highlighting       |  c -copy both region to C
     j -jump to diff  |     @ -auto-refinement    |  r -restore buf C's old diff
    gx -goto X's point|    ## -ignore whitespace  |  * -refine current region
   C-l -recenter      | #f/#h -focus/hide regions |  ! -update diff regions
@@ -157,7 +158,14 @@ n,SPC -next diff     |     h -highlighting       |  B -copy both region to C
     "extra setup for `forge-post-mode'"
     (add-hook 'eldoc-documentation-functions #'ra/forge-post-eldoc-function nil t))
 
-  (add-hook 'forge-post-mode-hook #'ra/forge-post-setup))
+  (add-hook 'forge-post-mode-hook #'ra/forge-post-setup)
+
+  (with-eval-after-load 'forge-core
+    (push '("git.datacandy.com"               ; GITHOST
+            "git.datacandy.com/api/v4"        ; APIHOST
+            "git.datacandy.com"               ; WEBHOST and INSTANCE-ID
+            forge-gitlab-repository)    ; CLASS
+          forge-alist)))
 
 (elpaca agitate
   (add-hook 'diff-mode-hook #'agitate-diff-enable-outline-minor-mode)
@@ -185,12 +193,19 @@ n,SPC -next diff     |     h -highlighting       |  B -copy both region to C
 This ensures that we can visit correct pullreq file when reviewing."
     (interactive)
     (let ((pullreq (or pullreq
-                       (forge-current-topic)
+                       (forge-current-pullreq)
                        (forge-read-pullreq "Review pull-request: "))))
       (magit-fetch-all-no-prune)
       (magit-checkout (forge--pullreq-ref pullreq))
       (forge-visit-pullreq pullreq)
-      (call-interactively #'code-review-forge-pr-at-point))))
+      (call-interactively #'code-review-forge-pr-at-point)))
+
+  (setopt code-review-auth-login-marker 'forge
+          code-review-gitlab-host "git.datacandy.com/api"
+          code-review-gitlab-graphql-host "git.datacandy.com/api"))
+
+(elpaca (emsg-blame :host github :repo "ISouthRain/emsg-blame")
+  (setopt emsg-blame-background t))
 
 (provide '+vc)
 ;;; +vc.el ends here

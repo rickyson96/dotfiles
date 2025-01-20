@@ -177,3 +177,4 @@ Name[zh_CN]=首选项
 Name[zh_HK]=偏好設定
 Name[zh_TW]=偏好設定
 Exec=qutebrowser "qute://settings"
+MimeType=x-scheme-handler/unknown;x-scheme-handler/about;text/html;text/xml;application/xhtml+xml;application/xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/qute;

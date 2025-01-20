@@ -73,7 +73,16 @@
 
   ;; to work with daemon
   ;; https://github.com/emacs-dashboard/emacs-dashboard?tab=readme-ov-file#emacs-daemon
-  (setopt initial-buffer-choice (lambda () (get-buffer-create dashboard-buffer-name))))
+  (setopt initial-buffer-choice (lambda () (get-buffer-create dashboard-buffer-name)))
+
+  ;; Add more quotes
+  (setopt dashboard-footer-messages '("The one true editor, Emacs!"
+                                      "Who the hell uses VIM anyway? Go Evil!"
+                                      "Free as free speech, free as free Beer" "Happy coding!"
+                                      "Vi Vi Vi, the editor of the beast" "Welcome to the church of Emacs"
+                                      "While any text editor can save your files, only Emacs can save your soul"
+                                      "I showed you my source code, pls respond"
+                                      "There's no magic, there's just some f-ing sand, shoved together into silicone, and that's the chip. - DHH")))
 
 (provide '+ui-dashboard)
 ;;; +ui-dashboard.el ends here

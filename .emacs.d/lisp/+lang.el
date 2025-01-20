@@ -39,11 +39,54 @@
 (require '+lang-jsts)
 
 (ra/treesitter-setup python "https://github.com/tree-sitter/tree-sitter-python")
+;; (with-eval-after-load 'lsp-mode
+;;   (lsp-register-custom-settings
+;;    '(("python.pythonPath" "~/miniconda3/envs/atom-etl/bin/python")
+;;      ("python.venvPath" "~/miniconda3/envs/atom-etl"))))
+(elpaca lsp-pyright)
+(setopt lsp-pylsp-plugins-rope-autoimport-enabled t
+        lsp-pyright-langserver-command "basedpyright")
+;; (add-hook 'python-ts-mode-hook (lambda ()
+;;                                  (require 'lsp-pyright)
+;;                                  (lsp-deferred)))
+(add-hook 'python-ts-mode-hook #'eglot-ensure)
+(add-hook 'python-ts-mode-hook #'apheleia-mode)
+
+(defun ra/project-run-python ()
+  "Call `run-python' on project root."
+  (interactive)
+  (let ((default-directory (project-root (project-current))))
+    (call-interactively #'run-python)))
+
+(setopt python-shell-interpreter "ipython"
+        python-shell-interpreter-args "--simple-prompt")
+
 (elpaca pip-requirements)
 (when (executable-find "conda")
   (elpaca conda
     (conda-env-initialize-eshell)))
 (elpaca anaconda-mode)
+(elpaca code-cells
+  (with-eval-after-load 'code-cells
+    (ra/keymap-set code-cells-mode-map
+      "n" (code-cells-speed-key 'code-cells-forward-cell)
+      "p" (code-cells-speed-key 'code-cells-backward-cell)
+      "e" (code-cells-speed-key 'code-cells-eval)
+      "s" (code-cells-speed-key 'code-cells-eval-and-step)
+      "b" (code-cells-speed-key 'code-cells-eval-whole-buffer)
+      "C-c C-c" 'code-cells-eval
+      "C-c C-b" 'code-cells-eval-whole-buffer))
+
+  (setopt code-cells-boundary-regexp (rx bol (zero-or-more space) (one-or-more (syntax comment-start))
+                                         (or (seq (zero-or-more (syntax whitespace)) "%" (group-n 1 (one-or-more "%")))
+                                             (seq " In[" (zero-or-more (any space digit)) "]:")
+                                             (seq (zero-or-more (syntax whitespace)) "COMMAND" (1+ nonl)))))
+
+  (add-hook 'python-ts-mode-hook #'code-cells-mode))
+
+(with-eval-after-load 'python
+  (ra/keymap-set python-ts-mode-map
+   "<remap> <run-python>" #'ra/project-run-python))
 
 (require '+lang-org)
 
@@ -77,8 +120,13 @@
                                       (when (derived-mode-p 'markdown-mode)
                                         (markdown-toggle-markup-hiding -1)))))
 
+(elpaca adoc-mode)
+
 (elpaca jsonian
   (add-hook 'jsonian-mode-hook #'lsp-deferred)
+  (with-eval-after-load 'lsp
+	(add-to-list 'lsp-language-id-configuration '(jsonian-mode . "json"))
+	(add-to-list 'lsp-language-id-configuration '(jsonian-c-mode . "jsonc")))
   (with-eval-after-load 'markdown-mode
     (add-to-list 'markdown-code-lang-modes '("json" . jsonian-mode))))
 
@@ -116,7 +164,15 @@
 
 (elpaca csv-mode
   (add-hook 'csv-mode-hook #'csv-align-mode)
-  (setopt csv-align-style 'auto))
+  (setopt csv-align-style 'left
+          csv-separators '("," "\t" "^"))
+
+  (with-eval-after-load 'csv-mode
+    (ef-themes-with-colors
+      (custom-set-faces `(header-line ((,c ( :family "monospace"
+                                             :box ( :line-width 4
+                                                    :color ,bg-dim
+                                                    :style nil)))))))))
 
 ;; Emacs Lisp
 (elpaca (elispfl :host github :repo "cireu/elispfl")
@@ -219,11 +275,45 @@
 (defun ra/sqlite-view-file-magically ()
   "Runs `sqlite-mode-open-file' on the file name visited by the
 current buffer, killing it."
+  (interactive)
   (require 'sqlite-mode)
-  (let ((file-name buffer-file-name))
-    (sqlite-mode-open-file file-name)))
+  (let ((display-buffer-overriding-action '((display-buffer-same-window display-buffer-use-some-window))))
+    (sqlite-mode-open-file buffer-file-name)))
 
-(add-to-list 'magic-mode-alist '("SQLite format 3\x00" . ra/sqlite-view-file-magically))
+(add-to-list 'magic-mode-alist '("SQLite format 3" . ra/sqlite-view-file-magically))
+
+(defvar-local ra/sqlite-file-name "")
+(define-advice sqlite-mode-open-file (:after (file &rest _) store-current-file-name)
+  "Store current sqlite file name."
+  (setq ra/sqlite-file-name file))
+
+(elpaca with-simulated-input
+  (autoload with-simulated-input 'with-simulated-input))
+
+(defun ra/open-sql-sqlite ()
+  "Open `sql-sqlite' on current `sqlite-mode' opened database."
+  (interactive)
+  (apply (macroexpand `(with-simulated-input ("M-h" "C-w" ,ra/sqlite-file-name "RET")
+                         (sql-product-interactive
+                          'sqlite
+                          (generate-new-buffer-name
+                           (format "SQLite: %s"
+                                   (file-relative-name ,ra/sqlite-file-name (if (project-current)
+                                                                               (project-root (project-current))
+                                                                             default-directory)))))))))
+
+(with-eval-after-load 'sqlite-mode
+  (ra/keymap-set sqlite-mode-map
+    "n" #'next-line
+    "p" #'previous-line
+    "e" #'ra/open-sql-sqlite
+    "TAB" #'sqlite-mode-list-data))
+
+;; disable dirvish preview from opening sqlite, so that magic viewer works properly
+(with-eval-after-load 'dirvish
+  (add-to-list 'dirvish-preview-disabled-exts "sqlite"))
+
+(elpaca (soql-mode :host github :repo "nxtr/soql-mode"))
 
 (provide '+lang)
 ;;; +lang.el ends here

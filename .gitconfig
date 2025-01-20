@@ -52,3 +52,8 @@
 	program = gpg2
 [maintenance]
 	repo = /home/randerson/work/paystone/atom-communications
+
+[includeIf "gitdir:~/work/paystone/"]
+	path = ~/.paystone.gitconfig
+[gitlab "git.datacandy.com/api"]
+	user = randerson

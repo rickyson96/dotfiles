@@ -109,7 +109,18 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
                 ("REVIEW" . ,red)
                 ("DEPRECATED" . ,yellow-faint)))))
 
-  (add-hook 'ef-themes-post-load-hook #'my-ef-themes-hl-todo-faces)
+  (defun ra/ef-themes-overrides ()
+    "Override ef-themes face definitions."
+    (my-ef-themes-hl-todo-faces)
+    (ef-themes-with-colors
+      (custom-set-faces `(header-line ((,c ( :family "monospace"
+                                             :box ( :line-width 4
+                                                    :color ,bg-dim
+                                                    :style nil))))))))
+
+  (add-hook 'ef-themes-post-load-hook #'ra/ef-themes-overrides)
+  (add-hook 'csv-mode-hook #'ra/ef-themes-overrides)
+  (add-hook 'sqlite-mode-hook #'ra/ef-themes-overrides)
 
   (mapc #'disable-theme custom-enabled-themes)
   (ef-themes-select 'ef-cyprus))

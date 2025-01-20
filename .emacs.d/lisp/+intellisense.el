@@ -150,6 +150,14 @@
   (apheleia-lsp-formatter-buffer buffer scratch)
   (funcall callback))
 
+(cl-defun apheleia-pyflakes
+    (&key buffer scratch formatter callback &allow-other-keys)
+  (let ((inhibit-message t))
+    (with-current-buffer scratch
+      (ignore-errors
+       (python-fix-imports))))
+  (funcall callback))
+
 (elpaca apheleia
   ;; Apheleia LSP
   (with-eval-after-load 'apheleia-formatters
@@ -158,9 +166,11 @@
           '((eslint . ("apheleia-npx" "eslint" "--fix" file))
             (eslintd . ("eslint_d" "--fix-to-stdout" "--stdin" "--stdin-filename" filepath))
             (lsp-format . apheleia-lsp-formatter)
-            (lsp-organize . apheleia-lsp-organize-import-formatter)))
+            (lsp-organize . apheleia-lsp-organize-import-formatter)
+            (pyflakes . apheleia-pyflakes)))
 
-    (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(lsp-organize eslintd))))
+    (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(lsp-organize eslintd))
+    (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(pyflakes black isort))))
 
 (elpaca tempel
   (defun ra/tempel-setup-capf ()
@@ -247,6 +257,11 @@ If BASE-URL is not specified, it defaults to `openai-base-url'."
           openai-user "ricky.anderson2696@gmail.com"))
 (elpaca (chatgpt :host github :repo "emacs-openai/chatgpt"))
 (elpaca (codegpt :host github :repo "emacs-openai/codegpt"))
+
+;; Tabby
+;; (elpaca (tabby :host github :files ("*.el" "node_scripts") :repo "alan-w-255/tabby.el")
+;;   (ra/keymap-set tabby-mode-map
+;;     "C-<return>" #'tabby-accept-completion))
 
 (elpaca tiny
   (defun ra/tiny-setup-capf ()

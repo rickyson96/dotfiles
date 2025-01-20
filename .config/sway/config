@@ -20,6 +20,8 @@ set $term foot
 # on the original workspace that the command was run on.
 set $menu fuzzel
 
+for_window [shell="xwayland"] title_format "[XWayland] %title"
+
 include /etc/sway/config-vars.d/*
 
 ### Output configuration
@@ -58,11 +60,20 @@ output DP-2 resolution 1920x1200 position 0 0
 #       natural_scroll enabled
 #       middle_emulation enabled
 #   }
+
+seat seat0 xcursor_theme Bibata-Modern-Ice 20
+
+input "9011:26214:ydotoold_virtual_device" {
+	  xkb_layout us
+}
+input 1386:21300:Wacom_HID_5334_Finger map_to_output eDP-1
+input 1386:21300:Wacom_HID_5334_Pen map_to_output eDP-1
 input * {
 	  xkb_layout us,us
 	  xkb_variant dvorak,
 	  xkb_options grp:alts_toggle
 }
+
 #
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
@@ -187,6 +198,8 @@ mode "layout" {
 	bindsym XF86AudioLowerVolume exec pulsemixer --change-volume -5
 	bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
     bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
+	bindsym XF86MonBrightnessDown exec brightnessctl --min-value=1 set 100-  
+	bindsym XF86MonBrightnessUp exec brightnessctl set +100
 #
 # Scratchpad:
 #
@@ -201,7 +214,11 @@ mode "layout" {
     bindsym $mod+minus scratchpad show
 
 	bindsym $mod+p exec "~/.config/sway/passmenu-fuzzel"
-	bindsym $mod+o exec "~/.config/sway/passmenu-fuzzel" otp
+	bindsym $mod+Shift+p exec "~/.config/sway/passmenu-fuzzel -c"
+
+	bindsym $mod+o exec "~/.config/sway/passmenu-fuzzel otp"
+	bindsym $mod+Shift+o exec "~/.config/sway/passmenu-fuzzel -c otp"
+
 #
 # Resizing containers:
 #
@@ -229,15 +246,46 @@ bindsym $mod+s mode "resize"
 
 # Screenshot
 bindsym Print exec grimshot save area - | swappy -f -
-bindsym $mod+Print exec grimshot save window - | swappy -f -
-bindsym $mod+shift+Print exec grimshot save output - | swappy -f -
-bindsym $mod+ctrl+print exec grimshot save screen - | swappy -f -
+bindsym $mod+Print mode "printscreen"
+
+mode "printscreen" {
+	 bindsym Escape mode "default"
+	 bindsym t exec grimshot save area - | tesseract stdin stdout | wl-copy ; mode "default" 
+	 bindsym w exec grimshot save window - | swappy -f - ; mode "default"
+	 bindsym o exec grimshot save output - | swappy -f - ; mode "default"
+	 bindsym s exec grimshot save screen - | swappy -f - ; mode "default"
+}
 
 # cliphist
 exec wl-paste --type text --watch cliphist store
 exec wl-paste --type image --watch cliphist store
 
+# IIO auto rotate
+exec iio-sway
+
 bindsym $mod+v exec cliphist list | fuzzel --width 80 --prompt " : " --dmenu | cliphist decode | wl-copy
+
+# emacs-everywhere
+bindsym $mod+e exec sh -c "emacsclient --eval '(emacs-everywhere)'"
+
+mode "gromit-mpx" {
+    # toggle painting
+    bindsym f9 exec gromit-mpx --toggle
+    # clear
+    bindsym Shift+f9 exec gromit-mpx --clear
+    # toggle visibility
+    bindsym Ctrl+f9 exec gromit-mpx --visibility
+    # quit
+    bindsym Alt+f9 exec gromit-mpx --quit
+    # undo
+    bindsym f8 exec gromit-mpx --undo
+    # redo
+    bindsym Shift+f8 exec gromit-mpx --redo
+
+    # Return to default mode
+    bindsym $mod+g exec gromit-mpx --quit; mode "default"
+}
+bindsym $mod+g exec gromit-mpx --active; mode "gromit-mpx"
 
 #
 # Status Bar:

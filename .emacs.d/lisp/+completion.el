@@ -72,6 +72,14 @@
     (delete-active-region)
     (yank)))
 
+;;;###autoload
+(defun ra/replace-region-with-consult-yank-pop ()
+  "Replace region content with kill-ring"
+  (interactive)
+  (when (use-region-p)
+    (delete-active-region)
+    (consult-yank-pop)))
+
 ;; TODO add embark elpaca integration?
 (elpaca embark
   (setopt prefix-help-command #'embark-prefix-help-command)

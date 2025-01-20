@@ -6,6 +6,13 @@ shopt -s nullglob globstar
 
 otp=0
 prompt="Password: "
+copy=0
+
+if [[ $1 == "-c" ]]; then
+	copy=1
+	shift
+fi
+
 if [[ $1 == "otp" ]]; then
 	otp=1
 	prompt="OTP: "
@@ -34,8 +41,13 @@ password=$(printf '%s\n' "${password_files[@]}" | "$dmenu" "${dmenu_switches[@]}
 
 [[ -n $password ]] || exit
 
-if [[ $otp -eq 0 ]]; then
-	pass show "$password" | { IFS= read -r pass; printf %s "$pass"; } | xargs -0 "${xdotool[@]}"
+command='show'
+if [[ $otp -ne 0 ]]; then
+	command='otp'
+fi
+
+if [[ $copy -eq 0 ]]; then
+	pass "$command" "$password" | { IFS= read -r pass; printf %s "$pass"; } | wtype -
 else
-	pass otp "$password" | { IFS= read -r pass; printf %s "$pass"; } | xargs -0 "${xdotool[@]}"
+	pass "$command" -c "$password" && wtype -d 200 -M ctrl v -m ctrl
 fi

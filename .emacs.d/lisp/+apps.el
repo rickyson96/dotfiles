@@ -13,6 +13,19 @@
 
 ;;; Code:
 
+(defun ra/generate-totp-url (account key issuer)
+  (interactive (let* ((account-raw (split-string (read-string "Account: ") ":"))
+                      (key (string-replace " " "" (read-string "Key: ")))
+                      (account (car (last account-raw)))
+                      (issuer-from-acc (when (length= account-raw 2)
+                                         (car account-raw)))
+                      (issuer (read-string "Issuer: " issuer-from-acc)))
+                 (list account key issuer)))
+  (kill-new (format "otpauth://totp/%s?secret=%s&issuer=%s"
+         (string-join (remove "" (list issuer account)) ":")
+         key
+         issuer)))
+
 (elpaca pass
   (defvar-keymap embark-password-store-actions
     :doc "Keymap for actions for password-store."
@@ -136,15 +149,46 @@
 
 (elpaca trashed)
 
-(elpaca elfeed)
+(elpaca elfeed
+  (setopt elfeed-search-filter "@6-months-ago +unread -bulk"))
 (elpaca elfeed-org
   (setopt rmh-elfeed-org-files '("~/org/elfeed.org"))
   (elfeed-org))
+(elpaca elfeed-goodies
+  (with-eval-after-load 'elfeed
+    (elfeed-goodies/setup)))
+
+(defun ra/denote-meeting-template ()
+  "Command to create a meeting note for denote on `org-capture-template'"
+  (lambda () (let ((denote-commands-for-new-notes (append denote-commands-for-new-notes '(denote-org-capture denote-org-capture-with-prompts)))
+                   (denote-use-keywords '("paystone"))
+                   (denote-org-capture-specifiers (string-join '(":Created: %T"
+                                                                 ""
+                                                                 "* Attendees%?"
+                                                                 "** Me"
+                                                                 "** "
+                                                                 ""
+                                                                 "* Notes"
+                                                                 ""
+                                                                 "* Action Items"
+                                                                 "** TODO [#A] ")
+                                                               "\n")))
+               (denote-org-capture-with-prompts (not denote-use-title)))))
+
+(defun ra/start-meeting ()
+  "Use at org-agenda. Tries to open link at point and create a meeting note after that."
+  (interactive)
+  (unless (eq major-mode 'org-agenda-mode)
+    (user-error "Need to be in org-agenda."))
+
+  (org-agenda-open-link)
+  (let* ((meeting-name (substring-no-properties (get-text-property (point) 'txt)))
+         (denote-use-title (format "Meeting: %s" meeting-name)))
+    (org-capture nil "m")))
 
 (elpaca denote
   (require 'denote-journal-extras)
-  (setopt denote-journal-extras-title-format 'day-date-month-year
-          denote-directory "/home/randerson/org/notes")
+  (setopt denote-journal-extras-title-format 'day-date-month-year)
 
   (with-eval-after-load 'doct
     (setopt org-capture-templates (doct-add-to org-capture-templates
@@ -154,8 +198,17 @@
                                                   :template denote-org-capture
                                                   :no-save t
                                                   :immediate-finish nil
-                                                  :kill-buffer t))
-                                               t))))
+                                                  :kill-buffer t)
+                                                 ("󰢧 Denote Meeting" :keys "m"
+                                                  :file denote-last-path
+                                                  :type plain
+                                                  :template ra/denote-meeting-template
+                                                  :no-save t
+                                                  :immediate-finish nil
+                                                  :kill-buffer t
+                                                  :jump-to-captured t
+                                                  :clock-in t
+                                                  :clock-resume t))))))
 
 (elpaca wordel)
 
@@ -252,18 +305,41 @@
 (elpaca (ready-player :host github :repo "xenodium/ready-player")
   (ready-player-add-to-auto-mode-alist))
 
+(elpaca calfw-org)
+(elpaca (calfw-blocks :host github :repo "ml729/calfw-blocks"))
 (elpaca calfw
+  (with-eval-after-load 'calfw
+    (setq cfw:calendar-mode-map (make-sparse-keymap))
+    (ra/keymap-set cfw:calendar-mode-map
+      "<mouse-1>" 'cfw:navi-on-click
+      "n" 'cfw:navi-next-item-command
+      "p" 'cfw:navi-prev-item-command
+      "f" 'cfw:navi-next-day-command
+      "b" 'cfw:navi-previous-day-command
+      "." 'cfw:navi-goto-today-command
+      "g" 'cfw:refresh-calendar-buffer
+      "q" 'quit-window))
+
+
   (defun ra/calendar ()
     "open calendar using calfw"
     (interactive)
     (require 'calfw)
     (require 'calfw-org)
+    (require 'calfw-blocks)
+
+    (set-face-attribute 'cfw:face-today nil :background nil)
+
     (cfw:open-calendar-buffer
      :contents-sources
-     (list (cfw:org-create-file-source "personal" (file-name-concat org-directory "schedule/personal.org") "Blue")
-           (cfw:org-create-file-source "work" (file-name-concat org-directory "schedule/work.org") "Cyan")))))
+     (list (cfw:org-create-file-source "personal" (file-name-concat org-directory "schedule/personal.org") "White")
+           (cfw:org-create-file-source "work" (file-name-concat org-directory "schedule/work.org") "White")
+           (cfw:org-create-file-source "work" (file-name-concat org-directory "schedule/private.org") "White"))
+     :view 'block-day)))
 
 (elpaca (show-font :host github :repo "protesilaos/show-font"))
+
+(elpaca tmr)
 
 (provide '+apps)
 ;;; +apps.el ends here

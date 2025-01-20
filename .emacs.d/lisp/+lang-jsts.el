@@ -31,7 +31,7 @@
 (dolist (actions '(apheleia-mode
                    lsp-deferred
                    indent-bars-mode
-                   combobulate-mode
+                   ;; combobulate-mode
                    ;; ra/setup-extra-pair-typescript
                    ;;eglot-ensure
                    ))
