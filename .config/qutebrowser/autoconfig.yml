@@ -214,16 +214,20 @@ settings:
     https://app.lunapark.com: true
     https://lunapark.com: true
     https://meet.google.com: true
+    https://vc-sg.larksuite.com: true
   content.media.audio_video_capture:
     https://meet.google.com: true
+    https://vc-sg.larksuite.com: true
   content.media.video_capture:
     https://app.lunapark.com: true
     https://meet.google.com: true
+    https://vc-sg.larksuite.com: true
   content.notifications.enabled:
     '*://*.clash.ninja/*': true
     https://dialpad.com: true
     https://meet.google.com: true
     https://raspberrypi.corgi-gentoo.ts.net: true
+    https://vc-sg.larksuite.com: true
   content.proxy:
     global: system
   hints.mode:

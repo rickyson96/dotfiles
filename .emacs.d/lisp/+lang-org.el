@@ -99,6 +99,7 @@
 (elpaca alert
   (setopt alert-default-style 'libnotify))
 
+(elpaca (elnode :depth nil))
 (elpaca org-gcal
   (require 'password-store)
   (require 'plstore)
@@ -109,8 +110,7 @@
          (client-secret (alist-get 'secret pass-entry)))
     (setopt org-gcal-client-id client-id
             org-gcal-client-secret client-secret
-            org-gcal-fetch-file-alist `(("ricky.anderson2696@gmail.com" . ,(file-name-concat org-directory "schedule/personal.org"))
-                                        ("randerson@paystone.com" . ,(file-name-concat org-directory "schedule/work.org")))
+            org-gcal-fetch-file-alist `(("ricky.anderson2696@gmail.com" . ,(file-name-concat org-directory "schedule/personal.org")))
             org-gcal-recurring-events-mode 'top-level
             org-gcal-notify-p nil
             org-gcal-remove-api-cancelled-events t))
@@ -257,6 +257,10 @@
                                     :html-background "Transparent"
                                     :html-scale 1.0
 			                        :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+
+(elpaca (org-cv :host github :repo "Titan-C/org-cv"
+                :main "ox-moderncv.el" 
+                :files ("ox-moderncv.el" "org-cv-utils.el")))
 
 (provide '+lang-org)
 ;;; +lang-org.el ends here

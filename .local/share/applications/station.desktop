@@ -3,7 +3,7 @@ Name=Station
 StartupWMClass=Station
 Comment=getstation.com
 GenericName=Station for Linux
-Exec=/home/randerson/.local/applications/Station-x86_64.AppImage --enable-features=UseOzonePlatform --ozone-platform=wayland
+Exec=station --enable-features=UseOzonePlatform --ozone-platform=wayland %U
 Icon=station
 Type=Application
 MimeType=x-scheme-handler/station;

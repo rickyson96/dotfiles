@@ -341,5 +341,7 @@
 
 (elpaca tmr)
 
+(elpaca leetcode)
+
 (provide '+apps)
 ;;; +apps.el ends here

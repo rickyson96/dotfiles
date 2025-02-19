@@ -288,7 +288,7 @@ current buffer, killing it."
   (setq ra/sqlite-file-name file))
 
 (elpaca with-simulated-input
-  (autoload with-simulated-input 'with-simulated-input))
+  (autoload 'with-simulated-input "with-simulated-input"))
 
 (defun ra/open-sql-sqlite ()
   "Open `sql-sqlite' on current `sqlite-mode' opened database."

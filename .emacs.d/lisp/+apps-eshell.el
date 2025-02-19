@@ -69,13 +69,13 @@
   (autoload #'global-fish-completion-mode "fish-completion")
   (global-fish-completion-mode 1))
 
-(elpaca eshell-atuin
-  (setopt eshell-atuin-history-format "%->110c %-<50i %t + %d (%r ago) - %e"
-          eshell-atuin-search-fields '(time duration command relativetime directory exit))
-  (eshell-atuin-mode 1)
-  (with-eval-after-load 'em-hist
-    (ra/keymap-set eshell-hist-mode-map
-      "<remap> <eshell-previous-matching-input>"  #'eshell-atuin-history)))
+;; (elpaca eshell-atuin
+;;   (setopt eshell-atuin-history-format "%->110c %-<50i %t + %d (%r ago) - %e"
+;;           eshell-atuin-search-fields '(time duration command relativetime directory exit))
+;;   (eshell-atuin-mode 1)
+;;   (with-eval-after-load 'em-hist
+;;     (ra/keymap-set eshell-hist-mode-map
+;;       "<remap> <eshell-previous-matching-input>"  #'eshell-atuin-history)))
 
 ;; Prompts
 

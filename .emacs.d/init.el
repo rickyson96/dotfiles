@@ -330,7 +330,7 @@ otherwise, use `substitute-target-in-buffer'"
 
 (elpaca copy-as-format
   (ra/keymap-set (current-global-map)
-    "<remap> <kill-ring-save>"))
+    "<remap> <kill-ring-save>" #'ra/kill-ring-save))
 
 (elpaca kurecolor)
 (elpaca rainbow-mode)
@@ -729,6 +729,7 @@ first, and wrap it in `wrap-str'."
           gcmh-idle-delay 5
           gc-cons-percentage 0.2)
   (gcmh-mode))
+
 
 (put 'list-timers 'disabled nil)
 ;;; init.el ends here

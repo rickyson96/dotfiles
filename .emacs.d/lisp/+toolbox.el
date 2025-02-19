@@ -80,8 +80,8 @@
     (interactive)
     (dwim-shell-command-on-marked-files
      "Drag and Drop on Files"
-     "dragon '<<*>>'"
-     :utils '("dragon")))
+     "dragon-drop '<<*>>'"
+     :utils '("dragon-drop")))
 
   (autoload #'dwim-shell-command "dwim-shell-command")
   (autoload #'dwim-shell-command-on-marked-files "dwim-shell-command"))

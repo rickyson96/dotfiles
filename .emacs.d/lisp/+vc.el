@@ -207,5 +207,7 @@ This ensures that we can visit correct pullreq file when reviewing."
 (elpaca (emsg-blame :host github :repo "ISouthRain/emsg-blame")
   (setopt emsg-blame-background t))
 
+(elpaca dumb-diff)
+
 (provide '+vc)
 ;;; +vc.el ends here

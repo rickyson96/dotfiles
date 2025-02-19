@@ -14,7 +14,7 @@ fundle plugin 'edc/bass'
 fundle plugin 'jorgebucaran/autopair.fish'
 fundle plugin 'PatrickF1/fzf.fish'
 fundle plugin 'jorgebucaran/nvm.fish'
-fundle plugin 'oh-my-fish/plugin-pyenv'
+# fundle plugin 'oh-my-fish/plugin-pyenv'
 fundle plugin 'reitzig/sdkman-for-fish'
 
 fundle init
@@ -55,7 +55,7 @@ if status is-interactive
     # Commands to run in interactive sessions can go here
     starship init fish | source
     direnv hook fish | source
-    atuin init fish | source
+    # atuin init fish | source
 end
 
 # Created by `pipx` on 2023-11-23 18:52:18

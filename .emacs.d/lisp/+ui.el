@@ -76,10 +76,10 @@
   (setopt ef-themes-mixed-fonts t
           ef-themes-variable-pitch-ui t
           ef-themes-headings ; read the manual's entry or the doc string
-          '((0 bold variable-pitch 1.2)
-            (1 bold variable-pitch 1.2)
-            (2 bold variable-pitch 1.1)
-            (t bold variable-pitch)))
+          (quote ((0 bold variable-pitch 1.2)
+                  (1 bold variable-pitch 1.2)
+                  (2 bold variable-pitch 1.1)
+                  (t bold variable-pitch))))
 
   (with-eval-after-load 'org
     (set-face-attribute 'org-quote nil :slant 'italic))
