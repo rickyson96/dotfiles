@@ -46,6 +46,9 @@ org-mode
 "{{(verb-part)}}^" n
 )
 
+(nsrc & "#+NAME: " p n "#+begin_src " p n r n "#+end_src"
+ :post (org-edit-src-code))
+
 
 markdown-mode
 (details "<details><summary>" p "</summary>" n
@@ -89,6 +92,22 @@ typescript-ts-mode :when (string-match-p (rx (0+ nonl) ".test.ts" eos) (file-nam
 (eb (t ex) ".toBe(" q ");")
 (erj (t ex) ".toReject();" q)
 (ers (t ex) ".toResolve();" q)
+
+
+go-mode go-ts-mode
+(func "func " p "(" p ") {" n> q n "}" >)
+(ifel "if " p " {" n> p n "} else {" > n> p n "}" > q)
+(tst "func Test" p " (t *testing.T) { " n> q n "}")
+(tstf "func (t *testing.T) { " n> q n "}")
+(tsts "tests := []struct{" n> "name string" n> q n "}{}")
+(tstr "for _, test := range tests {" n> "t.Run(" (p "test.name") ", func (t *testing.T) { " n> q n "})" n "}")
+(bench "func Benchmark" p " (b *testing.B) { " n> q n "}")
+(ex "Expect(" (p "value") ")")
+(exerr "Expect(err).NotTo(HaveOccurred())" q)
+(exeq "Expect(" (p "w") ").To(Equal(" (p "expectation") "))" q)
+(exhs "Expect(" (p "w") ").To(HaveHTTPStatus(" (p "http.StatusOK") "))")
+(exhb "Expect(" (p "w") ").To(HaveHTTPBody(" (p "body") "))")
+(exhttp (t exhs) n> (t exhb))
 
 
 yaml-ts-mode

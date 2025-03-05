@@ -343,5 +343,12 @@
 
 (elpaca leetcode)
 
+(elpaca go-translate
+  (require 'go-translate)
+  (setq gt-langs '(en id zh)
+        gt-default-translator (gt-translator :taker (gt-taker :text 'word :prompt t)
+                                             :engines (gt-google-engine)
+                                             :render (gt-buffer-render))))
+
 (provide '+apps)
 ;;; +apps.el ends here

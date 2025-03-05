@@ -92,25 +92,25 @@
 
 (elpaca jest-test-mode)
 
-(elpaca flymake-eslint
-  (add-hook 'eglot-managed-mode-hook
-            (lambda ()
-              (let ((eslint (cond ((executable-find "eslint_d") "eslint_d")
-                                  ((executable-find "eslint") "eslint"))))
-                (when (and eslint
-                           (or (locate-dominating-file buffer-file-name ".eslintrc.json")
-                               (locate-dominating-file buffer-file-name ".eslintrc.js"))
-                           (derived-mode-p 'typescript-ts-base-mode))
-                  (setq flymake-eslint-executable-name eslint)
-                  (flymake-eslint-enable)))
+;; (elpaca flymake-eslint
+;;   (add-hook 'eglot-managed-mode-hook
+;;             (lambda ()
+;;               (let ((eslint (cond ((executable-find "eslint_d") "eslint_d")
+;;                                   ((executable-find "eslint") "eslint"))))
+;;                 (when (and eslint
+;;                            (or (locate-dominating-file buffer-file-name ".eslintrc.json")
+;;                                (locate-dominating-file buffer-file-name ".eslintrc.js"))
+;;                            (derived-mode-p 'typescript-ts-base-mode))
+;;                   (setq flymake-eslint-executable-name eslint)
+;;                   (flymake-eslint-enable)))
 
-              (flymake-flycheck-auto)))
+;;               (flymake-flycheck-auto)))
 
-  (defun ra/flymake-eslint_d-restart ()
-    "Restart eslint_d and then run `flymake-start'"
-    (interactive)
-    (shell-command "eslint_d restart")
-    (flymake-start)))
+;;   (defun ra/flymake-eslint_d-restart ()
+;;     "Restart eslint_d and then run `flymake-start'"
+;;     (interactive)
+;;     (shell-command "eslint_d restart")
+;;     (flymake-start)))
 
 (elpaca flycheck-jest
   (setq flycheck-jest '(typescript-ts-mode web-mode js-mode typescript-mode rjsx-mode))

@@ -221,6 +221,7 @@ settings:
   content.media.video_capture:
     https://app.lunapark.com: true
     https://meet.google.com: true
+    https://teams.microsoft.com: true
     https://vc-sg.larksuite.com: true
   content.notifications.enabled:
     '*://*.clash.ninja/*': true

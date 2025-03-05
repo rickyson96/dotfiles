@@ -57,7 +57,8 @@
                    "LSP_USE_PLISTS"
                    "DISPLAY"
                    "WAYLAND_DISPLAY"
-                   "RIPGREP_CONFIG_PATH"))
+                   "RIPGREP_CONFIG_PATH"
+                   "DOCKER_HOST"))
       (add-to-list 'exec-path-from-shell-variables var))
 
     (exec-path-from-shell-initialize)))

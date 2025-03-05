@@ -34,6 +34,15 @@
 (elpaca go-playground)
 (ra/treesitter-setup go "https://github.com/tree-sitter/tree-sitter-go")
 
+(add-hook 'go-ts-mode-hook #'eglot-ensure)
+(add-hook 'go-ts-mode-hook #'apheleia-mode)
+
+;; Need to fix the &key and &rest behaviour
+;; https://github.com/doomemacs/doomemacs/blob/07fca786154551f90f36535bfb21f8ca4abd5027/lisp/doom-lib.el#L754
+;; https://emacs.stackexchange.com/questions/77647/how-do-i-properly-use-keyword-named-arguments-in-a-macro-with-cl-defmacro
+;; (ra/treesitter-setup gomod "https://github.com/camdencheek/tree-sitter-go-mod" :no-mode-remap t)
+(add-to-list 'treesit-language-source-alist '(gomod "https://github.com/camdencheek/tree-sitter-go-mod"))
+
 (ra/treesitter-setup bash "https://github.com/tree-sitter/tree-sitter-bash")
 
 (require '+lang-jsts)
@@ -216,7 +225,8 @@
 
 (elpaca systemd)
 
-(elpaca dotenv-mode)
+(elpaca dotenv-mode
+  (add-to-list 'auto-mode-alist `(,(rx ".env" (? (or ".local")) eos) . dotenv-mode)))
 
 (elpaca mermaid-mode)
 

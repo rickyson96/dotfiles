@@ -170,7 +170,8 @@
             (pyflakes . apheleia-pyflakes)))
 
     (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(lsp-organize eslintd))
-    (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(pyflakes black isort))))
+    (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(pyflakes black isort))
+    (setf (alist-get 'go-ts-mode apheleia-mode-alist) '(goimports gofumpt))))
 
 (elpaca tempel
   (defun ra/tempel-setup-capf ()
@@ -209,12 +210,12 @@ Taken from tempel's readme"
 (elpaca aggressive-indent
   (global-aggressive-indent-mode 0))
 
-(elpaca flymake-flycheck
-  (add-hook 'flymake-mode-hook 'flymake-flycheck-auto)
-
-  (with-eval-after-load 'flymake-flycheck
-    (dolist (checkers '(javascript-eslint))
-      (add-to-list 'flycheck-disabled-checkers checkers))))
+;; (elpaca flymake-flycheck
+;;   ;; (add-hook 'flymake-mode-hook 'flymake-flycheck-auto)
+;;
+;;   (with-eval-after-load 'flymake-flycheck
+;;     (dolist (checkers '(javascript-eslint))
+;;       (add-to-list 'flycheck-disabled-checkers checkers))))
 
 (elpaca eldoc-box)
 

@@ -220,7 +220,7 @@
                           (org-agenda-files `(,org-gtd-directory))))
             (todo "WAIT" ((org-agenda-overriding-header " Delegated / Blocked")
                           (org-agenda-todo-ignore-with-date t)
-                          (org-agenda-prefix-format " %i %-12:(org-gtd--agenda-prefix-format)")
+                          ;; (org-agenda-prefix-format " %i %-12:(org-gtd--agenda-prefix-format)")
                           (org-agenda-files `(,org-gtd-directory))))))))
 
 (add-hook 'org-agenda-finalize-hook #'beginning-of-buffer 90)

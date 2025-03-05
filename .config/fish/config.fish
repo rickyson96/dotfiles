@@ -44,6 +44,10 @@ set -Ux NODE_VERSION_PREFIX v
 set -Ux NODE_VERSIONS {$HOME/.local/share/nvm}
 set -Ux NODE_OPTIONS "--max-old-space-size=2048"
 set -Ux RIPGREP_CONFIG_PATH "$HOME/.config/ripgrep/ripgreprc"
+set -Ux DOCKER_HOST "unix://$XDG_RUNTIME_DIR/podman/podman.sock"
+set -Ux GEM_HOME "$(gem env user_gemhome)"
+
+fish_add_path --universal "$GEM_HOME/bin" 
 
 alias grep=rg
 alias ls="eza --icons"
@@ -56,6 +60,7 @@ if status is-interactive
     starship init fish | source
     direnv hook fish | source
     # atuin init fish | source
+    rbenv init - | source
 end
 
 # Created by `pipx` on 2023-11-23 18:52:18
