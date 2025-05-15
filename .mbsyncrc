@@ -1,25 +1,27 @@
-IMAPAccount gmail
+IMAPAccount ricky.anderson2696@gmail.com
 Host imap.gmail.com
 Port 993
 User ricky.anderson2696@gmail.com
-PassCmd "pass "
-SSLType IMAPS
+PassCmd "pass google.com/ricky.anderson2696@gmail.com^mbsync"
+# SSLType IMAPS
+TLSType IMAPS
 CertificateFile /etc/ssl/certs/ca-certificates.crt
 
-IMAPStore <account>-remote
-Account <account>
+IMAPStore ricky.anderson2696@gmail.com-remote
+Account ricky.anderson2696@gmail.com
 
-MaildirStore <account>-local
+MaildirStore ricky.anderson2696@gmail.com-local
 SubFolders Verbatim
-Path ~/Mail/<account>/
-Inbox ~/Mail/<account>/Inbox
-Trash ~/Mail/<account>/Trash
+Path ~/mail/ricky.anderson2696@gmail.com/
+Inbox ~/mail/ricky.anderson2696@gmail.com/Inbox
+Trash ~/mail/ricky.anderson2696@gmail.com/Trash
 
-Channel <account>
-Far :<account>-remote:
-Near :<account>-local:
-;; Patterns are the names of your mail folders. You can also use * for all of your mail folders.
-Patterns INBOX "Sent Items" Drafts Trash Spam?
+Channel ricky.anderson2696@gmail.com
+Far :ricky.anderson2696@gmail.com-remote:
+Near :ricky.anderson2696@gmail.com-local:
+# Patterns are the names of your mail folders. You can also use * for all of your mail folders.
+Patterns *
+# Patterns * ![Gmail]* "[Gmail]/Sent Mail" "[Gmail]/Starred" "[Gmail]/All Mail"x
 SyncState *
 Create Both
 Expunge Both

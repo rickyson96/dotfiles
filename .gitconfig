@@ -57,3 +57,6 @@
 	path = ~/.paystone.gitconfig
 [gitlab "git.datacandy.com/api"]
 	user = randerson
+
+[alias]
+	crypt = git-crypt

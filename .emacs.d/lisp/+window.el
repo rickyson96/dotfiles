@@ -167,12 +167,28 @@ Use `ra/ace-window-prefix' if there's more than two windows."
 
 ;; It also pairs well with `get-mru-window' for `other-window-scroll-default'
 
+;; After using it for a while, sometime I do need to use 3 windows for
+;; terminal. The way that I think about this is to use
+;; `ra/other-window-mru' for the default, while letting the
+;; \\[universal-argument] version to temporarily switch to
+;; `ra/other-window-alternating'. Preserving the first window as MRU.
+;; This way, we can just C-u away and choose the new window to
+;; alternate into. The other thing is to use `set-transient-map' to
+;; enable the `ra/other-window-alternating' to be repeated with o
+;; and M-o until we don't use the `switch-window' command.
+
+;; I found that this is slightly similar with `switchy-window', trying it
+
 (defun ra/other-window-mru ()
   "Select the most recently used window on this frame."
   (interactive)
   (when-let ((mru-window
               (get-mru-window nil t 'not-this-one-dummy)))
     (select-window mru-window)))
+
+(elpaca switchy-window
+  (setq switchy-window-delay 1)
+  (switchy-window-minor-mode 1))
 
 ;; (defun ra/avy-select-window-as-mru ()
 ;;   "use `ace-window' to select a window, but goes back so that we can set it
@@ -189,7 +205,9 @@ the mru window using `ra/avy-select-window-as-mru'."
                         (> (count-windows) 2))))
     (if force-ace
         (ace-window nil)
-      (ra/other-window-mru))))
+      (if (bound-and-true-p switchy-window-minor-mode)
+          (switchy-window)
+        (ra/other-window-mru)))))
 
 (setopt other-window-scroll-default
       (lambda ()

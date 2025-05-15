@@ -377,7 +377,7 @@ doesn't find overlay"
   "Mark line"
   (interactive "p")
   (beginning-of-line)
-  (set-mark (point))
+  (push-mark (point) nil t)
   (end-of-line p))
 
 (defvar-keymap ra/object-map
@@ -402,7 +402,8 @@ doesn't find overlay"
   :doc "Keymap for invoking eglot features"
   :prefix 'ra/eglot-map
   "h" #'eglot-inlay-hints-mode
-  "d" #'eldoc-box-help-at-point)
+  "d" #'eldoc-box-help-at-point
+  "a" #'eglot-code-actions)
 
 ;; C-c keymap
 (ra/keymap-set mode-specific-map
@@ -459,6 +460,7 @@ doesn't find overlay"
   "C-M-2" #'other-window-prefix
   "C-M-4" #'ra/dwim-window-prefix
   "C-M-o" #'ra/give-buffer-to-other-window
+  "C-M-SPC" #'ra/mark-line
 
   "<remap> <Info-goto-emacs-command-node>" #'describe-face)
 

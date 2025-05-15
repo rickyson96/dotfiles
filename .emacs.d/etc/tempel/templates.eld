@@ -95,12 +95,22 @@ typescript-ts-mode :when (string-match-p (rx (0+ nonl) ".test.ts" eos) (file-nam
 
 
 go-mode go-ts-mode
+(ctxc "ctx context.Context")
 (func "func " p "(" p ") {" n> q n "}" >)
 (ifel "if " p " {" n> p n "} else {" > n> p n "}" > q)
-(tst "func Test" p " (t *testing.T) { " n> q n "}")
+(tst "func Test" p "(t *testing.T) { " n> q n "}")
 (tstf "func (t *testing.T) { " n> q n "}")
 (tsts "tests := []struct{" n> "name string" n> q n "}{}")
 (tstr "for _, test := range tests {" n> "t.Run(" (p "test.name") ", func (t *testing.T) { " n> q n "})" n "}")
+(tscmp "if diff := cmp.Diff(" (p "want") ", " (p "got") "); diff != \"\" {" n
+       "t.Errorf(\"" (p "function") " mismatch, (-want,+got):\\n%s\"" q ", diff)" n
+       "}")
+(tswer "if test.wantErr != (err != nil) {" n>
+	   "t.Errorf(\"wantErr is %t, but err is %v\", test.wantErr, err)" n>
+	   "}")
+(tsen "if err != nil {" n>
+	   "t.Errorf(\"unwanted error: %v\", err)" n>
+	   "}")
 (bench "func Benchmark" p " (b *testing.B) { " n> q n "}")
 (ex "Expect(" (p "value") ")")
 (exerr "Expect(err).NotTo(HaveOccurred())" q)
@@ -116,3 +126,10 @@ yaml-ts-mode
 
 sh-mode
 (echo "echo \"" q "\" >&2")
+
+
+sql-mode
+(ine "IF NOT EXISTS ")
+(ie "IF EXISTS ")
+(ct "CREATE TABLE " (t ine) (p "table_name") "(" n> q n ");")
+(dt "DROP TABLE " (t ie) (p "table_name") ";" q)

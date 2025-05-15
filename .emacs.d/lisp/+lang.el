@@ -37,6 +37,16 @@
 (add-hook 'go-ts-mode-hook #'eglot-ensure)
 (add-hook 'go-ts-mode-hook #'apheleia-mode)
 
+(with-eval-after-load 'go-ts-mode
+  (ra/keymap-set go-ts-mode-map
+    "C-c C-r" #'go-run
+    "C-c C-l a" #'go-tag-add
+    "C-c C-l k" #'go-tag-remove
+    "C-c C-l r" #'go-tag-refresh
+    "C-c C-t f" #'go-test-current-file
+    "C-c C-t t" #'go-test-current-test
+    "C-c C-t p" #'go-test-current-project))
+
 ;; Need to fix the &key and &rest behaviour
 ;; https://github.com/doomemacs/doomemacs/blob/07fca786154551f90f36535bfb21f8ca4abd5027/lisp/doom-lib.el#L754
 ;; https://emacs.stackexchange.com/questions/77647/how-do-i-properly-use-keyword-named-arguments-in-a-macro-with-cl-defmacro
@@ -200,6 +210,10 @@
 (elpaca suggest)
 (elpaca elisp-autofmt)
 
+(elpaca geiser)
+(elpaca geiser-guile)
+(elpaca guix)
+
 (elpaca (pdf-tools :host github :repo "vedang/pdf-tools"
                    ;; :remotes ("roll" :repo "dalanicolai/pdf-tools" :branch "pdf-roll")
                    )
@@ -211,6 +225,8 @@
       "p" 'pdf-view-scroll-down-or-previous-page
       "v" 'pdf-view-next-page
       "V" 'pdf-view-previous-page)))
+
+(elpaca (pdf-mode :host github :repo "mishoo/pdf-mode.el"))
 
 (elpaca (image-roll :host github :repo "dalanicolai/image-roll.el"))
 

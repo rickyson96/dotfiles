@@ -1,5 +1,68 @@
-#+TITLE: Stow-based Dotfiles
-#+SUBTITLE: The new stow-based dotfiles after losing it
+#+TITLE: Literate home
+#+SUBTITLE: The literate config for my $HOME
 
 * Introduction
-This is my dotfiles, which is powered by [[https://www.gnu.org/software/stow/][GNU Stow]]
+This is my attempt on integrating Literate Configurations using org-mode and Guix Home.
+
+** Goals
+- Use literate configurations to configure guix home and emacs.
+- ort over existing emacs config and use ~use-package~.  
+- Group relevant tools and configurations near each other, instead of
+  separated on multiple files for mulitple programs
+
+** Structure
+The literate configurations enable us to write configurations on
+single org file, and then tangle them into mulitple files. One thing
+that I really wish I can do is to group similar program's
+configurations that exists in separate files together.
+
+Example:
+We want to have configuration for postgresql. Now there are few things to configure:
+- guix package
+- emacs sql-mode and packages
+- psql
+- pgcli
+- pspg
+- pgformatter
+- etc.
+
+Usually, we would do all of those configurations in their
+corresponding files. What if, we could do that on a single file? And
+better, what if we can actually group them into the same outline?
+What if we have the ability to configure them at the same time in a
+multi tools and package configuration environments (such as emacs?).
+
+This literate config tries to solve that issue, by grouping the
+relevant config on the same outline. This way, we could look an =postgres=
+config and skim through all of the relevant tools and configs.
+
+But, doesn't org tangle them in sequential order?
+
+The solution to this is to heavily utilize ~:noweb-ref~. ~:noweb-ref~
+enables us to write configurations that will be tangled to that noweb
+reference. Take a look at the following examples
+
+#+begin_src org :eval no
+,#+begin_src emacs-lisp :tangle test.el :noweb yes
+<<test>>
+,#+end_src
+
+,#+begin_src emacs-lisp :noweb-ref test
+(message "hi!")
+,#+end_src
+
+,#+begin_src emacs-lisp :noweb-ref test
+(message "hello!")
+,#+end_src
+
+,#+begin_src emacs-lisp
+(org-babel-expand-src-block nil '("emacs-lisp" "<<test>>" ((:colname-names) (:rowname-names) (:result-params "replace") (:result-type . value) (:results . "replace") (:exports . "code") (:tangle . "test.el") (:lexical . "no") (:hlines . "no") (:noweb . "yes") (:cache . "no") (:session . "none")) "" nil 1 "(ref:%s)"))
+,#+end_src
+
+,#+RESULTS:
+: (message "hi!")
+: (message "hello!")
+#+end_src
+
+
+*

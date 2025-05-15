@@ -81,7 +81,17 @@
     (dwim-shell-command-on-marked-files
      "Drag and Drop on Files"
      "dragon-drop '<<*>>'"
-     :utils '("dragon-drop")))
+     :utils '("dragon-drop")
+     :silent-success t))
+
+  (defun ra/restart-waybar ()
+    "Restart waybar"
+    (interactive)
+    (dwim-shell-command-on-marked-files
+     "Restart Waybar"
+     "pkill -SIGUSR2 waybar"
+     :utils '("waybar")
+     :silent-success t))
 
   (autoload #'dwim-shell-command "dwim-shell-command")
   (autoload #'dwim-shell-command-on-marked-files "dwim-shell-command"))

@@ -157,8 +157,8 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
                                          ("t" "~/.local/share/Trash/files/" "TrashCan")
                                          (". ." "~/.dotfiles"               "Dotfiles")
                                          (". r" "~/.root-dotfiles"          "Root Dotfiles")))
-  (setopt dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index))
-          dirvish-header-line-format '(:left (path) :right (vc-info file-user))
+  (setopt dirvish-mode-line-format '(:left (sort file-size symlink) :right (omit yank index))
+          dirvish-header-line-format '(:left (path) :right (vc-info file-modes file-user))
           dirvish-attributes '(nerd-icons file-time file-size collapse subtree-state vc-state git-msg)
           dired-listing-switches "-l --almost-all --human-readable --group-directories-first --no-group"
           dirvish-reuse-session t

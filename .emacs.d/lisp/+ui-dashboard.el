@@ -82,7 +82,8 @@
                                       "Vi Vi Vi, the editor of the beast" "Welcome to the church of Emacs"
                                       "While any text editor can save your files, only Emacs can save your soul"
                                       "I showed you my source code, pls respond"
-                                      "There's no magic, there's just some f-ing sand, shoved together into silicone, and that's the chip. - DHH")))
+                                      "There's no magic, there's just some f-ing sand, shoved together into silicone, and that's the chip. - DHH"
+                                      "You should be your biggest fan, bcs everybody else will \"boo\" you, don't join them! - GaryVee")))
 
 (provide '+ui-dashboard)
 ;;; +ui-dashboard.el ends here

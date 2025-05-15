@@ -43,9 +43,9 @@
                                         ("*" . "+"))
         org-use-property-inheritance t
         org-edit-src-content-indentation 0
-        org-link-abbrev-alist '(("ytni" . "yt:%s")
-                                ("github" . "https://github.com/%s")
-                                ("verb-var" . "elisp:%(ra/verb-var-link)")))
+        org-link-abbrev-alist '(("github" . "https://github.com/%s")
+                                ("verb-var" . "elisp:%(ra/verb-var-link)")
+                                ("youtube" . "https://youtube.com/watch?v=%s")))
 
 (put 'ra/verb-var-link 'org-link-abbrev-safe t)
 
@@ -54,7 +54,8 @@
 
 (setopt org-babel-load-languages '((emacs-lisp . t)
                                    (js . t)
-                                   (shell . t)))
+                                   (shell . t)
+                                   (sql . t)))
 
 (with-eval-after-load 'verb
   (add-to-list 'org-babel-load-languages '(verb . t)))
@@ -65,7 +66,7 @@
           org-appear-autokeywords t
           org-appear-autolinks t
           org-appear-delay 0.0
-          org-appear-trigger 'manual)
+          org-appear-trigger 'on-change)
 
   (add-hook 'org-mode-hook (lambda ()
                              (add-hook 'meow-normal-mode-hook #'org-appear-manual-stop nil t)
@@ -84,16 +85,19 @@
 
 (require 'org-protocol)
 
+(elpaca org-edna
+  (setopt org-edna-use-inheritance t)
+
+  (with-eval-after-load 'org
+    (org-edna-mode 1)))
+
 (elpaca org-gtd
-  (setopt org-edna-use-inheritance t
-          org-gtd-update-ack "3.0.0"
+  (setopt org-gtd-update-ack "3.0.0"
 
           org-gtd-engage-prefix-width 20)
   (ra/keymap-set org-gtd-clarify-map
     "C-c c" #'org-gtd-organize)
-
   (with-eval-after-load 'org
-    (org-edna-mode 1)
     (require 'org-gtd)))
 
 (elpaca alert
@@ -146,17 +150,17 @@
                    :kill-buffer t)
                   ("🗓 Schedule" :keys "s"
                    :file ,(file-name-concat org-directory "schedule/private.org")
-                   :template ("* TODO %?"
-                              "SCHEDULED: %^T"
+                   :template ("* TODO %^{Title}"
+                              "SCHEDULED: %^t"
                               ""
-                              ""
+                              "%?"
                               " %i"))
                   ("🗓 Agenda" :keys "a"
                    :file ,(file-name-concat org-directory "schedule/private.org")
-                   :template ("* %?"
+                   :template ("* %^{Title}"
                               "%^T"
                               ""
-                              ""
+                              "%?"
                               " %i"))
                   ("Protocols" :keys "p"
                    :children ("Capture Protocol" :keys "c"
@@ -185,17 +189,45 @@
         org-log-redeadline 'note
         org-log-into-drawer t
         org-return-follows-link t
-        org-extend-today-until 4)
+        org-extend-today-until 4
+        org-todo-keywords '((sequence "TODO" "CHECK" "|" "DONE(d!)" "CNCL(c@)"))
+        org-refile-targets '(("recurring.org" :maxlevel . 1)
+                             (org-agenda-files :maxlevel . 3))
+        org-refile-use-outline-path 'file
+        org-use-speed-commands t)
 
-(setopt denote-directory "/home/randerson/org/notes"
+;; https://github.com/minad/vertico?tab=readme-ov-file#org-refile 
+(with-eval-after-load 'vertico
+  (defun vertico-enforce-basic-completion (&rest args)
+    (minibuffer-with-setup-hook
+        (:append
+         (lambda ()
+           (let ((map (make-sparse-keymap)))
+             (define-key map [tab] #'minibuffer-complete)
+             (use-local-map (make-composed-keymap (list map) (current-local-map))))
+           (setq-local completion-styles (cons 'basic completion-styles)
+                       vertico-preselect 'prompt)))
+      (apply args)))
+  
+  (advice-add #'org-olpath-completing-read :around #'vertico-enforce-basic-completion))
+
+(with-eval-after-load 'ef-themes
+  (setq org-modern-tag-faces (ef-themes-with-colors
+                               `(("personal" :background ,bg-cyan-subtle)
+                                 ("work" :background ,bg-red-subtle)))
+        org-modern-todo-faces (ef-themes-with-colors
+                               `(("CHECK" :background ,yellow :foreground ,bg-main)))))
+
+(setopt denote-directory "/home/rickyson/org/notes")
+(setopt org-tag-alist '((:startgroup . nil)
+                        ("personal" . ?p)
+                        ("work" . ?w)
+                        (:endgroup . nil))
         org-agenda-files (list org-directory (file-name-concat org-directory "schedule") denote-directory)
         org-agenda-current-time-string "◀═════ now ═════▶"
         org-agenda-custom-commands
         '(("u" "My GTD Agenda"
-           ((tags "PRIORITY=\"A\"" ((org-agenda-overriding-header " Urgent")
-                                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                                    (org-agenda-prefix-format "   %i %?-2 t%s")))
-            (agenda "" ((org-agenda-span 'day)
+           ((agenda "" ((org-agenda-span 'day)
                         (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                         (org-agenda-breadcrumbs-separator " ❱ ")
                         (org-agenda-current-time-string "◀═════ now ═════▶")
@@ -209,10 +241,14 @@
                         (org-agenda-overriding-header "󰃭 Calendar")
                         (org-super-agenda-header-separator "")
                         (org-super-agenda-groups '((:time-grid t)))))
-            (org-ql-block '(and (todo "TODO")
-                                (not (ts-active))
-                                (not (priority "A")))
-                           ((org-ql-block-header "⚡ New TODO")))
+            (tags-todo "PRIORITY=\"A\"&TODO=\"TODO\"" ((org-agenda-overriding-header " Urgent")
+                                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                                    (org-agenda-prefix-format "%8b %i ")))
+            (tags-todo "-PRIORITY=\"A\"&-TODO=\"DONE\""
+                       ((org-agenda-overriding-header "⚡ New TODO")
+                        (org-agenda-prefix-format "%8b %i ")
+                        (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))
+                        (org-agenda-sorting-strategy '(priority-down))))
             (todo "NEXT" ((org-agenda-overriding-header "⚡ Next Action")
                           ;; (org-agenda-prefix-format " %i %-30:(my/org-gtd-agenda-prefix-format 30) ")
                           (org-agenda-prefix-format '((todo . " %i %-30:(org-gtd-agenda--prefix-format)")))
@@ -261,6 +297,14 @@
 (elpaca (org-cv :host github :repo "Titan-C/org-cv"
                 :main "ox-moderncv.el" 
                 :files ("ox-moderncv.el" "org-cv-utils.el")))
+
+(elpaca ob-mermaid
+  (add-to-list 'org-babel-load-languages '(mermaid . t)))
+
+(elpaca ox-hugo
+  (with-eval-after-load 'ox
+    (require 'ox-hugo))
+  (setopt org-hugo-base-dir "~/projects/rickyson96.github.io"))
 
 (provide '+lang-org)
 ;;; +lang-org.el ends here

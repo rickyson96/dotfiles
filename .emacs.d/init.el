@@ -47,6 +47,7 @@
 ;; can rely on newly setup PATH. Some package also depends on
 ;; environment variable like `lsp-mode'
 (elpaca exec-path-from-shell
+  (setopt exec-path-from-shell-arguments '("-l"))
   (when (daemonp)
     (require 'exec-path-from-shell)
     (dolist (var '("PATH"
@@ -58,10 +59,14 @@
                    "DISPLAY"
                    "WAYLAND_DISPLAY"
                    "RIPGREP_CONFIG_PATH"
-                   "DOCKER_HOST"))
+                   "DOCKER_HOST"
+                   "GUILE_LOAD_PATH"))
       (add-to-list 'exec-path-from-shell-variables var))
 
-    (exec-path-from-shell-initialize)))
+    (exec-path-from-shell-initialize))
+
+  (unless (getenv "WAYLAND_DISPLAY")
+    (setenv "WAYLAND_DISPLAY" "wayland-1")))
 
 ;; we need to wait for `no-littering' to install so that further
 ;; installation can conform to the no-littering directories
@@ -176,6 +181,8 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 (elpaca (treesit-fold :host github :repo "emacs-tree-sitter/treesit-fold"))
 
 (require '+completion)
+
+(require '+ai)
 
 (require '+intellisense)
 
@@ -731,7 +738,4 @@ first, and wrap it in `wrap-str'."
           gc-cons-percentage 0.2)
   (gcmh-mode))
 
-
-(put 'list-timers 'disabled nil)
 ;;; init.el ends here
-(put 'set-goal-column 'disabled nil)

@@ -96,6 +96,10 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     ;; (add-hook 'magit-mode-hook #'magit-delta-mode)
     (setopt magit-delta-hide-plus-minus-markers nil)))
 
+(elpaca consult-gh)
+(elpaca consult-gh-forge)
+(elpaca consult-gh-embark)
+
 (setopt ediff-window-setup-function 'ediff-setup-windows-plain
         ediff-split-window-function 'split-window-horizontally
         ediff-diff-options "-w"

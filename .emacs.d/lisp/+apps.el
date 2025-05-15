@@ -47,7 +47,24 @@
 
   (with-eval-after-load 'pass
     (ra/keymap-set pass-view-mode-map
-      "<remap> <meow-quit>" #'kill-current-buffer)))
+      "<remap> <meow-quit>" #'kill-current-buffer)
+    (ra/keymap-set pass-mode-map
+      "S" #'ra/pass-symlink)))
+
+;; TODO upstream this?
+(defun ra/pass-symlink (edit)
+  "Relatively generate symlink entry at point.
+By default, it'll try to symlink the parent directory.
+EDIT means edit which directory or file to be symlinked."
+    (interactive "P")
+    (if-let* ((pass-entry (pass-closest-entry))
+              (pass-dir (file-name-concat default-directory (file-name-directory pass-entry)))
+              (entry (if edit
+                         (read-file-name "Select dir/file to symlink: " pass-dir nil t (concat "/" pass-entry))
+                       (file-name-concat default-directory (file-name-parent-directory pass-entry))))
+              (symlink-name (read-file-name (format "Symlink %s to: " (propertize entry 'face 'bold)) (file-name-parent-directory entry))))
+        (make-symbolic-link entry symlink-name 1)
+      (message "No entry at point")))
 
 (defun ra/scan-otp-uri (&optional direct-insert)
   "Scan otp-uri using `hyprshot' and put it in `kill-ring'"
@@ -187,8 +204,8 @@
     (org-capture nil "m")))
 
 (elpaca denote
-  (require 'denote-journal-extras)
-  (setopt denote-journal-extras-title-format 'day-date-month-year)
+  ;; (require 'denote-journal-extras)
+  ;; (setopt denote-journal-extras-title-format 'day-date-month-year)
 
   (with-eval-after-load 'doct
     (setopt org-capture-templates (doct-add-to org-capture-templates
@@ -284,10 +301,20 @@
     (add-to-list 'plz-see-content-type-alist `("\\`application/json" . ,(lambda ()
                                                                           (jsonian-format-region (point-min) (point-max))
                                                                           (jsonian-mode))))))
+(defun ra/get-redirect-location (url)
+  "Get the Location header on an URL, if any."
+  (interactive "sURL: ")
+  (unwind-protect
+      (progn
+        (advice-add 'plz--skip-redirect-headers :override #'ignore)
+        (condition-case err
+	      (let ((plz-curl-default-args '("--silent" "--compressed")))
+	        (plz 'get url))
+        (plz-error (alist-get 'location (plz-response-headers
+								         (plz-error-response (caddr err)))))))
+    (advice-remove 'plz--skip-redirect-headers #'ignore)))
 
 (elpaca devdocs)
-
-(elpaca (emacs-conflict :host github :repo "ibizaman/emacs-conflict"))
 
 ;; (elpaca mu4e)
 
@@ -349,6 +376,21 @@
         gt-default-translator (gt-translator :taker (gt-taker :text 'word :prompt t)
                                              :engines (gt-google-engine)
                                              :render (gt-buffer-render))))
+
+(elpaca (syncthing :host github :repo "KeyWeeUsr/emacs-syncthing")
+  (setq syncthing-default-server-token "fWEeWbbvkqXXgixeTUWGCfcPxGyDhY9T"))
+(elpaca (emacs-conflict :host github :repo "ibizaman/emacs-conflict")
+  (autoload 'emacs-conflict-resolve-conflicts "emacs-conflict" "" t)
+  (autoload 'emacs-conflict-show-conflicts-dired "emacs-conflict" "" t)
+  (autoload 'emacs-conflict-resolve-conflict-dired "emacs-conflict" "" t))
+
+(elpaca (iwd :host sourcehut :repo "leon_plickat/iwd-el")
+  (autoload #'iwd "iwd" "Control iwd WLAN connections." t))
+
+(elpaca esup)
+
+(elpaca (hexrgb :host github :repo "emacsmirror/hexrgb"))
+(elpaca (palette :host github :repo "emacsmirror/palette"))
 
 (provide '+apps)
 ;;; +apps.el ends here

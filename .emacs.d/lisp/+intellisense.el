@@ -171,7 +171,7 @@
 
     (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(lsp-organize eslintd))
     (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(pyflakes black isort))
-    (setf (alist-get 'go-ts-mode apheleia-mode-alist) '(goimports gofumpt))))
+    (setf (alist-get 'go-ts-mode apheleia-mode-alist) '(gofumpt goimports))))
 
 (elpaca tempel
   (defun ra/tempel-setup-capf ()
@@ -231,38 +231,6 @@ with IMENU-PATTERN"
                         ,(format "Set up imenu-extra on %s" hook-name)
                         (imenu-extra-auto-setup ,imenu-pattern))
                       (add-hook ',hook #',sym)))))
-
-(elpaca (copilot :host github :repo "copilot-emacs/copilot.el")
-  ;; (add-hook 'prog-mode-hook #'copilot-mode)
-  (with-eval-after-load 'copilot
-    (ra/keymap-set copilot-completion-map
-      "C-g" #'copilot-clear-overlay
-      "M-p" #'copilot-previous-completion
-      "M-n" #'copilot-next-completion
-      "C-e" #'copilot-accept-completion-by-line
-      "M-f" #'copilot-accept-completion-by-word
-      "C-<return>" #'copilot-accept-completion)))
-
-(elpaca (openai :host github :repo "emacs-openai/openai")
-
-  (defun ra/openai-key-auth-source (&optional base-url)
-    "Retrieve the OpenAI API key from auth-source given a BASE-URL.
-If BASE-URL is not specified, it defaults to `openai-base-url'."
-    (if-let ((auth-info (auth-source-search :max 1
-                                            :host (url-host (url-generic-parse-url (or nil openai-base-url)))
-                                            :require '(:secret))))
-        (funcall (plist-get (car auth-info) :secret))
-      (error "OpenAI API key not found in auth-source")))
-
-  (setopt openai-key #'ra/openai-key-auth-source
-          openai-user "ricky.anderson2696@gmail.com"))
-(elpaca (chatgpt :host github :repo "emacs-openai/chatgpt"))
-(elpaca (codegpt :host github :repo "emacs-openai/codegpt"))
-
-;; Tabby
-;; (elpaca (tabby :host github :files ("*.el" "node_scripts") :repo "alan-w-255/tabby.el")
-;;   (ra/keymap-set tabby-mode-map
-;;     "C-<return>" #'tabby-accept-completion))
 
 (elpaca tiny
   (defun ra/tiny-setup-capf ()

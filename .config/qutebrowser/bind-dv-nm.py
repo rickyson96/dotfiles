@@ -178,6 +178,20 @@ c.bindings.commands['insert'] = {
     '<alt-w>': 'fake-key <ctrl-c>',
     '<ctrl-g>': 'mode-leave',
     '<escape>': 'mode-leave',
+
+    # userscript
+    "<alt-u>pp": "spawn -u qute-pass -m -d 'fuzzel -d'",
+    "<alt-u>pP": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered",
+    "<alt-u>pu": "spawn -u qute-pass -m -d 'fuzzel -d' --username-only",
+    "<alt-u>pU": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --username-only",
+    "<alt-u>pw": "spawn -u qute-pass -m -d 'fuzzel -d' --password-only",
+    "<alt-u>pW": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --password-only",
+    "<alt-u>po": "spawn -u qute-pass -m -d 'fuzzel -d' --otp-only",
+    "<alt-u>pO": "spawn -u qute-pass -m -d 'fuzzel -d' --unfiltered --otp-only",
+    '<alt-u>mm': 'spawn umpv {url}',
+    '<alt-u>mv': 'hint video spawn umpv {hint-url}',
+    '<alt-u>ml': 'hint links spawn umpv {hint-url}',
+    '<alt-u>ma': 'hint all spawn umpv {hint-url}',
 }
 
 c.bindings.commands['hint'] = {

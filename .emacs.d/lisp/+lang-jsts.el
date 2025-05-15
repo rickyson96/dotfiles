@@ -82,7 +82,7 @@
 
 ;; (elpaca tide)
 
-(elpaca npm)
+;; (elpaca npm)
 (elpaca nodejs-repl)
 (elpaca nvm
   (setopt nvm-dir "/home/randerson/.local/share/nvm/"))
