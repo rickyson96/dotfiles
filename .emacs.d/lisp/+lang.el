@@ -15,15 +15,17 @@
 
 (require 'treesit)
 (setopt treesit-font-lock-level 4)      ; more colors
-(cl-defmacro ra/treesitter-setup (language url &rest extra &key no-mode-remap &allow-other-keys)
+;; TODO no mode remap
+(cl-defmacro ra/treesitter-setup (language url &rest extra &allow-other-keys)
   "Setup Emacs's treesitter for LANGUAGE"
   (macroexp-progn
    `((add-to-list 'treesit-language-source-alist '(,language ,url ,@extra))
      (unless (treesit-language-available-p ',language)
        (treesit-install-language-grammar ',language))
-     (unless ,no-mode-remap
-       (add-to-list 'major-mode-remap-alist '(,(intern (concat (symbol-name language) "-mode")) .
-                                              ,(intern (concat (symbol-name language) "-ts-mode"))))))))
+     ;; (unless ,no-mode-remap
+     ;;   (add-to-list 'major-mode-remap-alist '(,(intern (concat (symbol-name language) "-mode")) .
+     ;;                                          ,(intern (concat (symbol-name language) "-ts-mode")))))
+     )))
 
 (elpaca go-mode)
 (elpaca gotest)
@@ -50,7 +52,7 @@
 ;; Need to fix the &key and &rest behaviour
 ;; https://github.com/doomemacs/doomemacs/blob/07fca786154551f90f36535bfb21f8ca4abd5027/lisp/doom-lib.el#L754
 ;; https://emacs.stackexchange.com/questions/77647/how-do-i-properly-use-keyword-named-arguments-in-a-macro-with-cl-defmacro
-;; (ra/treesitter-setup gomod "https://github.com/camdencheek/tree-sitter-go-mod" :no-mode-remap t)
+(ra/treesitter-setup gomod "https://github.com/camdencheek/tree-sitter-go-mod")
 (add-to-list 'treesit-language-source-alist '(gomod "https://github.com/camdencheek/tree-sitter-go-mod"))
 
 (ra/treesitter-setup bash "https://github.com/tree-sitter/tree-sitter-bash")
@@ -141,6 +143,7 @@
 
 (elpaca adoc-mode)
 
+(ra/treesitter-setup json "https://github.com/tree-sitter/tree-sitter-json")
 (elpaca jsonian
   (add-hook 'jsonian-mode-hook #'lsp-deferred)
   (with-eval-after-load 'lsp
@@ -156,6 +159,11 @@
           jq-interactive-default-options "--prettyPrint --input-format json --output-format json"
           jq-interactive-font-lock-mode #'jsonian-mode)
 
+  (with-eval-after-load 'jq-mode
+    (ra/keymap-set jq-interactive-map
+      "C-v" #'scroll-other-window
+      "M-v" #'scroll-other-window-down))
+
   (defun ra/yq-interactively ()
     "`jq-interactively' but using yq for yaml files"
     (interactive)
@@ -165,8 +173,7 @@
           (jq-interactive-default-prompt "yq: "))
       (call-interactively #'jq-interactively))))
 
-(ra/treesitter-setup yaml "https://github.com/ikatyang/tree-sitter-yaml"
-                     :no-mode-remap t)
+(ra/treesitter-setup yaml "https://github.com/ikatyang/tree-sitter-yaml")
 (elpaca yaml-pro
   (autoload #'yaml-pro-ts-mode "yaml-pro" "" t)
   (add-hook 'yaml-mode-hook #'yaml-pro-ts-mode)
@@ -234,7 +241,23 @@
 (elpaca etc-sudoers-mode)
 
 (elpaca fish-mode)
-(add-hook 'sh-mode-hook #'lsp-deferred)
+(add-hook 'sh-mode-hook #'eglot-ensure)
+
+(add-to-list 'auto-mode-alist `(,(rx ".bash" eos) . bash-ts-mode))
+(defun ra/bash-enable-ts ()
+  "Enable treesitter for bash mode if `sh-shell' is `bash'."
+  (interactive)
+  (when (and (eq sh-shell 'bash)
+             (not (derived-mode-p 'bash-ts-mode)))
+    (bash-ts-mode)))
+
+(add-to-list 'major-mode-remap-alist
+             '(sh-mode . ra/bash-enable-ts))
+(add-hook 'bash-ts-mode-hook #'apheleia-mode)
+
+(elpaca flymake-shellcheck
+  (add-hook 'sh-mode-hook #'flymake-shellcheck-load)
+  (add-hook 'bash-ts-mode-hook #'flymake-shellcheck-load))
 
 ;; literate calc
 (elpaca literate-calc-mode)
@@ -255,38 +278,7 @@
 (elpaca ansible-vault)
 (elpaca poly-ansible)
 
-(defun sql-comint-spanner (product options &optional buffer)
-  "Create comint buffer and connect to spanner"
-  (let ((params (append (unless (string= "" sql-server)
-                          (list "-p" sql-server))
-                        (unless (string= "" sql-user)
-                          (list "-i" sql-user))
-                        (unless (string= "" sql-database)
-                          (list "-d" sql-database)))))
-    (sql-comint product params buffer)))
-
-(defun ra/sql-spanner-setup-history ()
-  (setq-local sql-input-ring-file-name (file-truename "~/.cache/spanner/history.sql")
-              sql-input-ring-separator ";\n"))
-(add-hook 'sql-interactive-mode-hook #'ra/sql-spanner-setup-history)
-
-(with-eval-after-load 'sql
-  (add-to-list 'sql-product-alist `(spanner :name "Spanner"
-                                            :font-lock sql-mode-ansi-font-lock-keywords
-                                            :sqli-program "spanner-cli"
-                                            :sqli-options nil
-                                            :sqli-login (server user database)
-                                            :sqli-comint-func sql-comint-spanner
-                                            :prompt-regexp ,(rx bol "spanner> ")
-                                            :prompt-cont-regexp ,(rx bol "      -> ")
-                                            :prompt-length 9
-                                            :list-all "SHOW TABLES;"
-                                            :list-table "SHOW COLUMNS FROM %s;"
-                                            :terminator ";")))
-(defun sql-spanner (&optional buffer)
-  (interactive "P")
-  (sql-product-interactive 'spanner buffer))
-
+(require '+lang-sql)
 (elpaca caddyfile-mode
   (add-to-list 'auto-mode-alist `(,(rx "Caddyfile" eos) . caddyfile-mode))
   (add-to-list 'auto-mode-alist `(,(rx "caddy.conf" eos) . caddyfile-mode)))

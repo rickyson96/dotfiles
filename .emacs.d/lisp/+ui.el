@@ -140,10 +140,16 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
                                      :mode-line-width 3
                                      :tab-width 4
                                      :right-divider-width 10
-                                     :scroll-bar-width 8))
+                                     :scroll-bar-width 1))
 
-  (ra/configure-frame ra/spacious-padding
-    (spacious-padding-mode 1)))
+  (add-hook 'after-make-frame-functions
+            (lambda (frame)
+              (let-alist (json-read-from-string
+                          (shell-command-to-string "hyprctl -j getoption animations:enabled"))
+                (spacious-padding-mode (if (= .int 1) 1 -1)))
+
+              (setq spacious-padding--internal-border-width 0
+                    spacious-padding--right-divider-width 0))))
 
 (elpaca (dired-plus :host github :repo "emacsmirror/dired-plus" :main "dired+.el"))
 
@@ -176,7 +182,7 @@ Taken from: https://protesilaos.com/emacs/ef-themes#h:19c549dc-d13f-45c4-a727-36
     "M-t" #'dirvish-layout-toggle
     "M-s" #'dirvish-setup-menu
     "M-e" #'dirvish-emerge-menu
-    "M-j" #'dirvish-fd-jump
+    "j" #'dirvish-fd-jump
 
     "$" #'eshell
     "M-$" #'eshell

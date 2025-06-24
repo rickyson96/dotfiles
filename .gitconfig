@@ -50,13 +50,11 @@
 	enabled = true
 [gpg]
 	program = gpg2
-[maintenance]
-	repo = /home/randerson/work/paystone/atom-communications
+[pull]
+	rebase = true
 
-[includeIf "gitdir:~/work/paystone/"]
-	path = ~/.paystone.gitconfig
-[gitlab "git.datacandy.com/api"]
-	user = randerson
+[includeIf "gitdir:~/projects/xendit/"]
+	path = ~/.xendit.gitconfig
 
 [alias]
 	crypt = git-crypt

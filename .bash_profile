@@ -7,6 +7,8 @@
 
 export SSH_AGENT_PID=""
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+export LSP_USE_PLISTS=true
+# export DOCKER_HOST="unix://$XDG_RUNTIME_DIR/podman/podman.sock"
 
 if [ -e /home/rickyson/.nix-profile/etc/profile.d/nix.sh ]; then . /home/rickyson/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
@@ -23,3 +25,14 @@ export PATH=$PATH:/usr/local/opt/openssl@1.1/bin
 export PATH=$PATH:/Users/rickyson/opensource/kotlin-language-server/server/build/install/server/bin
 export PATH=$PATH:~/.cargo/bin
 export PATH=$PATH:/Users/rickyson/opensource/mermaid-cli/node_modules/.bin
+
+export SDKMAN_DIR="$HOME/.sdkman"
+export EDITOR='emacsclient -r'
+
+# pnpm
+export PNPM_HOME="/home/randerson/.local/share/pnpm"
+case ":$PATH:" in
+*":$PNPM_HOME:"*) ;;
+*) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

@@ -4,18 +4,30 @@
 
 shopt -s nullglob globstar
 
-otp=0
+cmd="show"
+copy=""
 prompt="Password: "
-if [[ $1 == "otp" ]]; then
-	otp=1
-	prompt="OTP: "
-	shift
-fi
+while [[ $# -gt 0 ]]; do
+	case $1 in
+	otp)
+		cmd="otp"
+		prompt="OTP: "
+		shift
+		;;
+	copy)
+		copy="--clip"
+		shift
+		;;
+	*)
+		break
+		;;
+	esac
+done
 
-dmenu_switches=""
+dmenu_switches=()
 if [[ -n $WAYLAND_DISPLAY ]]; then
 	dmenu=fuzzel
-	dmenu_switches="--prompt $prompt --width 80 --dmenu"
+	dmenu_switches=(--prompt "$prompt" --width 80 --dmenu)
 	xdotool="wtype"
 elif [[ -n $DISPLAY ]]; then
 	dmenu=dmenu
@@ -26,16 +38,19 @@ else
 fi
 
 prefix=${PASSWORD_STORE_DIR-~/.password-store}
-password_files=( "$prefix"/**/*.gpg )
-password_files=( "${password_files[@]#"$prefix"/}" )
-password_files=( "${password_files[@]%.gpg}" )
+password_files=("$prefix"/**/*.gpg)
+password_files=("${password_files[@]#"$prefix"/}")
+password_files=("${password_files[@]%.gpg}")
 
-password=$(printf '%s\n' "${password_files[@]}" | "$dmenu" $dmenu_switches "$@")
+password=$(printf '%s\n' "${password_files[@]}" | "$dmenu" "${dmenu_switches[@]}" "$@")
 
 [[ -n $password ]] || exit
 
-if [[ $otp -eq 0 ]]; then
-	pass show "$password" | { IFS= read -r pass; printf %s "$pass"; } | xargs -0 $xdotool
-else
-	pass otp "$password" | { IFS= read -r pass; printf %s "$pass"; } | xargs -0 $xdotool
+pw=$(pass "$cmd" ${copy:+"$copy"} "$password" | {
+	IFS= read -r pass
+	printf %s "$pass"
+})
+
+if [[ -z $copy ]]; then
+	"$xdotool" "$pw"
 fi

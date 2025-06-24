@@ -35,11 +35,11 @@
           dashboard-set-file-icons t)
 
   (setopt dashboard-navigator-buttons
-          `((("󰃭" "Agenda" "Org GTD Agenda" ,(cmd! (org-agenda nil "u")))
-             ("󱖟" "Process" "Org GTD Process Inbox" ,(cmd! (org-gtd-process-inbox)))
-             ("" "Edit" "Edit gtd inbox" ,(cmd! (find-file (file-name-concat org-directory "gtd/inbox.org" nil)))))
-            (("" "Elfeed" "Browse elfeed" ,(cmd! (elfeed)))
-             ("" "Edit" "Edit elfeed-org" ,(cmd! (find-file (file-name-concat org-directory "elfeed.org" nil)))))))
+          `((("󰃭" "Agenda" "Org GTD Agenda" ,(##org-agenda nil "u" _&*))
+             ("󱖟" "Process" "Org GTD Process Inbox" ,(##org-gtd-process-inbox))
+             ("" "Edit" "Edit gtd inbox" ,(##find-file (file-name-concat org-directory "gtd/inbox.org" nil))))
+            (("" "Elfeed" "Browse elfeed" ,(##elfeed))
+             ("" "Edit" "Edit elfeed-org" ,(##find-file (file-name-concat org-directory "elfeed.org" nil))))))
 
   (setopt dashboard-items '((projects . 5)
                             (agenda . 15)))

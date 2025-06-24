@@ -41,16 +41,16 @@ GenericName[tr]=Web Tarayıcı
 GenericName[uk]=Навігатор Тенет瀏覽器
 Comment=A keyboard-driven, vim-like browser based on Python and Qt
 Comment[de]=Ein Tastatur-gesteuerter, vim-ähnlicher Browser basierend auf Python und Qt
-Comment[it]=Un browser web vim-like utilizzabile da tastiera basato su Python e Qt
+Comment[it]= Un browser web vim-like utilizzabile da tastiera basato su Python e Qt
 Icon=qutebrowser
 Type=Application
 Categories=Network;WebBrowser;
 Exec=qutebrowser --untrusted-args %u
 Terminal=false
 StartupNotify=true
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/rdf+xml;image/gif;image/webp;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/qute;
 Keywords=Browser
 Actions=new-window;preferences;
-X-Desktop-File-Install-Version=0.27
 
 [Desktop Action new-window]
 Name=New Window
@@ -176,5 +176,3 @@ Name[zh_CN]=首选项
 Name[zh_HK]=偏好設定
 Name[zh_TW]=偏好設定
 Exec=qutebrowser "qute://settings"
-x-scheme-handler/unknown;x-scheme-handler/about;text/html;text/xml;application/xhtml+xml;application/xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/qute;
-MimeType=x-scheme-handler/about;x-scheme-handler/unknown;text/html;text/xml;application/xhtml+xml;application/xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/qute;

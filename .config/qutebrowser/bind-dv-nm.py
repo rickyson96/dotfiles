@@ -105,6 +105,8 @@ c.bindings.commands['normal'] = {
     '<alt-u>mv': 'hint video spawn umpv {hint-url}',
     '<alt-u>ml': 'hint links spawn umpv {hint-url}',
     '<alt-u>ma': 'hint all spawn umpv {hint-url}',
+    '<alt-b>b': 'spawn -u org-protocol capture pl',
+    '<alt-b>x': 'spawn -u org-protocol capture pb',
 
     # modes
     '<ctrl-i>': 'mode-enter insert',
@@ -166,8 +168,9 @@ c.bindings.commands['insert'] = {
     '<ctrl-d>': 'fake-key <Delete>',
     '<alt-d>': 'fake-key <Ctrl-Delete>',
     '<alt-backspace>': 'fake-key <Ctrl-Backspace>',
-    '<ctrl-w>': 'fake-key <ctrl-c>',
-    '<ctrl-c>': 'fake-key <ctrl-c>',
+    '<alt-w>': 'fake-key -g <ctrl-c>',
+    '<ctrl-w>': 'fake-key <ctrl-x>',
+    '<ctrl-c>': 'fake-key -g <ctrl-c>',
     '<ctrl-y>': 'fake-key <ctrl-v>',
     '<ctrl-v>': 'fake-key <PgDown>',
     '<alt-v>': 'fake-key <PgUp>',

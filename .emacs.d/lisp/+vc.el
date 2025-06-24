@@ -13,7 +13,9 @@
 
 ;;; Code:
 
-(elpaca transient)
+(elpaca transient
+  (setopt transient-default-level 7))
+
 (elpaca magit
   (setopt magit-prefer-remote-upstream t
           magit-branch-prefer-remote-upstream '("master" "develop" "production" "development" "staging" "dev" "main")
@@ -28,10 +30,7 @@
           magit-clone-name-alist `(("\\`\\(?:github:\\|gh:\\)?\\([^:]+\\)\\'" "github.com" "github.user")
                                    ("\\`\\(?:gitlab:\\|gl:\\)\\([^:]+\\)\\'" "gitlab.com" "gitlab.user")
                                    ("\\`\\(?:sourcehut:\\|sh:\\)\\([^:]+\\)\\'" "git.sr.ht" "sourcehut.user")
-                                   (,(rx bos "dc:" (group (1+ (not (any ":")))) eos) "git.datacandy.com" "gitlab.git.datacandy.com/api.user")
-                                   (,(rx bos (or "nicejob:" "nj:" "nicejobinc:") (group (1+ (not (any ":")))) eos) "git.datacandy.com" "nicejob")
-                                   (,(rx bos (or "atom:" "a:") (group (1+ (not (any ":")))) eos) "git.datacandy.com" "atom")
-                                   (,(rx bos (or "zomaron:" "zm:") (group (1+ (not (any ":")))) eos) "git.datacandy.com" "zomaron")))
+                                   (,(rx bos (or "xendit:" "x:") (group (1+ (not (any ":")))) eos) "github.com" "xendit")))
 
   (ra/keymap-set project-prefix-map
     "m" #'magit-project-status)
@@ -96,9 +95,14 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     ;; (add-hook 'magit-mode-hook #'magit-delta-mode)
     (setopt magit-delta-hide-plus-minus-markers nil)))
 
-(elpaca consult-gh)
+(elpaca consult-gh
+  (setopt consult-gh-show-preview t
+          consult-gh-preview-key "M-t"
+          consult-gh-repo-action #'consult-gh--repo-clone-action))
 (elpaca consult-gh-forge)
-(elpaca consult-gh-embark)
+(elpaca consult-gh-embark
+  (with-eval-after-load 'consult-gh
+    (consult-gh-embark-mode 1)))
 
 (setopt ediff-window-setup-function 'ediff-setup-windows-plain
         ediff-split-window-function 'split-window-horizontally
@@ -139,7 +143,7 @@ n,SPC -next diff     |     h -highlighting       |  c -copy both region to C
   (autoload #'forge-read-pullreq "forge")
 
   (defconst ra/transient-review-pr
-    '("/r" "Review Pull Request" ra/checkout-and-review-forge-pr
+    '("/C" "Code Review" ra/checkout-and-review-forge-pr
       :transient transient--do-exit))
 
   (with-eval-after-load 'forge-commands
@@ -170,6 +174,26 @@ n,SPC -next diff     |     h -highlighting       |  c -copy both region to C
             "git.datacandy.com"               ; WEBHOST and INSTANCE-ID
             forge-gitlab-repository)    ; CLASS
           forge-alist)))
+
+(defun ra/diff-yank (beg end &optional with-marks)
+  "yank diff but without the marks.
+\\[universal-arguments] to use default yank"
+  (interactive "r\nP")
+  (let ((diff (buffer-substring-no-properties beg end)))
+    (unless with-marks
+      (setq diff (replace-regexp-in-string (rx bol "+") " " diff)))
+    (kill-new diff)
+    (setq deactivate-mark t)
+    (when (called-interactively-p 'interactive)
+      (indicate-copied-region))))
+
+(with-eval-after-load 'diff-mode
+  ;; Use C-M-. for `diff-goto-source' instead of `M-o'
+  (ra/keymap-set diff-mode-shared-map
+    "o" nil
+    "C-." #'diff-goto-source)
+  (ra/keymap-set diff-mode-map
+    "M-w" #'ra/diff-yank))
 
 (elpaca agitate
   (add-hook 'diff-mode-hook #'agitate-diff-enable-outline-minor-mode)

@@ -30,21 +30,18 @@ fish_add_path --universal ~/.cargo/bin
 fish_add_path --universal /Users/rickyson/opensource/mermaid-cli/node_modules/.bin
 
 set -Ux YDOTOOL_SOCKET /tmp/.ydotool_socket
-set -Ux SSH_AGENT_PID ""
-set -Ux SSH_AUTH_SOCK "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
 set -Ux LANG 'en_US.UTF-8'
 set -Ux LC_ALL 'en_US.UTF-8'
 set -Ux EDITOR 'emacsclient -r'
 set -Ux LESS "-g -i -M -R -w -z-4"
 set -Ux BAT_PAGER "less -RF"
 set -Ux STARSHIP_CONFIG "~/.config/starship/starship.toml"
-set -Ux LSP_USE_PLISTS true
 set -Ux npm_config_prefix "$HOME/.local"
 set -Ux NODE_VERSION_PREFIX v
 set -Ux NODE_VERSIONS {$HOME/.local/share/nvm}
 set -Ux NODE_OPTIONS "--max-old-space-size=2048"
 set -Ux RIPGREP_CONFIG_PATH "$HOME/.config/ripgrep/ripgreprc"
-set -Ux DOCKER_HOST "unix://$XDG_RUNTIME_DIR/podman/podman.sock"
+# set -Ux DOCKER_HOST "unix://$XDG_RUNTIME_DIR/podman/podman.sock"
 set -Ux GEM_HOME "$(gem env user_gemhome)"
 
 fish_add_path --universal "$GEM_HOME/bin" 
@@ -71,4 +68,8 @@ if test -e ~/.asdf/asdf.fish
     if not test -e ~/.config/fish/completions/asdf.fish
         mkdir -p ~/.config/fish/completions; and ln -s ~/.asdf/completions/asdf.fish ~/.config/fish/completions
     end
+end
+
+if test -x (which mise)
+    mise activate fish | source
 end

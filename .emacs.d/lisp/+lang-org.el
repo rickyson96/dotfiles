@@ -50,7 +50,12 @@
 (put 'ra/verb-var-link 'org-link-abbrev-safe t)
 
 (with-eval-after-load 'org
-  (add-to-list 'org-src-lang-modes '("json" . jsonian)))
+  (setopt org-src-lang-modes (append org-src-lang-modes '(("json" . jsonian)
+                                                          ("jsx" . tsx-ts)
+                                                          ("ts" . typescript-ts)
+                                                          ("typescript" . typescript-ts)
+                                                          ("tsx" . tsx-ts)))))
+
 
 (setopt org-babel-load-languages '((emacs-lisp . t)
                                    (js . t)
@@ -114,7 +119,8 @@
          (client-secret (alist-get 'secret pass-entry)))
     (setopt org-gcal-client-id client-id
             org-gcal-client-secret client-secret
-            org-gcal-fetch-file-alist `(("ricky.anderson2696@gmail.com" . ,(file-name-concat org-directory "schedule/personal.org")))
+            org-gcal-fetch-file-alist `(("ricky.anderson2696@gmail.com" . ,(file-name-concat org-directory "schedule/personal.org"))
+                                        ("ricky.anderson@xendit.co" . ,(file-name-concat org-directory "schedule/work.org")))
             org-gcal-recurring-events-mode 'top-level
             org-gcal-notify-p nil
             org-gcal-remove-api-cancelled-events t))
@@ -139,6 +145,14 @@
                               ""
                               " %i")
                    :kill-buffer t)
+                  ("󰏪 Work Todo" :keys "w"
+                   :file ,(file-name-concat org-directory "todos.org")
+                   :template ("* TODO %? :work:"
+                              "%U"
+                              ""
+                              ""
+                              " %i")
+                   :kill-buffer t)
                   ("  Todo with link" :keys "l"
                    :file ,(file-name-concat org-directory "schedule/private.org")
                    :template ("* TODO %?"
@@ -155,6 +169,13 @@
                               ""
                               "%?"
                               " %i"))
+                  ("🗓 Work Schedule" :keys "z"
+                   :file ,(file-name-concat org-directory "schedule/private.org")
+                   :template ("* TODO %^{Title} :work:"
+                              "SCHEDULED: %^t"
+                              ""
+                              "%?"
+                              " %i"))
                   ("🗓 Agenda" :keys "a"
                    :file ,(file-name-concat org-directory "schedule/private.org")
                    :template ("* %^{Title}"
@@ -162,10 +183,25 @@
                               ""
                               "%?"
                               " %i"))
+                  (" Bookmark" :keys "b"
+                   :file ,(file-name-concat org-directory "linkmarks.org")
+                   :template ("* %^{Title}"
+                              "%(with-temp-buffer (org-insert-link '(16) nil \"\") (buffer-string))"
+                              "  added: %U"))
                   ("Protocols" :keys "p"
-                   :children ("Capture Protocol" :keys "c"
-                              :file ,(file-name-concat org-directory "todos.org")
-                              :template ("* TODO")))))))
+                   :children (("Capture" :keys "c"
+                               :file ,(file-name-concat org-directory "todos.org")
+                               :template ("* TODO"))
+                              ("Linkmarks" :keys "l"
+                               :file ,(file-name-concat org-directory "linkmarks.org")
+                               :template ("* %:description %?"
+                                          "[[%:link]]"
+                                          "  added: %U"))
+                              ("Linkmarks BSSD" :keys "b"
+                               :file ,(file-name-concat org-directory "linkmarks.org")
+                               :template ("* Xendit: BSSD %:description %?"
+                                          "[[%:link]]"
+                                          "  added: %U"))))))))
 
 (elpaca org-super-agenda
   (org-super-agenda-mode 1))
@@ -212,19 +248,30 @@
   (advice-add #'org-olpath-completing-read :around #'vertico-enforce-basic-completion))
 
 (with-eval-after-load 'ef-themes
-  (setq org-modern-tag-faces (ef-themes-with-colors
+  (setopt org-modern-tag-faces (ef-themes-with-colors
                                `(("personal" :background ,bg-cyan-subtle)
                                  ("work" :background ,bg-red-subtle)))
         org-modern-todo-faces (ef-themes-with-colors
                                `(("CHECK" :background ,yellow :foreground ,bg-main)))))
 
 (setopt denote-directory "/home/rickyson/org/notes")
+
+(let ((agenda (list org-directory denote-directory))
+      (schedule (file-name-concat org-directory "schedule"))
+      (work-schedule (file-name-concat org-directory "schedule/work.org"))
+      (work-recur (file-name-concat org-directory "schedule/work-recurring.org")))
+  (setopt org-agenda-files (flatten-list (list agenda schedule)))
+  (setopt ra/org-work-agenda-files (flatten-list (list agenda work-schedule work-recur))))
+
 (setopt org-tag-alist '((:startgroup . nil)
                         ("personal" . ?p)
                         ("work" . ?w)
                         (:endgroup . nil))
-        org-agenda-files (list org-directory (file-name-concat org-directory "schedule") denote-directory)
         org-agenda-current-time-string "◀═════ now ═════▶"
+        org-agenda-default-appointment-duration 60
+        org-priority-highest ?A
+        org-priority-lowest ?E
+        org-priority-default ?D
         org-agenda-custom-commands
         '(("u" "My GTD Agenda"
            ((agenda "" ((org-agenda-span 'day)
@@ -242,8 +289,8 @@
                         (org-super-agenda-header-separator "")
                         (org-super-agenda-groups '((:time-grid t)))))
             (tags-todo "PRIORITY=\"A\"&TODO=\"TODO\"" ((org-agenda-overriding-header " Urgent")
-                                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                                    (org-agenda-prefix-format "%8b %i ")))
+                                                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                                                       (org-agenda-prefix-format "%8b %i ")))
             (tags-todo "-PRIORITY=\"A\"&-TODO=\"DONE\""
                        ((org-agenda-overriding-header "⚡ New TODO")
                         (org-agenda-prefix-format "%8b %i ")
@@ -257,7 +304,33 @@
             (todo "WAIT" ((org-agenda-overriding-header " Delegated / Blocked")
                           (org-agenda-todo-ignore-with-date t)
                           ;; (org-agenda-prefix-format " %i %-12:(org-gtd--agenda-prefix-format)")
-                          (org-agenda-files `(,org-gtd-directory))))))))
+                          (org-agenda-files `(,org-gtd-directory))))))
+          ("w" "Work"
+           ((agenda "" ((org-agenda-span 'day)
+                        (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                        (org-agenda-breadcrumbs-separator " ❱ ")
+                        (org-agenda-current-time-string "◀═════ now ═════▶")
+                        (org-agenda-time-grid '((today require-timed remove-match)
+                                                (800 1000 1200 1400 1600 1800 2000 2200 2400)
+                                                "      " "┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈"))
+                        ;; (org-agenda-prefix-format "  %-3i  %-15b%t  %s")
+                        (org-agenda-prefix-format "   %i %?-2 t%s")
+                        (org-agenda-start-day "+0")
+                        ;; (org-agenda-prefix-format " %i %-12:c%?-12t% s")
+                        (org-agenda-overriding-header "󰃭 Calendar")
+                        (org-super-agenda-header-separator "")
+                        (org-super-agenda-groups '((:time-grid t)))
+                        (org-agenda-files ra/org-work-agenda-files)))
+            (tags-todo "work&PRIORITY=\"A\"&TODO=\"TODO\"" ((org-agenda-overriding-header " Urgent")
+                                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                                    (org-agenda-prefix-format "%8b %i ")
+                                    (org-agenda-files ra/org-work-agenda-files)))
+            (tags-todo "work&-PRIORITY=\"A\"&-TODO=\"DONE\""
+                       ((org-agenda-overriding-header "⚡ New TODO")
+                        (org-agenda-prefix-format "%8b %i ")
+                        (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))
+                        (org-agenda-sorting-strategy '(priority-down))
+                        (org-agenda-files ra/org-work-agenda-files)))))))
 
 (add-hook 'org-agenda-finalize-hook #'beginning-of-buffer 90)
 
@@ -298,6 +371,15 @@
                 :main "ox-moderncv.el" 
                 :files ("ox-moderncv.el" "org-cv-utils.el")))
 
+(defun ra/denote-mermaid-file (&optional name ext)
+  "Return the denote file name for a mermaid file, appended with NAME and
+using EXT as extension."
+  (let* ((current-file-name (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+         (file-name (if name
+                        (concat current-file-name "." name)
+                      current-file-name)))
+    (concat file-name (or ext ".svg"))))
+
 (elpaca ob-mermaid
   (add-to-list 'org-babel-load-languages '(mermaid . t)))
 
@@ -305,6 +387,8 @@
   (with-eval-after-load 'ox
     (require 'ox-hugo))
   (setopt org-hugo-base-dir "~/projects/rickyson96.github.io"))
+
+(elpaca ob-mongo)
 
 (provide '+lang-org)
 ;;; +lang-org.el ends here

@@ -6,24 +6,142 @@ PassCmd "pass google.com/ricky.anderson2696@gmail.com^mbsync"
 # SSLType IMAPS
 TLSType IMAPS
 CertificateFile /etc/ssl/certs/ca-certificates.crt
+AuthMech LOGIN
 
 IMAPStore ricky.anderson2696@gmail.com-remote
 Account ricky.anderson2696@gmail.com
 
 MaildirStore ricky.anderson2696@gmail.com-local
 SubFolders Verbatim
-Path ~/mail/ricky.anderson2696@gmail.com/
-Inbox ~/mail/ricky.anderson2696@gmail.com/Inbox
-Trash ~/mail/ricky.anderson2696@gmail.com/Trash
+Path /home/mail/ricky.anderson2696@gmail.com/
+Inbox /home/mail/ricky.anderson2696@gmail.com/Inbox
+Subfolders Verbatim
 
-Channel ricky.anderson2696@gmail.com
-Far :ricky.anderson2696@gmail.com-remote:
-Near :ricky.anderson2696@gmail.com-local:
-# Patterns are the names of your mail folders. You can also use * for all of your mail folders.
-Patterns *
-# Patterns * ![Gmail]* "[Gmail]/Sent Mail" "[Gmail]/Starred" "[Gmail]/All Mail"x
-SyncState *
+Channel ricky.anderson2696@gmail.com-inbox
+Far :ricky.anderson2696@gmail.com-remote:"INBOX"
+Near :ricky.anderson2696@gmail.com-local:"INBOX"
+CopyArrivalDate yes
 Create Both
 Expunge Both
+SyncState *
+
+Channel ricky.anderson2696@gmail.com-trash
+Far :ricky.anderson2696@gmail.com-remote:"[Gmail]/Bin"
+Near :ricky.anderson2696@gmail.com-local:"Trash"
 CopyArrivalDate yes
-Sync All
+Create Both
+Expunge Both
+SyncState *
+
+Channel ricky.anderson2696@gmail.com-spam
+Far :ricky.anderson2696@gmail.com-remote:"[Gmail]/Spam"
+Near :ricky.anderson2696@gmail.com-local:"Spam"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel ricky.anderson2696@gmail.com-all
+Far :ricky.anderson2696@gmail.com-remote:"[Gmail]/All Mail"
+Near :ricky.anderson2696@gmail.com-local:"Archive"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel ricky.anderson2696@gmail.com-drafts
+Far :ricky.anderson2696@gmail.com-remote:"[Gmail]/Drafts"
+Near :ricky.anderson2696@gmail.com-local:"Drafts"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel ricky.anderson2696@gmail.com-drafts
+Far :ricky.anderson2696@gmail.com-remote:"[Gmail]/Starred"
+Near :ricky.anderson2696@gmail.com-local:"Starred"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Group ricky.anderson2696@gmail.com
+Channel ricky.anderson2696@gmail.com-inbox
+Channel ricky.anderson2696@gmail.com-trash
+Channel ricky.anderson2696@gmail.com-all
+Channel ricky.anderson2696@gmail.com-spam
+Channel ricky.anderson2696@gmail.com-drafts
+
+IMAPAccount ricky.anderson@xendit.co
+Host imap.gmail.com
+Port 993
+User ricky.anderson@xendit.co
+PassCmd "pass google.com/ricky.anderson@xendit.co^mbsync"
+# SSLType IMAPS
+TLSType IMAPS
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+AuthMech LOGIN
+
+IMAPStore ricky.anderson@xendit.co-remote
+Account ricky.anderson@xendit.co
+
+MaildirStore ricky.anderson@xendit.co-local
+SubFolders Verbatim
+Path /home/mail/ricky.anderson@xendit.co/
+Inbox /home/mail/ricky.anderson@xendit.co/Inbox
+Subfolders Verbatim
+
+Channel ricky.anderson@xendit.co-inbox
+Far :ricky.anderson@xendit.co-remote:"INBOX"
+Near :ricky.anderson@xendit.co-local:"INBOX"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel ricky.anderson@xendit.co-trash
+Far :ricky.anderson@xendit.co-remote:"[Gmail]/Trash"
+Near :ricky.anderson@xendit.co-local:"Trash"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel ricky.anderson@xendit.co-spam
+Far :ricky.anderson@xendit.co-remote:"[Gmail]/Spam"
+Near :ricky.anderson@xendit.co-local:"Spam"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel ricky.anderson@xendit.co-all
+Far :ricky.anderson@xendit.co-remote:"[Gmail]/All Mail"
+Near :ricky.anderson@xendit.co-local:"Archive"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel ricky.anderson@xendit.co-drafts
+Far :ricky.anderson@xendit.co-remote:"[Gmail]/Drafts"
+Near :ricky.anderson@xendit.co-local:"Drafts"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Channel ricky.anderson@xendit.co-drafts
+Far :ricky.anderson@xendit.co-remote:"[Gmail]/Starred"
+Near :ricky.anderson@xendit.co-local:"Starred"
+CopyArrivalDate yes
+Create Both
+Expunge Both
+SyncState *
+
+Group ricky.anderson@xendit.co
+Channel ricky.anderson@xendit.co-inbox
+Channel ricky.anderson@xendit.co-trash
+Channel ricky.anderson@xendit.co-all
+Channel ricky.anderson@xendit.co-spam
+Channel ricky.anderson@xendit.co-drafts

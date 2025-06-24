@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Use animations:enabled for flag
+ENABLED=$(hyprctl -j getoption animations:enabled | jq '.int')
+
+toggle() {
+	[[ $ENABLED -eq '1' ]] && echo "$1" || echo "$2"
+}
+
+hyprctl keyword animations:enabled "$(toggle '0' '1')"
+hyprctl keyword general:gaps_in "$(toggle '0' '5')"
+hyprctl keyword general:gaps_out "$(toggle '0' '10')"
+hyprctl keyword general:border_size "$(toggle '0' '2')"
+hyprctl keyword decoration:rounding "$(toggle '0' '10')"
+emacsclient -e "(spacious-padding-mode $(toggle '-1' '1'))"

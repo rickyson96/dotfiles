@@ -14,6 +14,7 @@
 ;;; Code:
 
 (ra/treesitter-setup css "https://github.com/tree-sitter/tree-sitter-css")
+(add-to-list 'auto-mode-alist `(,(rx ".css" eos) . css-ts-mode))
 
 (elpaca web-mode
   (setopt web-mode-enable-html-entities-fontification t)

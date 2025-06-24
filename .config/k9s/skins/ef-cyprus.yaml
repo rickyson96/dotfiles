@@ -1,0 +1,74 @@
+# -*- eval: (colorful-mode 1); -*-
+# $XDG_CONFIG_HOME/k9s/in_the_navy_skin.yaml
+k9s:
+  # General K9s styles
+  body:
+    fgColor: '#1f70af'
+    bgColor: '#fcf7ef'
+    logoColor: '#375cc6'
+
+  # ClusterInfoView styles
+  info:
+    fgColor: '#006f00'
+    sectionColor: '#59786f'
+
+  # Frame styles
+  frame:
+    # Borders styles
+    border:
+      fgColor: '#e5e3d8'
+      focusColor: '#242521'
+
+    # MenuView attributes and styles
+    menu:
+      fgColor: '#59786f'
+      keyColor: '#007a9f'
+      # Used for favorite namespaces
+      numKeyColor: cadetblue
+
+    # CrumbView attributes for history navigation.
+    crumbs:
+      fgColor: '#fcf7ef'
+      bgColor: '#4a659f'
+      activeColor: skyblue
+
+    # Resource status and update styles
+    status:
+      newColor: '#00ff00'
+      modifyColor: powderblue
+      addColor: lightskyblue
+      errorColor: indianred
+      highlightcolor: royalblue
+      killColor: slategray
+      completedColor: gray
+
+    # Border title styles.
+    title:
+      fgColor: aqua
+      bgColor: '#fcf7ef'
+      highlightColor: skyblue
+      counterColor: slateblue
+      filterColor: slategray
+  # Specific views styles
+  views:
+    # TableView attributes.
+    table:
+      fgColor: '#007a9f'
+      bgColor: '#fcf7ef'
+      cursorColor: aqua
+      # Header row styles.
+      header:
+        fgColor: '#fcf7ef'
+        bgColor: darkblue
+        sorterColor: orange
+
+    # YAML info styles.
+    yaml:
+      keyColor: steelblue
+      colonColor: blue
+      valueColor: royalblue
+
+    # Logs styles.
+    logs:
+      fgColor: '#fcf7ef'
+      bgColor: black

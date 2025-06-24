@@ -64,6 +64,66 @@
 
   (advice-add #'register-preview :override #'consult-register-window))
 
+(elpaca browser-hist
+  (setq browser-hist-default-browser 'qutebrowser))
+
+(elpaca (consult-mu :host github :repo "armindarvish/consult-mu"))
+
+(elpaca (consult-omni :host github :repo "armindarvish/consult-omni" :files (:defaults "sources/*.el"))
+  (setopt consult-omni-sources-modules-to-load
+          (list 'consult-omni-apps
+                'consult-omni-brave-autosuggest
+                'consult-omni-brave
+                'consult-omni-browser-history
+                'consult-omni-buffer
+                'consult-omni-calc
+                ;; 'consult-omni-consult-notes
+                'consult-omni-dict
+                'consult-omni-elfeed
+                'consult-omni-fd
+                'consult-omni-gh
+                'consult-omni-git-grep
+                'consult-omni-gptel
+                'consult-omni-line-multi
+                'consult-omni-man
+                'consult-omni-mu4e
+                'consult-omni-notes
+                'consult-omni-org-agenda
+                'consult-omni-projects
+                'consult-omni-ripgrep
+                'consult-omni-ripgrep-all
+                'consult-omni-stackoverflow
+                'consult-omni-wikipedia
+                'consult-omni-youtube))
+  ;; (setopt consult-omni-multi-sources '(consult-omni-apps
+  ;;                                      consult-omni-file
+  ;;                                      consult-omni-buffer
+  ;;                                      ;; "Bookmark"
+  ;;                                      consult-omni-apps
+  ;;                                      ;; "gptel"
+  ;;                                      "Brave"
+  ;;                                      "Dictionary"
+  ;;                                      ;; "Google"
+  ;;                                      "Wikipedia"
+  ;;                                      "elfeed"
+  ;;                                      ;; "mu4e"
+  ;;                                      ;; "buffers text search"
+  ;;                                      "Notes Search"
+  ;;                                      "Org Agenda"
+  ;;                                      "GitHub"
+  ;;                                      "YouTube"
+  ;;                                      "Invidious"))
+  (setopt consult-omni-multi-sources (list "Apps"
+                                           "File"
+                                           "Buffer"
+                                           "Notes Search"
+                                           "Org Agenda")))
+  ;; (require 'consult-omni-brave-autosuggest)
+  (with-eval-after-load 'consult-omni
+    (require 'consult-omni-sources)
+    (require 'consult-omni-embark)
+    (consult-omni-sources-load-modules))
+
 ;;;###autoload
 (defun ra/replace-region-with-kill ()
   "Replace region content with kill-ring"

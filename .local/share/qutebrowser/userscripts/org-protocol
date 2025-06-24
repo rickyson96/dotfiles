@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+PROTOCOL="$1"
+TEMPLATE="$2"
+TITLE="${3:-${QUTE_TITLE}}"
+QUTE_URL=$(echo -n $QUTE_URL | python -c "import sys;from urllib.parse import quote;print(quote(sys.stdin.readline()).rstrip())")
+TITLE=$(echo -n $TITLE | python -c "import sys;from urllib.parse import quote;print(quote(sys.stdin.readline()).rstrip())")
+
+OUT="org-protocol:/$PROTOCOL"
+OUT+="?"
+if [[ "$PROTOCOL" == "capture" ]];
+then
+   OUT+="template=$TEMPLATE"
+   OUT+="&"
+fi
+
+OUT+="url=$QUTE_URL&title=$TITLE"
+echo "$OUT"
+hyprctl dispatch focuswindow "title:Emacs"
+xdg-open "$OUT"

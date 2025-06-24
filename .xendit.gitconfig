@@ -1,0 +1,6 @@
+[user]
+	email = ricky.anderson@xendit.co
+	name = Ricky Anderson
+	signingKey = 749B78BB0BDA3BD874EC9A0DDA5219B29E56E4F9
+[commit]
+	gpgSign = true

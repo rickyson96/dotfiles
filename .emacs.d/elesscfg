@@ -1,0 +1,4 @@
+;; -*- mode: emacs-lisp; -*-
+(add-to-list 'load-path (expand-file-name "elpaca/builds/ef-themes/" user-emacs-directory))
+(add-to-list 'custom-theme-load-path (expand-file-name "elpaca/builds/ef-themes/" user-emacs-directory))
+(load-theme 'ef-cyprus t)

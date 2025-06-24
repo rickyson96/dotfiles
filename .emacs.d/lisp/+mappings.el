@@ -314,11 +314,14 @@ doesn't find overlay"
   "J" #'crux-top-join-line
   "." #'mc/mark-all-like-this-dwim
   "n" #'mc/mark-next-like-this
-  "m" #'multi-line)
+  "m" #'multi-line
+  "RET" #'gptel-rewrite)
 
 (defvar-keymap ra/completion-map
   :doc "Keymap for hosting multiple completion type"
-  "f" #'cape-file)
+  :prefix 'ra/completion-map
+  "f" #'cape-file
+  "c" (cmd!! cape-interactive #'codeium-completion-at-point))
 
 (defvar-keymap ra/toggle-map
   :doc "Keymap for toggling emacs state"
@@ -347,6 +350,7 @@ doesn't find overlay"
   "D" #'docker
   "b" #'bluetooth-list-devices
   "a" #'ra/calendar
+  "e" #'mu4e
   "RET" #'mediator-open
   "'" #'proced)
 
@@ -403,11 +407,18 @@ doesn't find overlay"
   :prefix 'ra/eglot-map
   "h" #'eglot-inlay-hints-mode
   "d" #'eldoc-box-help-at-point
-  "a" #'eglot-code-actions)
+  "a" #'eglot-code-actions
+  "i" #'eglot-find-implementation)
+
+(defvar-keymap ra/ai-map
+  :doc "Keymap for invoking ai features"
+  :prefix 'ra/ai-map
+  "g" (cmd!! find-file (file-name-concat org-directory "ai" "gptel.org")))
 
 ;; C-c keymap
 (ra/keymap-set mode-specific-map
-  "TAB" ra/completion-map
+  "TAB" 'ra/completion-map
+  "A" 'ra/ai-map
   "a" #'org-agenda
   "e" ra/eval-map
   "o" #'ra/open-map

@@ -22,9 +22,9 @@
                       (issuer (read-string "Issuer: " issuer-from-acc)))
                  (list account key issuer)))
   (kill-new (format "otpauth://totp/%s?secret=%s&issuer=%s"
-         (string-join (remove "" (list issuer account)) ":")
-         key
-         issuer)))
+                    (string-join (remove "" (list issuer account)) ":")
+                    key
+                    issuer)))
 
 (elpaca pass
   (defvar-keymap embark-password-store-actions
@@ -56,15 +56,15 @@
   "Relatively generate symlink entry at point.
 By default, it'll try to symlink the parent directory.
 EDIT means edit which directory or file to be symlinked."
-    (interactive "P")
-    (if-let* ((pass-entry (pass-closest-entry))
-              (pass-dir (file-name-concat default-directory (file-name-directory pass-entry)))
-              (entry (if edit
-                         (read-file-name "Select dir/file to symlink: " pass-dir nil t (concat "/" pass-entry))
-                       (file-name-concat default-directory (file-name-parent-directory pass-entry))))
-              (symlink-name (read-file-name (format "Symlink %s to: " (propertize entry 'face 'bold)) (file-name-parent-directory entry))))
-        (make-symbolic-link entry symlink-name 1)
-      (message "No entry at point")))
+  (interactive "P")
+  (if-let* ((pass-entry (pass-closest-entry))
+            (pass-dir (file-name-concat default-directory (file-name-directory pass-entry)))
+            (entry (if edit
+                       (read-file-name "Select dir/file to symlink: " pass-dir nil t (concat "/" pass-entry))
+                     (file-name-concat default-directory (file-name-parent-directory pass-entry))))
+            (symlink-name (read-file-name (format "Symlink %s to: " (propertize entry 'face 'bold)) (file-name-parent-directory entry))))
+      (make-symbolic-link entry symlink-name 1)
+    (message "No entry at point")))
 
 (defun ra/scan-otp-uri (&optional direct-insert)
   "Scan otp-uri using `hyprshot' and put it in `kill-ring'"
@@ -81,6 +81,7 @@ EDIT means edit which directory or file to be symlinked."
   ;; (add-hook 'eat-exit-hook #'quit-window)
   (add-hook 'eshell-load-hook #'eat-eshell-mode)
   (eat-eshell-mode 1)
+  (setopt eat-term-scrollback-size nil)
 
   (defun ra/connect-to-paystone-vm ()
     (interactive)
@@ -133,7 +134,7 @@ EDIT means edit which directory or file to be symlinked."
         (compilation-insert-annotation
          (format "%s started at %s\n\n"
                  mode-name
-             (substring (current-time-string) 0 19))
+                 (substring (current-time-string) 0 19))
          command "\n")
         (eat-mode)
         (eat-exec outbuf "*compile*" shell-file-name nil (list "-lc" command))
@@ -233,30 +234,37 @@ EDIT means edit which directory or file to be symlinked."
   (require 'codespaces)
   (codespaces-setup))
 
+(defmacro ra/verb-stored-body (name &optional jsonpath)
+  "Get JSONPATH value from `verb-stored-response' with NAME.
+Essentially does what `verb-json-get' but with `let-alist' syntax"
+  `(let ((body (json-read-from-string
+                (oref (verb-stored-response ,name) body))))
+     (if ,(macroexp-quote jsonpath)
+         (let-alist body ,jsonpath)
+       body)))
+
+(defun ra/verb-view-stored-response (name)
+  "View stored response with NAME."
+  (interactive (list (completing-read "Stored response: "
+                                       (mapcar #'car verb--stored-responses))))
+  (with-current-buffer-window (format "*verb response: %s*" name)
+      #'display-buffer-other-window
+      nil
+    (insert (oref (verb-stored-response name) body))
+    (jsonian-mode)))
+
+
 (elpaca verb
   (setopt verb-json-use-mode 'jsonian-mode
-          verb-auto-show-headers-buffer nil)
+          verb-auto-show-headers-buffer nil
+          verb-suppress-load-unsecure-prelude-warning t)
   (with-eval-after-load 'org
     (ra/keymap-set org-mode-map
       "C-c C-r" verb-command-map))
-  (defun ra/verb-generate-url-encoded-body (&rest pairs)
-    "Turn pairs of KEY VALUE into url-encoded format
+  (add-hook 'verb-mode-hook (##require 'uuidgen))
 
-\(fn [KEY VALUE]...)"
-    (unless (zerop (mod (length pairs) 2))
-      (error "PAIRS must be pair of KEY VALUE"))
-    (string-join (seq-map (lambda (pair)
-                            (format "%s=%s" (car pair) (cadr pair)))
-                          (seq-split pairs 2))
-                 "&"))
-  (defun ra/verb-url-encoded-body-parser (rs)
-    "`Verb-Map-Request' compatible version to convert newline into &"
-    (when-let (body (oref rs body))
-      (thread-last
-        (string-trim body)
-        (replace-regexp-in-string "\n" "&")
-        (oset rs body)))
-    rs))
+  (with-eval-after-load 'mise
+    (advice-add #'verb-send-request-on-point-other-window-stay :around #'mise-propagate-env)))
 
 (elpaca impostman)
 
@@ -308,15 +316,155 @@ EDIT means edit which directory or file to be symlinked."
       (progn
         (advice-add 'plz--skip-redirect-headers :override #'ignore)
         (condition-case err
-	      (let ((plz-curl-default-args '("--silent" "--compressed")))
-	        (plz 'get url))
-        (plz-error (alist-get 'location (plz-response-headers
-								         (plz-error-response (caddr err)))))))
+	        (let ((plz-curl-default-args '("--silent" "--compressed")))
+	          (plz 'get url))
+          (plz-error (alist-get 'location (plz-response-headers
+								           (plz-error-response (caddr err)))))))
     (advice-remove 'plz--skip-redirect-headers #'ignore)))
 
 (elpaca devdocs)
 
-;; (elpaca mu4e)
+(elpaca (mu4e :host github :files ("mu4e/*.el" "build/mu4e/mu4e-meta.el" "build/mu4e/mu4e-config.el" "build/mu4e/mu4e.info") :repo "djcb/mu"
+              :main "mu4e/mu4e.el"
+              :pre-build (("./autogen.sh" "-Dtests=disabled")
+                          ("ninja" "-C" "build")
+                          (make-symbolic-link (expand-file-name "./build/mu/mu")
+                                              (expand-file-name "~/.local/bin/mu") 'ok-if-exists))
+              :build (:not elpaca--compile-info)
+              :post-build (("mu" "init" "--quiet" "--maildir" "/home/mail"
+                            "--my-address=" "ricky.anderson2696@gmail.com"
+                            "--my-address=" "ricky.anderson@xendit.co")
+                           ("mu" "index" "--quiet")))
+  ;; (setopt message-kill-buffer-on-exit t
+  ;;         mu4e-update-interval 900
+  ;;         mail-user-agent 'mu4e-user-agent
+  ;;         mu4e-org-support t
+  ;;         mu4e-maildir (expand-file-name "/home/mail")
+  ;;         mu4e-attachment-dir "~/Downloads"
+  ;;         mu4e-completing-read-function 'completing-read
+  ;;         mu4e-compose-signature-auto-include nil
+  ;;         mu4e-use-fancy-chars t
+  ;;         mu4e-view-show-addresses t
+  ;;         mu4e-view-show-images t
+  ;;         mu4e-sent-messages-behavior 'sent
+  ;;         mu4e-get-mail-command "mbsync -a"
+  ;;         mu4e-change-filenames-when-moving t
+  ;;         mu4e-confirm-quit nil
+  ;;         mu4e-html2text-command  'mu4e-shr2text
+  ;;         mu4e-context-policy 'pick-first
+  ;;         mu4e-compose-context-policy 'always-ask
+  ;;         mu4e-contexts (list
+  ;;                        (make-mu4e-context
+  ;;                         :name "personal"
+  ;;                         :enter-func (lambda () (mu4e-message "Entering personal context"))
+  ;;                         :leave-func (lambda () (mu4e-message "Leaving personal context"))
+  ;;                         :match-func (lambda (msg)
+  ;;                                       (when msg
+  ;;                                         (mu4e-message-contact-field-matches
+  ;;                                          msg '(:from :to :cc :bcc) "ricky.anderson2696@gmail.com")))
+  ;;                         :vars `((user-mail-address .  "ricky.anderson2696@gmail.com")
+  ;;                                 (user-full-name . "Ricky Anderson")
+  ;;                                 (mu4e-compose-format-flowed . t)
+  ;;                                 (mu4e-maildir . (file-name-concat (mu4e-root-maildir) user-mail-address))
+  ;;                                 (mu4e-drafts-folder . "/[Gmail].Drafts")
+  ;;                                 (mu4e-sent-folder . "/[Gmail].Sent Mail")
+  ;;                                 (mu4e-trash-folder . "/[Gmail].Trash")
+  ;;                                 (message-send-mail-function . smtpmail-send-it)
+  ;;                                 (smtpmail-smtp-user . "ricky.anderson2696@gmail.com")
+  ;;                                 ;; (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
+  ;;                                 (smtpmail-smtp-server . "smtp.gmail.com")
+  ;;                                 (smtpmail-smtp-service . 587)
+  ;;                                 (smtpmail-debug-info . t)
+  ;;                                 (smtpmail-debug-verbose . t)))
+  ;;                        (make-mu4e-context
+  ;;                         :name "work"
+  ;;                         :enter-func (lambda () (mu4e-message "Entering work context"))
+  ;;                         :leave-func (lambda () (mu4e-message "Leaving work context"))
+  ;;                         :match-func (lambda (msg)
+  ;;                                       (when msg
+  ;;                                         (mu4e-message-contact-field-matches
+  ;;                                          msg '(:from :to :cc :bcc) "ricky.anderson@xendit.co")))
+  ;;                         :vars `((user-mail-address .  "ricky.anderson@xendit.co")
+  ;;                                 (user-full-name . "Ricky Anderson")
+  ;;                                 (mu4e-drafts-folder . "/[Gmail].Drafts")
+  ;;                                 (mu4e-sent-folder . "/[Gmail].Sent Mail")
+  ;;                                 (mu4e-trash-folder . "/[Gmail].Trash")
+  ;;                                 (mu4e-compose-format-flowed . t)
+  ;;                                 (message-send-mail-function . smtpmail-send-it)
+  ;;                                 (smtpmail-smtp-user . "ricky.anderson@xendit.co")
+  ;;                                 ;; (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
+  ;;                                 (smtpmail-smtp-server . "smtp.gmail.com")
+  ;;                                 (smtpmail-smtp-service . 587)
+  ;;                                 (smtpmail-debug-info . t)
+  ;;                                 (smtpmail-debug-verbose . t)))))
+  )
+
+(elpaca mu4easy
+  (with-eval-after-load 'mu4e
+    (setf (alist-get 'refile mu4e-marks)
+      '(:char ("r" . "▶")
+              :prompt "refile"
+              :dyn-target (lambda (target msg) (mu4e-get-refile-folder msg))
+              ;; Notice the special treatment for Gmail.
+              :action (lambda (docid msg target)
+                        (let ((maildir (mu4e-message-field msg :maildir)))
+                          (if (string-match-p "Gmail\\|Google" maildir)
+                              (mu4e--server-remove docid)
+                            (mu4e--server-move docid (mu4e--mark-check-target target) "+S-u-N")))))))
+
+  (cl-defmacro mu4easy-context (&key c-name maildir mail smtp
+                                     (smtp-mail mail)
+                                     (smtp-port 587)
+                                     (smtp-type 'starttls)
+                                     (sent-action 'sent)
+                                     (name user-full-name)
+                                     (sig user-full-name))
+    (let ((inbox      (concat "/" maildir "/Inbox"))
+          (sent       (concat "/" maildir "/Sent"))
+          (trash      (concat "/" maildir "/Trash"))
+          (refile     (concat "/" maildir "/Archive"))
+          (draft      (concat "/" maildir "/Drafts")))
+
+    `(make-mu4e-context
+      :name ,c-name
+      :match-func (lambda (msg)
+                    (when msg
+                      (string-match-p (concat "^/" ,maildir "/")
+                                      (mu4e-message-field msg :maildir))))
+      :vars '((user-mail-address . ,mail)
+              (user-full-name . ,name)
+              (mu4e-sent-folder . ,sent)
+              (mu4e-drafts-folder . ,draft)
+              (mu4e-trash-folder . ,trash)
+              (mu4e-refile-folder . ,refile)
+              (mu4e-sent-messages-behavior . ,sent-action)
+              (smtpmail-stream-type . ,smtp-type)
+              (smtpmail-smtp-service . ,smtp-port)
+              (smtpmail-smtp-user . ,smtp-mail)
+              (smtpmail-smtp-server . ,smtp)
+              (smtpmail-debug-info . t)
+              (smtpmail-debug-verbose . t)
+              (org-msg-signature . ,sig)
+              (mu4e-maildir-shortcuts .
+                                      ((,inbox   . ?i)
+                                       (,sent    . ?s)
+                                       (,trash   . ?t)
+                                       (,refile  . ?a)
+                                       (,draft   . ?d)))))))
+
+  (setopt mu4easy-contexts '((mu4easy-context
+                              :c-name  "personal"
+                              :maildir "ricky.anderson2696@gmail.com"
+                              :mail    "ricky.anderson2696@gmail.com"
+                              :smtp    "smtp.gmail.com"
+                              :sent-action delete)
+                             (mu4easy-context
+                              :c-name  "work"
+                              :maildir "ricky.anderson@xendit.co"
+                              :mail    "ricky.anderson@xendit.co"
+                              :smtp    "smtp.gmail.com"
+                              :sent-action delete)))
+  (mu4easy-mode 1))
 
 (setopt zoneinfo-style-world-list '(("Asia/Jakarta" "Indonesia")
                                     ("Asia/Makassar" "Bali")
@@ -391,6 +539,42 @@ EDIT means edit which directory or file to be symlinked."
 
 (elpaca (hexrgb :host github :repo "emacsmirror/hexrgb"))
 (elpaca (palette :host github :repo "emacsmirror/palette"))
+
+(defun ra/linkmarks-capture ()
+  "`linkmarks-capture' but directly select the template. TODO upstream this"
+  (interactive)
+  (linkmarks--setup)
+  (org-capture nil "b"))
+(elpaca (linkmarks :host github :repo "dustinlacewell/linkmarks")
+  (setopt linkmarks-file (file-name-concat org-directory "linkmarks.org"))
+  (ra/keymap-set (current-global-map)
+    "<remap> <bookmark-jump>" #'linkmarks-select
+    "<remap> <bookmark-set>" #'ra/linkmarks-capture))
+
+(elpaca org-jira
+  (setopt jiralib-url "https://banksampoerna.atlassian.net"
+          jiralib-user "it.di2@banksampoerna.com"
+          org-jira-custom-jqls
+          '((:jql "project IN (BSSD) AND assignee = 'Ricky Anderson' AND status NOT IN (DONE) AND Sprint != EMPTY order by priority, created DESC"
+                  :limit 20
+                  :filename "bssd-sprint-assigned")
+            (:jql "project IN (BSSD) AND assignee = 'Ricky Anderson' AND status NOT IN (DONE) AND Sprint = EMPTY order by priority, created DESC"
+                  :limit 20
+                  :filename "bssd-backlog-assigned"))
+          org-jira-jira-status-to-org-keyword-alist '(("To Do" . "TODO")
+                                                      ("Blocked" . "BLOCKED")
+                                                      ("In Progress" . "IN-PROGRESS")
+                                                      ("QA FEEDBACK" . "TODO")
+                                                      ("READY FOR TEST" . "QA")
+                                                      ("CODE REVIEW" . "PR")
+                                                      ("Testing" . "TESTING")
+                                                      ("Done" . "DONE")
+                                                      ("Won't Do" . "CNCL"))
+          org-jira-progress-issue-flow '(("To Do" . "In Progress")
+                                         ("In Progress" . "CODE REVIEW")
+                                         ("CODE REVIEW" . "READY FOR TEST")
+                                         ("QA FEEDBACK" . "In Progress"))))
+
 
 (provide '+apps)
 ;;; +apps.el ends here

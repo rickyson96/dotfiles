@@ -29,11 +29,11 @@
 
 (add-to-list 'auto-mode-alist `(,(rx "." (or "j" "t") "s" eos) . typescript-ts-mode))
 (dolist (actions '(apheleia-mode
-                   lsp-deferred
+                   ;; lsp-deferred
                    indent-bars-mode
                    ;; combobulate-mode
                    ;; ra/setup-extra-pair-typescript
-                   ;;eglot-ensure
+                   eglot-ensure
                    ))
   (add-hook 'typescript-ts-base-mode-hook actions))
 
@@ -43,7 +43,7 @@
                  ("typescript-language-server" "--stdio"
                   :initializationOptions
                   ( :preferences
-                    ( :importModuleSpecifierPreference "relative"
+                    ( :importModuleSpecifierPreference "non-relative"
                       :includeInlayEnumMemberValueHints t
                       :includeInlayFunctionLikeReturnTypeHints t
                       :includeInlayFunctionParameterTypeHints t
@@ -92,25 +92,27 @@
 
 (elpaca jest-test-mode)
 
-;; (elpaca flymake-eslint
-;;   (add-hook 'eglot-managed-mode-hook
-;;             (lambda ()
-;;               (let ((eslint (cond ((executable-find "eslint_d") "eslint_d")
-;;                                   ((executable-find "eslint") "eslint"))))
-;;                 (when (and eslint
-;;                            (or (locate-dominating-file buffer-file-name ".eslintrc.json")
-;;                                (locate-dominating-file buffer-file-name ".eslintrc.js"))
-;;                            (derived-mode-p 'typescript-ts-base-mode))
-;;                   (setq flymake-eslint-executable-name eslint)
-;;                   (flymake-eslint-enable)))
+(defun ra/enable-flymake-eslint ()
+  ""
+  (interactive)
+  (let ((eslint (cond ((executable-find "eslint_d") "eslint_d")
+                      ((executable-find "eslint") "eslint"))))
+    (when (or (called-interactively-p)
+              (and eslint
+                   (or (derived-mode-p 'typescript-ts-base-mode)
+                       (derived-mode-p 'tsx-ts-base-mode))))
+      (setq flymake-eslint-executable-name "eslint"
+            flymake-eslint-executable-args '("--cache"))
+      (flymake-eslint-enable))))
 
-;;               (flymake-flycheck-auto)))
+(elpaca flymake-eslint
+  (add-hook 'eglot-managed-mode-hook #'ra/enable-flymake-eslint)
 
-;;   (defun ra/flymake-eslint_d-restart ()
-;;     "Restart eslint_d and then run `flymake-start'"
-;;     (interactive)
-;;     (shell-command "eslint_d restart")
-;;     (flymake-start)))
+  (defun ra/flymake-eslint_d-restart ()
+    "Restart eslint_d and then run `flymake-start'"
+    (interactive)
+    (shell-command "eslint_d restart")
+    (flymake-start)))
 
 (elpaca flycheck-jest
   (setq flycheck-jest '(typescript-ts-mode web-mode js-mode typescript-mode rjsx-mode))

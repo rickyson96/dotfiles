@@ -1,0 +1,13 @@
+host: imap.gmail.com
+port: 993
+tls: true
+tlsOptions:
+  rejectUnauthorized: false
+username: ricky.anderson2696@gmail.com
+passwordCMD: pass google.com/ricky.anderson2696@gmail.com^mbsync | head -n1
+onNewMail: mbsync ricky.anderson2696@gmail.com | while read OUTPUT; do notify-send "" "$OUTPUT"; done
+onNewMailPost: ''
+onDeletedMail: ''
+onDeletedMailPost: ''
+boxes:
+  - INBOX

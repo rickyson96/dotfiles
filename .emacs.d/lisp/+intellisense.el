@@ -169,7 +169,8 @@
             (lsp-organize . apheleia-lsp-organize-import-formatter)
             (pyflakes . apheleia-pyflakes)))
 
-    (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(lsp-organize eslintd))
+    (setf (alist-get 'typescript-ts-mode apheleia-mode-alist) '(eslint prettier-typescript))
+    (setf (alist-get 'tsx-ts-mode apheleia-mode-alist) '(eslint prettier-typescript))
     (setf (alist-get 'python-ts-mode apheleia-mode-alist) '(pyflakes black isort))
     (setf (alist-get 'go-ts-mode apheleia-mode-alist) '(gofumpt goimports))))
 
@@ -268,7 +269,7 @@ with IMENU-PATTERN"
 (elpaca compile-multi
   (setopt compile-multi-config `(((file-exists-p ".stowrc")
                                   ("stow:stow" . ("stow" ".")))))
-  (setopt compile-multi-default-directory (lambda () (project-root (project-current)))
+  (setopt compile-multi-default-directory (##project-root (project-current))
           compile-multi-annotate-limit 120))
 (elpaca consult-compile-multi
   (with-eval-after-load 'consult
@@ -279,6 +280,7 @@ with IMENU-PATTERN"
 (elpaca projection
   (ra/keymap-set ctl-x-map
     "P" projection-map))
+
 (elpaca projection-multi
   (with-eval-after-load 'project
     (ra/keymap-set project-prefix-map

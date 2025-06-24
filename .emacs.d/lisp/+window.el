@@ -124,8 +124,7 @@ When `switch-to-buffer-obey-display-actions' is non-nil,
   (message "Use `ace-window' to display next command buffer..."))
 
 (defun ra/dwim-window-prefix ()
-  "Use `same-window-prefix' if there's only one window.
-Use `other-window-prefix' if there's only two windows.
+  "Use `other-window-prefix' if there's one or two windows.
 Use `ra/ace-window-prefix' if there's more than two windows."
   (interactive)
   (pcase (count-windows)

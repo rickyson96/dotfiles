@@ -93,21 +93,34 @@
      :utils '("waybar")
      :silent-success t))
 
+  (defun ra/expose-port (port)
+    "Expose PORT via tailscale funnel"
+    (interactive "nExpose Port: ")
+    (dwim-shell-command-execute-script
+     "Expose PORT via tailscale funnel"
+     (format "sudo tailscale funnel %d" port)
+     :utils '("tailscale")
+     :focus-now t))
+
   (autoload #'dwim-shell-command "dwim-shell-command")
   (autoload #'dwim-shell-command-on-marked-files "dwim-shell-command"))
 
 (elpaca (emacs-everywhere :host github :repo "tecosaur/emacs-everywhere"
                           :remotes ("wayland" :repo "zauster/emacs-everywhere")))
 
+(defvar ra/iso8601-time-format "%Y-%m-%dT%H:%M:%S%z"
+  "ISO-8601 date format")
 (defun ra/parse-date-from-unix (time &optional zone)
   "Parse time from unix to human readable format. `universal-argument' to define zone"
   (interactive (list (read-number "Unix Millis: ")
                      (when current-prefix-arg (read-string "Zone: " "UTC" nil '("UTC-7" "Asia/Jakarta")))))
-  (when (> (/ time (expt 10 10)) 0)
+  (when (> time (expt 10 10))
     (setq time (/ time 1000)))
   (let ((result (format-time-string "%Y-%m-%d %H:%M:%S %z" time zone)))
     (kill-new result)
     (message result)))
+
+
 
 (provide '+toolbox)
 ;;; +toolbox.el ends here

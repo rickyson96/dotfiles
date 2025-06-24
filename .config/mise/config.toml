@@ -1,0 +1,30 @@
+[tools]
+"go:github.com/mkatychev/faker-cli/cmd/gofaker" = "latest"
+"go:github.com/segmentio/chamber/v3" = "latest"
+"go:github.com/shoenig/bcrypt-tool" = "latest"
+node = "24"
+"npm:ast-grep" = "latest"
+"npm:faker" = "latest"
+python = "3.12"
+usage = "latest"
+uv = "latest"
+"pipx:aider-chat" = { version = "latest", pipx_args = "--python 3.12" }
+"ubi:cli/cli" = { version = "latest", exe = "gh" }
+yq = "latest"
+"go:gitlab.com/shackra/goimapnotify" = "latest"
+shellcheck = "latest"
+shfmt = "latest"
+"npm:bash-language-server" = "latest"
+"npm:@mermaid-js/mermaid-cli" = "latest"
+"npm:ts-node" = "latest"
+"npm:eslint_d" = "latest"
+k9s = "latest"
+pnpm = "latest"
+"npm:typescript-language-server" = "latest"
+"go:golang.org/x/tools/gopls" = "latest"
+"go:mvdan.cc/gofumpt" = "latest"
+go = "latest"
+"npm:@anthropic-ai/claude-code" = "latest"
+
+[settings]
+experimental = true

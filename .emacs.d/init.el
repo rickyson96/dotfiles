@@ -68,6 +68,10 @@
   (unless (getenv "WAYLAND_DISPLAY")
     (setenv "WAYLAND_DISPLAY" "wayland-1")))
 
+;; Not the llama you know
+(elpaca llama
+  (llama-fontify-mode +1))
+
 ;; we need to wait for `no-littering' to install so that further
 ;; installation can conform to the no-littering directories
 (elpaca-wait)
@@ -89,6 +93,21 @@ See https://emacs.stackexchange.com/questions/59791/font-and-frame-configuration
 (require '+defaults)
 
 (elpaca xr)
+(defun ra/xri (&optional string arg)
+  "Interactively run `xr'. Used to check regexp at point.
+ARG or \[universal-argument] for inserting the result to buffer."
+  (interactive (list (if (use-region-p)
+                         (buffer-substring-no-properties (use-region-beginning) (use-region-end))
+                       (thing-at-point 'string t))
+                     current-prefix-arg))
+  (let ((result (xr (read-string "Regexp string: " string) 'verbose)))
+    (if arg
+        (let ((beg (or (use-region-beginning) (car (bounds-of-thing-at-point 'string))))
+              (end (or (use-region-end) (cdr (bounds-of-thing-at-point 'string)))))
+          (delete-region beg end)
+          (insert (format "%S" result)))
+      (prin1 result))))
+
 (elpaca pcre2el)
 (elpaca 0xc)
 (elpaca el-patch)
@@ -102,8 +121,7 @@ See https://emacs.stackexchange.com/questions/59791/font-and-frame-configuration
   (declare (indent defun))
   (unless (zerop (mod (length pairs) 2))
     (error "PAIRS must be pair of KEY/DEFINITION"))
-  (seq-map (lambda (pair)
-             (keymap-set keymap (car pair) (cadr pair)))
+  (seq-map (##keymap-set keymap (car %1) (cadr %1))
            (seq-split pairs 2)))
 
 (defmacro ra/cmd (&rest body)
@@ -112,9 +130,32 @@ See https://emacs.stackexchange.com/questions/59791/font-and-frame-configuration
 Taken from https://github.com/doomemacs/doomemacs/blob/844a82c4a0cacbb5a1aa558c88675ba1a9ee80a3/lisp/doom-lib.el#L521"
   (declare (doc-string 1) (pure t) (side-effect-free t))
   `(lambda (&rest _) (interactive) ,@body))
+(make-obsolete #'ra/cmd #'\#\# "23-06-2025")
 
 (defalias 'cmd! #'ra/cmd
   "Aliases for `ra/cmd'. Enables short cmd! command inspired from doomemacs.
+It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the namespaced variant.
+
+Use `cmd!!' instead.")
+(make-obsolete #'cmd! #'cmd!! "23-06-2025")
+
+(defmacro ra/cmd-2 (fn &rest body)
+  "Shorthand for (lambda () (interactive) ,@body)
+
+Taken from https://github.com/doomemacs/doomemacs/blob/844a82c4a0cacbb5a1aa558c88675ba1a9ee80a3/lisp/doom-lib.el#L521
+Improved with `llama' like syntax.
+
+Previous usage: (ra/cmd (foo 1 2))
+New usage: (ra/cmd-2 foo 1 2)
+"
+  (declare (doc-string 1) (pure t) (side-effect-free t))
+  (let* ((orig (macroexpand-1 (macroexpand-1 `(## ,fn ,@body)))))
+    (nconc (butlast orig 1)
+         (list '(interactive))
+         (last orig))))
+
+(defalias 'cmd!! #'ra/cmd-2
+  "Aliases for `ra/cmd-2'. Enables short cmd!! command inspired from doomemacs.
 It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the namespaced variant.")
 
 (defun ra/fbound-and-true-p (fn &rest args)
@@ -128,13 +169,21 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 (setopt bookmark-save-flag 1) ; auto save bookmark
 
 ;; (require '+project)
-;; (defun ra/project-remember-default-directory ()
-;;   ""
-;;   (let ((tabspaces-project-switch-commands #'magit-project-status)
-;;      (project--list (append `(,default-directory) 'project--list))))
-;;   (tabspaces-project-switch-project-open-file default-directory))
-;; (with-eval-after-load 'magit
-;;   (add-hook 'magit-post-clone-hook #'ra/project-remember-default-directory))
+(defun ra/magit-clone-tabspaces-auto-switch ()
+  "Autoatically setup tabspaces project when cloning a repository with `magit-clone'."
+  (let ((tabspaces-project-switch-commands #'ignore)
+        (project--list (append `(,default-directory) 'project--list))))
+  (tabspaces-open-or-create-project-and-workspace default-directory))
+(with-eval-after-load 'magit
+  (add-hook 'magit-post-clone-hook #'ra/magit-clone-tabspaces-auto-switch))
+
+(defun ra/consult-gh-clone-tabspaces-auto-switch (dir)
+  "Autoatically setup tabspaces project when cloning a repository with `consult-gh'."
+  (let ((tabspaces-project-switch-commands #'magit-status)
+        (project--list (append dir 'project--list))))
+  (tabspaces-open-or-create-project-and-workspace dir))
+(with-eval-after-load 'consult-gh
+  (add-hook 'consult-gh-repo-post-clone-hook #'ra/consult-gh-clone-tabspaces-auto-switch))
 
 (require '+window)
 
@@ -178,7 +227,28 @@ It's so that if ! is not emacs-lisp friendly anymore, we can just swap for the n
 
 (elpaca imenu-list)
 
-(elpaca (treesit-fold :host github :repo "emacs-tree-sitter/treesit-fold"))
+(elpaca (treesit-fold :host github :repo "emacs-tree-sitter/treesit-fold")
+  (global-treesit-fold-mode 1)
+  (treesit-fold-line-comment-mode 1)
+  (setopt treesit-fold-line-count-show t)
+  (ra/keymap-set (current-global-map)
+    "M-z" nil
+    "M-z z" #'treesit-fold-toggle
+    "M-z c" #'treesit-fold-close
+    "M-z o" #'treesit-fold-open
+    "M-z C" #'treesit-fold-close-all
+    "M-z O" #'treesit-fold-open-recursively
+    "M-z k" #'treesit-fold-open-all))
+
+(elpaca (treesitter-context :host github :repo "zbelial/treesitter-context.el")
+  (with-eval-after-load 'ef-themes
+    (ef-themes-with-colors
+      (setopt treesitter-context-idle-time 1.0
+              treesitter-context-frame-min-width 10
+              treesitter-context-frame-min-height 1
+              treesitter-context-background-color bg-main
+              treesitter-context-border-color cyan-faint))))
+
 
 (require '+completion)
 
@@ -341,7 +411,14 @@ otherwise, use `substitute-target-in-buffer'"
     "<remap> <kill-ring-save>" #'ra/kill-ring-save))
 
 (elpaca kurecolor)
-(elpaca rainbow-mode)
+(elpaca colorful-mode
+  (setopt colorful-use-prefix nil
+          colorful-extra-color-keyword-functions '(colorful-add-hex-colors
+                                                   (emacs-lisp-mode . colorful-add-color-names)
+                                                   ((html-mode css-mode css-ts-mode) colorful-add-css-variables-colors
+                                                    colorful-add-rgb-colors colorful-add-hsl-colors
+                                                    colorful-add-oklab-oklch-colors colorful-add-color-names)
+                                                   (latex-mode . colorful-add-latex-colors))))
 
 (elpaca deadgrep)
 
@@ -466,10 +543,7 @@ first, and wrap it in `wrap-str'."
 
 (elpaca avy
   (ra/keymap-set (current-global-map)
-    "C-z" #'avy-goto-char-timer
-    "M-z" (cmd! (let ((avy-action-oneshot #'avy-action-zap-to-char)
-                      (avy-all-windows nil))
-                  (call-interactively #'avy-goto-char-timer))))
+    "C-z" #'avy-goto-char-timer)
   (ra/keymap-set isearch-mode-map
     "C-z" #'avy-isearch)
 
@@ -652,6 +726,21 @@ first, and wrap it in `wrap-str'."
   (setopt envrc-remote t)
   (envrc-global-mode 1))
 
+(defun ra/mise-update-current-buffer ()
+  "Run `mise-update-buffer' on current buffer"
+  (interactive)
+  (mise-update-buffer (buffer-name (current-buffer))))
+
+(elpaca mise
+  (global-mise-mode 1)
+  (setopt mise-auto-propagate-commands '(shell-command-to-string
+                                         process-lines
+                                         async-shell-command
+                                         org-babel-eval
+                                         shell-command+
+                                         dwim-shell-command
+                                         apheleia-format-buffer)))
+
 (elpaca makefile-executor)
 
 (elpaca num3-mode
@@ -714,16 +803,14 @@ first, and wrap it in `wrap-str'."
       (insert jira-link))
     jira-link))
 
-(defun ra/gobit-copy-mr-message ()
-  "Gobit: Copy formatted slack message to inform created MR"
+(defun ra/bssd-copy-mr-message ()
+  "BSSD: Copy formatted slack message to inform created MR"
   (interactive)
   (if-let ((pr (or (forge-post-at-point)
                    (forge-current-topic)))
            (title (oref pr title))
            (url (forge-get-url pr))
-           (jira-link (my/get-jira-url))
-           (msg-title "Hi guys @crypto-go, please review my MR! :capoo-thank:")
-           (msg (format "%s\n*%s*\n\n:merge: %s\n:jira: %s" msg-title title url jira-link)))
+           (msg (format "*[PR Review]*\n@bssd-engineer\nPlease help review this PR: %s\nThanks! :thankyou:" url)))
       (kill-new msg)
     (message "Fail to copy mr message")))
 
