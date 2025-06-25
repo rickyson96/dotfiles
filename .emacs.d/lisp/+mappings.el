@@ -351,6 +351,7 @@ doesn't find overlay"
   "b" #'bluetooth-list-devices
   "a" #'ra/calendar
   "e" #'mu4e
+  "s" #'daemons
   "RET" #'mediator-open
   "'" #'proced)
 
