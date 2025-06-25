@@ -9,6 +9,11 @@ copy=""
 prompt="Password: "
 while [[ $# -gt 0 ]]; do
 	case $1 in
+	user)
+		cmd="user"
+		prompt="User: "
+		shift
+		;;
 	otp)
 		cmd="otp"
 		prompt="OTP: "
@@ -46,10 +51,14 @@ password=$(printf '%s\n' "${password_files[@]}" | "$dmenu" "${dmenu_switches[@]}
 
 [[ -n $password ]] || exit
 
-pw=$(pass "$cmd" ${copy:+"$copy"} "$password" | {
-	IFS= read -r pass
-	printf %s "$pass"
-})
+if [[ $cmd = "user" ]]; then
+	pw=$(basename "$password")
+else
+	pw=$(pass "$cmd" ${copy:+"$copy"} "$password" | {
+		IFS= read -r pass
+		printf %s "$pass"
+	})
+fi
 
 if [[ -z $copy ]]; then
 	"$xdotool" "$pw"
