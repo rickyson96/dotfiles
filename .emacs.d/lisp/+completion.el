@@ -47,7 +47,8 @@
 
 (elpaca marginalia
   (marginalia-mode)
-  (add-to-list 'marginalia-prompt-categories '("Callable" . function)))
+  (add-to-list 'marginalia-prompt-categories '("Callable" . function))
+  (add-to-list 'marginalia-censor-variables (rx "secret")))
 
 (elpaca nerd-icons-completion
   (nerd-icons-completion-mode)
