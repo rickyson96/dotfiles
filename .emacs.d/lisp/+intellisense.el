@@ -285,6 +285,7 @@ with IMENU-PATTERN"
   (with-eval-after-load 'project
     (ra/keymap-set project-prefix-map
       "c" #'projection-multi-compile
+      "C" #'project-compile
       "g" #'compile-multi-recompile)))
 (elpaca projection-multi-embark
   (projection-multi-embark-setup-command-map))
