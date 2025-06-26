@@ -252,23 +252,19 @@ with IMENU-PATTERN"
 (setopt sideline-backends-left '(sideline-lsp))
 (setopt sideline-backends-right '(sideline-flymake sideline-load-cost))
 
-;; (defun ra/compile-multi-parse-package-json ()
-;;   "Parse package.json file and format it to use with `compile-multi-config'."
-;;   (let* ((json-object-type 'alist)
-;;       (json-array-type 'list)
-;;       (default-directory (project-root (project-current)))
-;;       (buf (find-file-noselect "package.json"))
-;;       (content (with-current-buffer buf
-;;                  (beginning-of-buffer)
-;;                  (json-read)))
-;;       (scripts (alist-get 'scripts content)))
-;;  (mapcar (lambda (x)
-;;            (cons (format "yarn:%s" (car x)) (cdr x)))
-;;          scripts)))
+(defmacro ra/compile-multi-parse-package-json (runner)
+  "Parse package.json file and format it to use with `compile-multi-config'."
+  `(##seq-map (##cons (format "%s:%s" ,runner (symbol-name (car %)))
+                      (format "%s run %s" ,runner (car %)))
+              (let-alist (json-read-file "package.json") .scripts)))
 
 (elpaca compile-multi
   (setopt compile-multi-config `(((file-exists-p ".stowrc")
-                                  ("stow:stow" . ("stow" ".")))))
+                                  ("stow:stow" . ("stow" ".")))
+                                 ((seq-every-p #'file-exists-p '("package.json" "pnpm-lock.yaml"))
+                                  ,(ra/compile-multi-parse-package-json "pnpm"))
+                                 ((seq-every-p #'file-exists-p '("package.json" "package-lock.json"))
+                                  ,(ra/compile-multi-parse-package-json "npm"))))
   (setopt compile-multi-default-directory (##project-root (project-current))
           compile-multi-annotate-limit 120))
 (elpaca consult-compile-multi
