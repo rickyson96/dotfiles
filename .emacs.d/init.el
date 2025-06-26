@@ -72,6 +72,9 @@
 (elpaca llama
   (llama-fontify-mode +1))
 
+(elpaca s)
+(elpaca dash)
+
 ;; we need to wait for `no-littering' to install so that further
 ;; installation can conform to the no-littering directories
 (elpaca-wait)
